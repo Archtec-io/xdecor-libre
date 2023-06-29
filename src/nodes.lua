@@ -284,7 +284,7 @@ local xdecor_doors = {
 	prison = {
 		recipe = {
 			{"xpanes:bar_flat", "xpanes:bar_flat",},
-			{"xpanes:bar_flat", "xpanes:bar_flat",},
+			{"xpanes:bar_flat", "default:steel_ingot",},
 			{"xpanes:bar_flat", "xpanes:bar_flat"}
 		},
 		desc = S("Prison Door"),
