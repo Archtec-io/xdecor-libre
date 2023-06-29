@@ -627,17 +627,21 @@ xdecor.register("woodframed_glass", {
 	sounds = default.node_sound_glass_defaults()
 })
 
-for _, v in ipairs({"radio", "speaker"}) do
-	xdecor.register(v, {
-		description = v:gsub("^%l", string.upper),
+local devices = {
+	{ "radio", S("Radio") },
+	{ "speaker", S("Speaker") },
+}
+for _, v in pairs(devices) do
+	xdecor.register(v[1], {
+		description = v[2],
 		on_rotate = screwdriver.rotate_simple,
 		tiles = {
-			"xdecor_" .. v .. "_top.png",
-			"xdecor_" .. v .. "_side.png",
-			"xdecor_" .. v .. "_side.png",
-			"xdecor_" .. v .. "_side.png",
-			"xdecor_" .. v .. "_back.png",
-			"xdecor_" .. v .. "_front.png",
+			"xdecor_" .. v[1] .. "_top.png",
+			"xdecor_" .. v[1] .. "_side.png",
+			"xdecor_" .. v[1] .. "_side.png",
+			"xdecor_" .. v[1] .. "_side.png",
+			"xdecor_" .. v[1] .. "_back.png",
+			"xdecor_" .. v[1] .. "_front.png",
 		},
 		groups = {cracky = 2, not_cuttable = 1},
 	})
