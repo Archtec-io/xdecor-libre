@@ -24,7 +24,8 @@ register_pane("bamboo_frame", S("Bamboo Frame"), {
 		{"default:papyrus", "default:papyrus", "default:papyrus"},
 		{"default:papyrus", "farming:cotton",  "default:papyrus"},
 		{"default:papyrus", "default:papyrus", "default:papyrus"}
-	}
+	},
+	sounds = default.node_sound_wood_defaults(),
 })
 
 register_pane("chainlink", S("Chainlink"), {
@@ -43,7 +44,8 @@ register_pane("rusty_bar", S("Rusty Iron Bars"), {
 		{"", "default:dirt", ""},
 		{"default:steel_ingot", "default:steel_ingot", "default:steel_ingot"},
 		{"default:steel_ingot", "default:steel_ingot", "default:steel_ingot"}
-	}
+	},
+	sounds = default.node_sound_metal_defaults(),
 })
 
 register_pane("wood_frame", S("Wood Frame"), {
@@ -288,6 +290,11 @@ local xdecor_doors = {
 			{"xpanes:bar_flat", "xpanes:bar_flat"}
 		},
 		desc = S("Prison Door"),
+		sounds = default.node_sound_metal_defaults(),
+		sound_open = "xpanes_steel_bar_door_open",
+		sound_close = "xpanes_steel_bar_door_close",
+		gain_open = 0.18,
+		gain_close = 0.16,
 	},
 	rusty_prison = {
 		recipe = {
@@ -296,6 +303,11 @@ local xdecor_doors = {
 			{"xpanes:rusty_bar_flat", "xpanes:rusty_bar_flat"}
 		},
 		desc = S("Rusty Prison Door"),
+		sounds = default.node_sound_metal_defaults(),
+		sound_open = "xpanes_steel_bar_door_open",
+		sound_close = "xpanes_steel_bar_door_close",
+		gain_open = 0.21,
+		gain_close = 0.19,
 	},
 	screen = {
 		recipe = {
@@ -351,6 +363,11 @@ for name, def in pairs(xdecor_doors) do
 		},
 		description = def.desc,
 		inventory_image = "xdecor_" .. name .. "_door_inv.png",
+		sounds = def.sounds,
+		sound_open = def.sound_open,
+		sound_close = def.sound_close,
+		gain_open = def.gain_open,
+		gain_close = def.gain_close,
 		protected = door_access(name),
 		groups = {choppy = 2, cracky = 2, oddly_breakable_by_hand = 1, door = 1},
 		recipe = def.recipe,
@@ -407,6 +424,7 @@ xdecor.register("rooster", {
 	walkable = false,
 	groups = {snappy = 3, attached_node = 1},
 	tiles = {"xdecor_rooster.png"},
+	sounds = default.node_sound_metal_defaults(),
 })
 
 xdecor.register("lantern", {
@@ -424,7 +442,8 @@ xdecor.register("lantern", {
 			animation = {type="vertical_frames", length = 1.5}
 		}
 	},
-	selection_box = xdecor.pixelbox(16, {{4, 0, 4, 8, 16, 8}})
+	selection_box = xdecor.pixelbox(16, {{4, 0, 4, 8, 16, 8}}),
+	sounds = default.node_sound_metal_defaults(),
 })
 
 local xdecor_lightbox = {
@@ -460,7 +479,10 @@ for f, desc in pairs(xdecor_potted) do
 		tiles = {"xdecor_" .. f .. "_pot.png"},
 		inventory_image = "xdecor_" .. f .. "_pot.png",
 		drawtype = "plantlike",
-		sounds = default.node_sound_leaves_defaults(),
+		sounds = default.node_sound_leaves_defaults({
+			place = default.node_sound_stone_defaults().place,
+			dug = default.node_sound_stone_defaults().dug,
+		}),
 		selection_box = xdecor.nodebox.slab_y(0.3)
 	})
 
@@ -503,7 +525,8 @@ xdecor.register("painting_1", {
 		end
 
 		return itemstack
-	end
+	end,
+	sounds = default.node_sound_wood_defaults(),
 })
 
 for i = 2, 4 do
@@ -592,12 +615,13 @@ xdecor.register("trampoline", {
 	use_texture_alpha = ALPHA_CLIP,
 	groups = {cracky = 3, oddly_breakable_by_hand = 1, fall_damage_add_percent = -80, bouncy = 90},
 	node_box = xdecor.nodebox.slab_y(0.5),
-	sounds = {
+	sounds = default.node_sound_defaults({
 		footstep = {
 			name = "xdecor_bouncy",
 			gain = 0.8
-		}
-	}
+		},
+		dig = default.node_sound_wood_defaults().dig,
+	}),
 })
 
 xdecor.register("tv", {
@@ -614,7 +638,8 @@ xdecor.register("tv", {
 			name = "xdecor_television_front_animated.png",
 			animation = {type = "vertical_frames", length = 80.0}
 		}
-	}
+	},
+	sounds = default.node_sound_metal_defaults(),
 })
 
 xdecor.register("woodframed_glass", {
@@ -628,8 +653,8 @@ xdecor.register("woodframed_glass", {
 })
 
 local devices = {
-	{ "radio", S("Radio") },
-	{ "speaker", S("Speaker") },
+	{ "radio", S("Radio"), default.node_sound_metal_defaults() },
+	{ "speaker", S("Speaker"), default.node_sound_metal_defaults() },
 }
 for _, v in pairs(devices) do
 	xdecor.register(v[1], {
@@ -644,5 +669,6 @@ for _, v in pairs(devices) do
 			"xdecor_" .. v[1] .. "_front.png",
 		},
 		groups = {cracky = 2, not_cuttable = 1},
+		sounds = v[3],
 	})
 end

@@ -164,6 +164,7 @@ xdecor.register("cauldron_empty", {
 	groups = {cracky=2, oddly_breakable_by_hand=1},
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {"xdecor_cauldron_top_empty.png", "xdecor_cauldron_sides.png"},
+	sounds = default.node_sound_metal_defaults(),
 	infotext = S("Cauldron (empty)"),
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_rightclick = cauldron.filling,
@@ -177,6 +178,7 @@ xdecor.register("cauldron_idle", {
 	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {"xdecor_cauldron_top_idle.png", "xdecor_cauldron_sides.png"},
+	sounds = default.node_sound_metal_defaults(),
 	drop = "xdecor:cauldron_empty",
 	infotext = S("Cauldron (idle)"),
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
@@ -199,6 +201,7 @@ xdecor.register("cauldron_boiling", {
 		},
 		"xdecor_cauldron_sides.png"
 	},
+	sounds = default.node_sound_metal_defaults(),
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_rightclick = cauldron.filling,
 	on_construct = cauldron.boiling_construct,
@@ -222,6 +225,7 @@ xdecor.register("cauldron_soup", {
 		},
 		"xdecor_cauldron_sides.png"
 	},
+	sounds = default.node_sound_metal_defaults(),
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_rightclick = cauldron.take_soup,
 	on_destruct = function(pos)

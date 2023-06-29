@@ -60,7 +60,8 @@ xdecor.register("rope", {
 			minetest.get_player_privs(player_name).protection_bypass then
 			rope.remove(pos, node, puncher, "xdecor:rope")
 		end
-	end
+	end,
+	sounds = default.node_sound_leaves_defaults(),
 })
 
 -- Recipes
