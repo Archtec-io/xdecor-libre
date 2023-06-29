@@ -3,29 +3,29 @@
 
 ### chess.lua ###
 
-Black Bishop=schwarzer Läufer
-Black King=schwarter König
-Black Knight=schwarzes Pferd
-Black Pawn=schwarzer Bauer
-Black Queen=schwarze Dame
-Black Rook=schwarzer Turm
+Black Bishop=Schwarzer Läufer
+Black King=Schwarzer König
+Black Knight=Schwarzer Springer
+Black Pawn=Schwarzer Bauer
+Black Queen=Schwarze Dame
+Black Rook=Schwarzer Turm
 Chess=Schach
 Chess Board=Schachbrett
-Dumb AI=dumme KI
+Dumb AI=Dumme KI
 Multiplayer=Mehrspieler
-New game=neues Spiel
-Select a mode:=Wähle einen Modus:
+New game=Neues Spiel
+Select a mode:=Modus wählen:
 Singleplayer=Einzelspieler
 Someone else plays black pieces!=Jemand anderes spielt Schwarz!
 Someone else plays white pieces!=Jemand anderes spielt Weiß!
-White Bishop=weißer Läufer
-White King=weißer König
-White Knight=weißes Pferd
-White Pawn=weißer Bauer
-White Queen=weiße Dame
-White Rook=weißer Turm
-You can't dig the chessboard, a game has been started. Reset it first if you're a current player, or dig it again in @1=Das Schachbrett ist während eines Schachspieles nicht abbaubar. Setze das Spiel zurück, falls du ein Mitspieler bist oder versuche es in @1 erneut.
-You can't reset the chessboard, a game has been started. If you aren't a current player, try again in @1=Das Schachbrett kann nicht zurückgesetzt werden, da ein Spiel im Gang ist. Versuche es in @1 erneut, falls du kein Mitspieler bist.
+White Bishop=Weißer Läufer
+White King=Weißer König
+White Knight=Weißer Springer
+White Pawn=Weißer Bauer
+White Queen=Weiße Dame
+White Rook=Weißer Turm
+You can't dig the chessboard, a game has been started. Reset it first if you're a current player, or dig it again in @1=Das Schachbrett ist während eines Schachspieles nicht abbaubar. Setzen Sie das Spiel zurück, falls Sie ein Mitspieler sind oder versuchen Sie es in @1 erneut.
+You can't reset the chessboard, a game has been started. If you aren't a current player, try again in @1=Das Schachbrett kann nicht zurückgesetzt werden, da ein Spiel im Gang ist. Versuchen Sie es in @1 erneut, falls Sie kein Mitspieler sind.
 
 check=Schach
 
@@ -35,8 +35,8 @@ Bowl=Schüssel
 Bowl of soup=Suppenschüssel
 Cauldron=Kessel
 Cauldron (active)=Kessel (aktiv)
-Cauldron (active) - Drop foods inside to make a soup=Kessel (aktiv) - Nahrungsmittel einwerfen, um Suppe zu machen.
-Cauldron (active) - Use a bowl to eat the soup=Kessel (aktiv) - Benutze eine Schüssel, um die Suppe zu essen
+Cauldron (active) - Drop foods inside to make a soup=Kessel (aktiv) – Nahrungsmittel einwerfen, um Suppe zu machen.
+Cauldron (active) - Use a bowl to eat the soup=Kessel (aktiv) – Schüssel benutzen, um die Suppe zu essen
 Cauldron (empty)=Kessel (leer)
 Cauldron (idle)=Kessel (untätig)
 No room in your inventory to add a bowl of soup.=Zu wenig Platz im Inventar für eine Schüssel voll Suppe.
@@ -52,18 +52,18 @@ Efficiency=Effizienz
 Enchanted @1 @2 @3=verzauberte(s) @1@2 @3
 Enchantment Table=Zaubertisch
 Mese=Mese
-Pickaxe=Spitzhacke
+Pickaxe=spitzhacke
 Sharpness=Schärfe
-Shovel=Schaufel
+Shovel=schaufel
 Steel=Eisen
-Sword=Schwert
-Your tool digs faster=Dein Werkzeug arbeitet schneller
-Your tool last longer=Dein Werkzeug hält länger
-Your weapon inflicts more damages=Deine Waffe erzeugt mehr Schaden
+Sword=schwert
+Your tool digs faster=Ihr Werkzeug arbeitet schneller
+Your tool last longer=Ihr Werkzeug hält länger
+Your weapon inflicts more damages=Ihre Waffe richtet mehr Schaden an
 
 ### hive.lua ###
 
-Artificial Hive=künstlicher Bienenstock
+Artificial Hive=Künstlicher Bienenstock
 Bees are busy making honey…=Bienen sind beschäftigt, Honig herzustellen.
 Honey=Honig
 
@@ -75,68 +75,70 @@ Item Frame=Objektrahmen
 ### mailbox.lua ###
 
 @1's Mailbox=Briefkasten von @1
-Last donators=letzte Spender
+Last donators=Letzte Spender
 Mailbox=Briefkasten
-Send your goods to@n@1=Sende deine Waren an@n@1
+Send your goods to@n@1=Senden Sie Ihre Waren an@n@1
 The mailbox is full.=Der Briefkasten ist voll.
 
 ### mechanisms.lua ###
 
 Lever=Schalthebel
-Stone Pressure Plate=steinerne Druckplatte
-Wooden Pressure Plate=hölzerne Druckplatte
+Stone Pressure Plate=Steindruckplatte
+Wooden Pressure Plate=Holzdruckplatte
 
 ### nodes.lua ###
 
 Bamboo Frame=Bambusgerüst
 Baricade=Barrikade
 Barrel=Fass
-Cactus Brick=Kaktusstein
+Cactus Brick=Kaktusziegel
 Candle=Kerze
-Chainlink=Kettenvorhang
-Chair=einfacher Stuhl
-Coal Stone Tile=Kohle-Stein-Block
+Chainlink=Maschendraht
+Chair=Stuhl
+Coal Stone Tile=Kohlesteinkachel
 Cobweb=Spinnenwebe
 Cushion=Sitzkissen
 Cushion Block=Sitzkissenblock
 Desert Stone Tile=Wüstensteinblock
-Empty Shelf=leeres Regal
+Empty Shelf=Leeres Regal
 Ender Chest=Endertruhe
 Garden Stone Path=Steingartenweg
-Half Wooden Cabinet=halber Holzschrank
-Hardened Clay=gehärteter Ton
-Iron Light Box=eiseneingefasster Lichtblock
+Half Wooden Cabinet=Halber Holzschrank
+Hardened Clay=Gehärteter Ton
+Iron Light Box=Eiseneingefasster Lichtblock
 Ivy=Efeu
-Japanese Door=japanische Tür
+Japanese Door=Japanische Tür
 Lantern=Laterne
 Moon Brick=Naturziegelwand
 Multi Shelf=Mehrzweckregal
 Packed Ice=Packeis
 Painting=Gemälde
-Potted Geranium=Geranien im Topf
-Potted Rose=Rosen im Topf
-Potted Tulip=Tulpen im Topf
-Potted Viola=Veilchen im Topf
-Potted White Dandelion=weißer Löwenzahn im Topf
-Potted Yellow Dandelion=gelber Löwenzahn im Topf
+Potted Geranium=Geranie im Topf
+Potted Rose=Rose im Topf
+Potted Tulip=Tulpe im Topf
+Potted Viola=Veilche im Topf
+Potted White Dandelion=Weißer Löwenzahn im Topf
+Potted Yellow Dandelion=Gelber Löwenzahn im Topf
 Prison Door=Verliestür
-Red Curtain=roter Vorhang
+Red Curtain=Roter Vorhang
 Runestone=Runensteinblock
-Rusty Iron Bars=rostige Eisenstäbe
-Rusty Prison Door=rostige Verliestür
-Screen Door=französische Glastür
+Rusty Iron Bars=Rostige Eisenstäbe
+Rusty Prison Door=Rostige Verliestür
+Screen Door=Französische Glastür
 Slide Door=Schiebetür
-Stone Tile=steinerner Block
-Table=einfacher Tisch
+Stone Tile=Steinkachel
+Table=Tisch
 Tatami=Tatamimatte
 Television=Fernseher
 Trampoline=Trampolin
-Wood Frame=hölzerner Zierrahmen
-Wood Framed Glass=holzeingefasstes Glas
+Wood Frame=Holzrahmen
+Wood Framed Glass=Holzeingefasstes Glas
 Wooden Cabinet=Holzschrank
-Wooden Light Box=holzeingefasster Lichtblock
-Wooden Tile=hölzerner Dekorblock
+Wooden Light Box=Holzeingefasster Lichtblock
+Wooden Light Box 2=Holzeingefasster Lichtblock 2
+Wooden Tile=Holzkachel
 Woodglass Door=Tür mit Lichtausschnitt
+Rooster=Hahn
 
 ### rope.lua ###
 
@@ -147,7 +149,7 @@ Rope=Seil
 Back=Zurück
 Crafting=Fertigung
 Cut=Zuschnitt
-Hammer=Hämmerchen
+Hammer=Hammer
 Repair=Reparatur
 Storage=Aufbewahrung
 Work Bench=Werkbank
