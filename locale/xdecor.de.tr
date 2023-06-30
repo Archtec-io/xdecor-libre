@@ -1,156 +1,166 @@
 # textdomain: xdecor
 
-
-### chess.lua ###
-
-Black Bishop=Schwarzer Läufer
-Black King=Schwarzer König
-Black Knight=Schwarzer Springer
-Black Pawn=Schwarzer Bauer
-Black Queen=Schwarze Dame
-Black Rook=Schwarzer Turm
 Chess=Schach
 Chess Board=Schachbrett
+Someone else plays white pieces!=Jemand anderes spielt Weiß!
+Someone else plays black pieces!=Jemand anderes spielt Schwarz!
 Dumb AI=Dumme KI
-Multiplayer=Mehrspieler
-New game=Neues Spiel
+You can't reset the chessboard, a game has been started. If you aren't a current player, try again in @1=Das Schachbrett kann nicht zurückgesetzt werden, da ein Spiel im Gang ist. Versuchen Sie es in @1 erneut, falls Sie kein Mitspieler sind.
+You can't dig the chessboard, a game has been started. Reset it first if you're a current player, or dig it again in @1=Das Schachbrett ist während eines Schachspieles nicht abbaubar. Setzen Sie das Spiel zurück, falls Sie ein Mitspieler sind oder versuchen Sie es in @1 erneut.
+White Pawn=Weißer Bauer
+Black Pawn=Schwarzer Bauer
+White Rook=Weißer Turm
+Black Rook=Schwarzer Turm
+White Knight=Weißer Springer
+Black Knight=Schwarzer Springer
+White Bishop=Weißer Läufer
+Black Bishop=Schwarzer Läufer
+White Queen=Weiße Dame
+Black Queen=Schwarze Dame
+White King=Weißer König
+Black King=Schwarzer König
 Select a mode:=Modus wählen:
 Singleplayer=Einzelspieler
-Someone else plays black pieces!=Jemand anderes spielt Schwarz!
-Someone else plays white pieces!=Jemand anderes spielt Weiß!
-White Bishop=Weißer Läufer
-White King=Weißer König
-White Knight=Weißer Springer
-White Pawn=Weißer Bauer
-White Queen=Weiße Dame
-White Rook=Weißer Turm
-You can't dig the chessboard, a game has been started. Reset it first if you're a current player, or dig it again in @1=Das Schachbrett ist während eines Schachspieles nicht abbaubar. Setzen Sie das Spiel zurück, falls Sie ein Mitspieler sind oder versuchen Sie es in @1 erneut.
-You can't reset the chessboard, a game has been started. If you aren't a current player, try again in @1=Das Schachbrett kann nicht zurückgesetzt werden, da ein Spiel im Gang ist. Versuchen Sie es in @1 erneut, falls Sie kein Mitspieler sind.
-
+Multiplayer=Mehrspieler
+New game=Neues Spiel
 check=Schach
-
-### cooking.lua ###
-
-Bowl=Schüssel
-Bowl of soup=Suppenschüssel
-Cauldron=Kessel
-Cauldron (active)=Kessel (aktiv)
-Cauldron (active) - Drop foods inside to make a soup=Kessel (aktiv) – Nahrungsmittel einwerfen, um Suppe zu machen.
-Cauldron (active) - Use a bowl to eat the soup=Kessel (aktiv) – Schüssel benutzen, um die Suppe zu essen
 Cauldron (empty)=Kessel (leer)
 Cauldron (idle)=Kessel (untätig)
-No room in your inventory to add a bowl of soup.=Zu wenig Platz im Inventar für eine Schüssel voll Suppe.
+Cauldron (active) - Drop foods inside to make a soup=Kessel (aktiv) – Nahrungsmittel einwerfen, um Suppe zu machen.
+Cauldron (active) - Use a bowl to eat the soup=Kessel (aktiv) – Schüssel benutzen, um die Suppe zu essen
 No room in your inventory to add a bucket of water.=Zu wenig Platz im Inventar für einen Eimer Wasser.
-
-### enchanting.lua ###
-
-Axe=axt
-Bronze=Bronze
-Diamond=Diamant
-Durability=Haltbarkeit
+No room in your inventory to add a bowl of soup.=Zu wenig Platz im Inventar für eine Schüssel voll Suppe.
+Cauldron=Kessel
+Cauldron with Water (idle)=
+Cauldron with River Water (idle)=
+Cauldron with Water (active)=
+Cauldron with River Water (active)=
+Cauldron with Soup (active)=
+Bowl=Schüssel
+Bowl of soup=Suppenschüssel
 Efficiency=Effizienz
-Enchanted @1 @2=@1@2 (verzaubert)
-Enchanted @1 @2@n@3=@1@2 (verzaubert)@n@3
-Enchantment Table=Zaubertisch
-Mese=Mese
-Pickaxe=spitzhacke
+Durability=Haltbarkeit
 Sharpness=Schärfe
-Shovel=schaufel
+Enchantment Table=Zaubertisch
+Enchanted @1 @2@n@3=@1@2 (verzaubert)@n@3
+Enchanted @1 @2=@1@2 (verzaubert)
 Steel=Eisen
+Bronze=Bronze
+Mese=Mese
+Diamond=Diamant
+Axe=axt
+Pickaxe=spitzhacke
+Shovel=schaufel
 Sword=schwert
-Your tool digs faster=Ihr Werkzeug arbeitet schneller
-Your tool last longer=Ihr Werkzeug hält länger
 Your weapon inflicts more damages=Ihre Waffe richtet mehr Schaden an
-
-### hive.lua ###
-
+Your tool last longer=Ihr Werkzeug hält länger
+Your tool digs faster=Ihr Werkzeug arbeitet schneller
 Artificial Hive=Künstlicher Bienenstock
-Bees are busy making honey…=Bienen sind beschäftigt, Honig herzustellen.
 Honey=Honig
-
-### itemframe.lua ###
-
+The bees are busy making honey.=
+The bees are looking for flowers.=
+The bees want to pollinate more flowers.=
+The bees are idle.=
+The bees are resting.=
 @1 (owned by @2)=@1 (gehört @2)
 Item Frame=Objektrahmen
-
-### mailbox.lua ###
-
 @1's Mailbox=Briefkasten von @1
-Last donators=Letzte Spender
-Mailbox=Briefkasten
-Send your goods to@n@1=Senden Sie Ihre Waren an@n@1
 The mailbox is full.=Der Briefkasten ist voll.
-
-### mechanisms.lua ###
-
-Lever=Schalthebel
-Stone Pressure Plate=Steindruckplatte
+Mailbox=Briefkasten
+× @1=
+Last donators=Letzte Spender
+Send your goods to@n@1=Senden Sie Ihre Waren an@n@1
 Wooden Pressure Plate=Holzdruckplatte
-
-### nodes.lua ###
-
+Stone Pressure Plate=Steindruckplatte
+Lever=Schalthebel
 Bamboo Frame=Bambusgerüst
+Chainlink=Maschendraht
+Rusty Iron Bars=Rostige Eisenstäbe
+Wood Frame=Holzrahmen
 Barricade=Barrikade
 Barrel=Fass
-Cactus Brick=Kaktusziegel
+Wooden Cabinet=Holzschrank
+Half Wooden Cabinet=Halber Holzschrank
+Plain Shelf=
+Multi Shelf=Mehrzweckregal
 Candle=Kerze
-Chainlink=Maschendraht
 Chair=Stuhl
-Coal Stone Tile=Kohlesteinkachel
 Cobweb=Spinnenwebe
+Red Curtain=Roter Vorhang
 Cushion=Sitzkissen
 Cushion Block=Sitzkissenblock
-Desert Stone Tile=Wüstensteinblock
-Empty Shelf=Leeres Regal
-Ender Chest=Endertruhe
-Garden Stone Path=Steingartenweg
-Half Wooden Cabinet=Halber Holzschrank
-Hardened Clay=Gehärteter Ton
-Iron Light Box=Eiseneingefasster Lichtblock
-Ivy=Efeu
 Japanese Door=Japanische Tür
+Prison Door=Verliestür
+Rusty Prison Door=Rostige Verliestür
+Screen Door=Französische Glastür
+Paper Door=
+Woodglass Door=Tür mit Lichtausschnitt
+Ender Chest=Endertruhe
+Ivy=Efeu
+Weathercock=
 Lantern=Laterne
-Moon Brick=Naturziegelwand
-Multi Shelf=Mehrzweckregal
-Packed Ice=Packeis
-Painting=Gemälde
+Hanging Lantern=
+Steel Lattice Light Box=
+Wooden Cross Light Box=
+Wooden Rhombus Light Box=
+Potted White Dandelion=Weißer Löwenzahn im Topf
+Potted Yellow Dandelion=Gelber Löwenzahn im Topf
 Potted Geranium=Geranie im Topf
 Potted Rose=Rose im Topf
 Potted Tulip=Tulpe im Topf
 Potted Viola=Veilche im Topf
-Potted White Dandelion=Weißer Löwenzahn im Topf
-Potted Yellow Dandelion=Gelber Löwenzahn im Topf
-Prison Door=Verliestür
-Red Curtain=Roter Vorhang
+Painting=Gemälde
+Garden Stone Path=Steingartenweg
+Cactus Brick=Kaktusziegel
+Coal Stone Tile=Kohlesteinkachel
+Polished Desert Stone Block=
+Hardened Clay=Gehärteter Ton
+Moon Brick=Naturziegelwand
+Polished Stone Block=
 Runestone=Runensteinblock
-Rusty Iron Bars=Rostige Eisenstäbe
-Rusty Prison Door=Rostige Verliestür
-Screen Door=Französische Glastür
-Slide Door=Schiebetür
-Stone Tile=Steinkachel
+Packed Ice=Packeis
+Wooden Tile=Holzkachel
 Table=Tisch
 Tatami=Tatamimatte
-Television=Fernseher
 Trampoline=Trampolin
-Wood Frame=Holzrahmen
+Television=Fernseher
 Wood Framed Glass=Holzeingefasstes Glas
-Wooden Cabinet=Holzschrank
+Radio=
+Speaker=
+@1 Stair=
+@1 Slab=
+Rope=Seil
+Nanoslab=
+Micropanel=
+Microslab=
+Thin Stair=
+Cube=
+Panel=
+Slab=
+Double Panel=
+Half-Stair=
+Outer Stair=
+Stair=
+Inner Stair=
+Work Bench=Werkbank
+@1 @2=
+Hammer=Hammer
+Cut=Zuschnitt
+Repair=Reparatur
+Crafting=Fertigung
+Storage=Aufbewahrung
+Back=Zurück
+
+
+##### not used anymore #####
+
+Cauldron (active)=Kessel (aktiv)
+Bees are busy making honey…=Bienen sind beschäftigt, Honig herzustellen.
+Desert Stone Tile=Wüstensteinblock
+Empty Shelf=Leeres Regal
+Iron Light Box=Eiseneingefasster Lichtblock
+Slide Door=Schiebetür
+Stone Tile=Steinkachel
 Wooden Light Box=Holzeingefasster Lichtblock
 Wooden Light Box 2=Holzeingefasster Lichtblock 2
-Wooden Tile=Holzkachel
-Woodglass Door=Tür mit Lichtausschnitt
 Rooster=Hahn
-
-### rope.lua ###
-
-Rope=Seil
-
-### workbench.lua ###
-
-Back=Zurück
-Crafting=Fertigung
-Cut=Zuschnitt
-Hammer=Hammer
-Repair=Reparatur
-Storage=Aufbewahrung
-Work Bench=Werkbank

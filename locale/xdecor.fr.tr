@@ -1,156 +1,164 @@
 # textdomain: xdecor
 
-
-### chess.lua ###
-
-Black Bishop=Fou noir
-Black King=Roi noir
-Black Knight=Cavalier noir
-Black Pawn=Pion noir
-Black Queen=Reine noire
-Black Rook=Tour noire
 Chess=Echecs
 Chess Board=Echiquier
+Someone else plays white pieces!=Quelqu’un d’autre joue les pièces blanches !
+Someone else plays black pieces!=Quelqu’un d’autre joue les pièces noires !
 Dumb AI=IA stupide
-Multiplayer=Multijoueur
-New game=Nouvelle partie
+You can't reset the chessboard, a game has been started. If you aren't a current player, try again in @1=Vous ne pouvez pas mettre à zéro l’échiquier, une partie a été commencée. Si ce n’est pas votre tour de jouer, réessayez dans @1
+You can't dig the chessboard, a game has been started. Reset it first if you're a current player, or dig it again in @1=Vous ne pouvez pas récupérer l’échiquier, une partie à été commencée. Remettez le à zéro si vous c’est votre tour de jouer, ou réessayez dans @1
+White Pawn=Pion blanc
+Black Pawn=Pion noir
+White Rook=Tour blanche
+Black Rook=Tour noire
+White Knight=Cavalier blanc
+Black Knight=Cavalier noir
+White Bishop=Fou blanc
+Black Bishop=Fou noir
+White Queen=Reine blanche
+Black Queen=Reine noire
+White King=Roi blanc
+Black King=Roi noir
 Select a mode:=Sélectionnez un mode de jeu:
 Singleplayer=Solo
-Someone else plays black pieces!=Quelqu’un d’autre joue les pièces noires !
-Someone else plays white pieces!=Quelqu’un d’autre joue les pièces blanches !
-White Bishop=Fou blanc
-White King=Roi blanc
-White Knight=Cavalier blanc
-White Pawn=Pion blanc
-White Queen=Reine blanche
-White Rook=Tour blanche
-
-You can't dig the chessboard, a game has been started. Reset it first if you're a current player, or dig it again in @1=Vous ne pouvez pas récupérer l’échiquier, une partie à été commencée. Remettez le à zéro si vous c’est votre tour de jouer, ou réessayez dans @1
-
-You can't reset the chessboard, a game has been started. If you aren't a current player, try again in @1=Vous ne pouvez pas mettre à zéro l’échiquier, une partie a été commencée. Si ce n’est pas votre tour de jouer, réessayez dans @1
-
+Multiplayer=Multijoueur
+New game=Nouvelle partie
 check=échec
-
-### cooking.lua ###
-
-Bowl=Bol
-Bowl of soup=Bol de soupe
-Cauldron=Chaudron
-Cauldron (active)=Chaudron (actif)
-Cauldron (active) - Drop foods inside to make a soup=Chaudron (actif) - Placez des ingrédients à l’intérieur pour faire une soupe
-Cauldron (active) - Use a bowl to eat the soup=Chaudron (actif) - Utilisez un bol pour boire la soupe
 Cauldron (empty)=Chaudron (vide)
 Cauldron (idle)=Chaudron (inactif)
-No room in your inventory to add a bowl of soup.=Pas de place dans votre inventaire pour ajouter un bol de soupe.
+Cauldron (active) - Drop foods inside to make a soup=Chaudron (actif) - Placez des ingrédients à l’intérieur pour faire une soupe
+Cauldron (active) - Use a bowl to eat the soup=Chaudron (actif) - Utilisez un bol pour boire la soupe
 No room in your inventory to add a bucket of water.=Pas de place dans votre inventaire pour ajouter un seau d’eau.
-
-### enchanting.lua ###
-
-Axe=Hache
-Bronze=Bronze
-Diamond=Diamant
-Durability=Durabilité
+No room in your inventory to add a bowl of soup.=Pas de place dans votre inventaire pour ajouter un bol de soupe.
+Cauldron=Chaudron
+Cauldron with Water (idle)=
+Cauldron with River Water (idle)=
+Cauldron with Water (active)=
+Cauldron with River Water (active)=
+Cauldron with Soup (active)=
+Bowl=Bol
+Bowl of soup=Bol de soupe
 Efficiency=Efficacité
-Enchanted @1 @2=@2 en @1 enchantée
-Enchanted @1 @2@n@3=@2 en @1 enchantée@n@3
-Enchantment Table=Table d’enchantements
-Mese=Mese
-Pickaxe=Pioche
+Durability=Durabilité
 Sharpness=Tranchant
-Shovel=Pelle
+Enchantment Table=Table d’enchantements
+Enchanted @1 @2@n@3=@2 en @1 enchantée@n@3
+Enchanted @1 @2=@2 en @1 enchantée
 Steel=Fer
+Bronze=Bronze
+Mese=Mese
+Diamond=Diamant
+Axe=Hache
+Pickaxe=Pioche
+Shovel=Pelle
 Sword=Épée
-Your tool digs faster=Votre outil creuse plus vite
-Your tool last longer=Votre outil dure plus longtemps
 Your weapon inflicts more damages=Votre arme inflige plus de dégâts
-
-### hive.lua ###
-
+Your tool last longer=Votre outil dure plus longtemps
+Your tool digs faster=Votre outil creuse plus vite
 Artificial Hive=Ruche artificielle
-Bees are busy making honey…=Les abeilles sont occupées à fabriquer du miel…
 Honey=Miel
-
-### itemframe.lua ###
-
+The bees are busy making honey.=
+The bees are looking for flowers.=
+The bees want to pollinate more flowers.=
+The bees are idle.=
+The bees are resting.=
 @1 (owned by @2)=@1 (propriété de @2)
 Item Frame=Cadre
-
-### mailbox.lua ###
-
 @1's Mailbox=Boite aux lettres de @1
-Last donators=Derniers donateurs
-Mailbox=Boite aux lettres
-Send your goods to@n@1=Envoyer vos biens à@n@1
 The mailbox is full.=La boite aux lettres est pleine.
-
-### mechanisms.lua ###
-
-Lever=Levier
-Stone Pressure Plate=Plaque de pression en pierre
+Mailbox=Boite aux lettres
+× @1=
+Last donators=Derniers donateurs
+Send your goods to@n@1=Envoyer vos biens à@n@1
 Wooden Pressure Plate=Plaque de pression en bois
-
-### nodes.lua ###
-
+Stone Pressure Plate=Plaque de pression en pierre
+Lever=Levier
 Bamboo Frame=Cadre en bambou
+Chainlink=Maillon de chaîne
+Rusty Iron Bars=Barreaux en fer rouillé
+Wood Frame=Cadre en bois
 Barricade=Barricade
 Barrel=Tonneau
-Cactus Brick=Brique en cactus
+Wooden Cabinet=Meuble en bois
+Half Wooden Cabinet=Demi meuble en bois
+Plain Shelf=
+Multi Shelf=Étagères multiple
 Candle=Bougie
-Chainlink=Maillon de chaîne
 Chair=Chaise
-Coal Stone Tile=Carreau en charbon et pierre
 Cobweb=Toile d’araignée
+Red Curtain=Rideaux rouge
 Cushion=Coussin
 Cushion Block=Bloc de coussin
-Desert Stone Tile=Carreau en pierre du désert
-Empty Shelf=Étagère vide
-Ender Chest=Coffre de l’End
-Garden Stone Path=Chemin de pierres de jardin
-Half Wooden Cabinet=Demi meuble en bois
-Hardened Clay=Argile durcie
-Iron Light Box=Boite lumineuse en fer
-Ivy=Lierre
 Japanese Door=Porte japonaise
+Prison Door=Porte de prison
+Rusty Prison Door=Barreaux de prison rouillés
+Screen Door=Porte avec moustiquaire
+Paper Door=
+Woodglass Door=Porte vitrée
+Ender Chest=Coffre de l’End
+Ivy=Lierre
+Weathercock=
 Lantern=Lanterne
-Moon Brick=Brique lunaire
-Multi Shelf=Étagères multiple
-Packed Ice=Glace compactée
-Painting=Tableau
+Hanging Lantern=
+Steel Lattice Light Box=
+Wooden Cross Light Box=
+Wooden Rhombus Light Box=
+Potted White Dandelion=Pissenlit blanc en pot
+Potted Yellow Dandelion=Pissenlit jaune en pot
 Potted Geranium=Géranium en pot
 Potted Rose=Rose en pot
 Potted Tulip=Tulipe en pot
 Potted Viola=Violette en pot
-Potted White Dandelion=Pissenlit blanc en pot
-Potted Yellow Dandelion=Pissenlit jaune en pot
-Prison Door=Porte de prison
-Red Curtain=Rideaux rouge
+Painting=Tableau
+Garden Stone Path=Chemin de pierres de jardin
+Cactus Brick=Brique en cactus
+Coal Stone Tile=Carreau en charbon et pierre
+Polished Desert Stone Block=
+Hardened Clay=Argile durcie
+Moon Brick=Brique lunaire
+Polished Stone Block=
 Runestone=Pierre runique
-Rusty Iron Bars=Barreaux en fer rouillé
-Rusty Prison Door=Barreaux de prison rouillés
-Screen Door=Porte avec moustiquaire
-Slide Door=Porte coulissante
-Stone Tile=Carreau en pierre
+Packed Ice=Glace compactée
+Wooden Tile=Carreau en bois
 Table=Table
 Tatami=Tatami
-Television=Télévision
 Trampoline=Trampoline
-Wood Frame=Cadre en bois
+Television=Télévision
 Wood Framed Glass=Verre encadré par du bois
-Wooden Cabinet=Meuble en bois
-Wooden Light Box=Boite lumineuse en bois
-Wooden Tile=Carreau en bois
-Woodglass Door=Porte vitrée
-
-### rope.lua ###
-
+Radio=
+Speaker=
+@1 Stair=
+@1 Slab=
 Rope=Corde
-
-### workbench.lua ###
-
-Back=Retour
-Crafting=Fabrication
-Cut=Couper
-Hammer=Marteau
-Repair=Réparer
-Storage=Stockage
+Nanoslab=
+Micropanel=
+Microslab=
+Thin Stair=
+Cube=
+Panel=
+Slab=
+Double Panel=
+Half-Stair=
+Outer Stair=
+Stair=
+Inner Stair=
 Work Bench=Atelier
+@1 @2=
+Hammer=Marteau
+Cut=Couper
+Repair=Réparer
+Crafting=Fabrication
+Storage=Stockage
+Back=Retour
+
+
+##### not used anymore #####
+
+Cauldron (active)=Chaudron (actif)
+Bees are busy making honey…=Les abeilles sont occupées à fabriquer du miel…
+Desert Stone Tile=Carreau en pierre du désert
+Empty Shelf=Étagère vide
+Iron Light Box=Boite lumineuse en fer
+Slide Door=Porte coulissante
+Stone Tile=Carreau en pierre
+Wooden Light Box=Boite lumineuse en bois

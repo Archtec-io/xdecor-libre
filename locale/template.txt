@@ -1,156 +1,152 @@
 # textdomain: xdecor
 
-
-### chess.lua ###
-
-Black Bishop=
-Black King=
-Black Knight=
-Black Pawn=
-Black Queen=
-Black Rook=
 Chess=
 Chess Board=
+Someone else plays white pieces!=
+Someone else plays black pieces!=
 Dumb AI=
-Multiplayer=
-New game=
+You can't reset the chessboard, a game has been started. If you aren't a current player, try again in @1=
+You can't dig the chessboard, a game has been started. Reset it first if you're a current player, or dig it again in @1=
+White Pawn=
+Black Pawn=
+White Rook=
+Black Rook=
+White Knight=
+Black Knight=
+White Bishop=
+Black Bishop=
+White Queen=
+Black Queen=
+White King=
+Black King=
 Select a mode:=
 Singleplayer=
-Someone else plays black pieces!=
-Someone else plays white pieces!=
-White Bishop=
-White King=
-White Knight=
-White Pawn=
-White Queen=
-White Rook=
-
-You can't dig the chessboard, a game has been started. Reset it first if you're a current player, or dig it again in @1=
-
-You can't reset the chessboard, a game has been started. If you aren't a current player, try again in @1=
-
+Multiplayer=
+New game=
 check=
-
-### cooking.lua ###
-
-Bowl=
-Bowl of soup=
-Cauldron=
-Cauldron (active)=
-Cauldron (active) - Drop foods inside to make a soup=
-Cauldron (active) - Use a bowl to eat the soup=
 Cauldron (empty)=
 Cauldron (idle)=
-No room in your inventory to add a bowl of soup.=
+Cauldron (active) - Drop foods inside to make a soup=
+Cauldron (active) - Use a bowl to eat the soup=
 No room in your inventory to add a bucket of water.=
-
-### enchanting.lua ###
-
-Axe=
-Bronze=
-Diamond=
-Durability=
+No room in your inventory to add a bowl of soup.=
+Cauldron=
+Cauldron with Water (idle)=
+Cauldron with River Water (idle)=
+Cauldron with Water (active)=
+Cauldron with River Water (active)=
+Cauldron with Soup (active)=
+Bowl=
+Bowl of soup=
 Efficiency=
-Enchanted @1 @2=
-Enchanted @1 @2@n@3=
-Enchantment Table=
-Mese=
-Pickaxe=
+Durability=
 Sharpness=
-Shovel=
+Enchantment Table=
+Enchanted @1 @2@n@3=
+Enchanted @1 @2=
 Steel=
+Bronze=
+Mese=
+Diamond=
+Axe=
+Pickaxe=
+Shovel=
 Sword=
-Your tool digs faster=
-Your tool last longer=
 Your weapon inflicts more damages=
-
-### hive.lua ###
-
+Your tool last longer=
+Your tool digs faster=
 Artificial Hive=
-Bees are busy making honey…=
 Honey=
-
-### itemframe.lua ###
-
+The bees are busy making honey.=
+The bees are looking for flowers.=
+The bees want to pollinate more flowers.=
+The bees are idle.=
+The bees are resting.=
 @1 (owned by @2)=
 Item Frame=
-
-### mailbox.lua ###
-
 @1's Mailbox=
-Last donators=
-Mailbox=
-Send your goods to@n@1=
 The mailbox is full.=
-
-### mechanisms.lua ###
-
-Lever=
-Stone Pressure Plate=
+Mailbox=
+× @1=
+Last donators=
+Send your goods to@n@1=
 Wooden Pressure Plate=
-
-### nodes.lua ###
-
+Stone Pressure Plate=
+Lever=
 Bamboo Frame=
+Chainlink=
+Rusty Iron Bars=
+Wood Frame=
 Barricade=
 Barrel=
-Cactus Brick=
+Wooden Cabinet=
+Half Wooden Cabinet=
+Plain Shelf=
+Multi Shelf=
 Candle=
-Chainlink=
 Chair=
-Coal Stone Tile=
 Cobweb=
+Red Curtain=
 Cushion=
 Cushion Block=
-Desert Stone Tile=
-Empty Shelf=
-Ender Chest=
-Garden Stone Path=
-Half Wooden Cabinet=
-Hardened Clay=
-Iron Light Box=
-Ivy=
 Japanese Door=
+Prison Door=
+Rusty Prison Door=
+Screen Door=
+Paper Door=
+Woodglass Door=
+Ender Chest=
+Ivy=
+Weathercock=
 Lantern=
-Moon Brick=
-Multi Shelf=
-Packed Ice=
-Painting=
+Hanging Lantern=
+Steel Lattice Light Box=
+Wooden Cross Light Box=
+Wooden Rhombus Light Box=
+Potted White Dandelion=
+Potted Yellow Dandelion=
 Potted Geranium=
 Potted Rose=
 Potted Tulip=
 Potted Viola=
-Potted White Dandelion=
-Potted Yellow Dandelion=
-Prison Door=
-Red Curtain=
+Painting=
+Garden Stone Path=
+Cactus Brick=
+Coal Stone Tile=
+Polished Desert Stone Block=
+Hardened Clay=
+Moon Brick=
+Polished Stone Block=
 Runestone=
-Rusty Iron Bars=
-Rusty Prison Door=
-Screen Door=
-Slide Door=
-Stone Tile=
+Packed Ice=
+Wooden Tile=
 Table=
 Tatami=
-Television=
 Trampoline=
-Wood Frame=
+Television=
 Wood Framed Glass=
-Wooden Cabinet=
-Wooden Light Box=
-Wooden Tile=
-Woodglass Door=
-
-### rope.lua ###
-
+Radio=
+Speaker=
+@1 Stair=
+@1 Slab=
 Rope=
-
-### workbench.lua ###
-
-Back=
-Crafting=
-Cut=
-Hammer=
-Repair=
-Storage=
+Nanoslab=
+Micropanel=
+Microslab=
+Thin Stair=
+Cube=
+Panel=
+Slab=
+Double Panel=
+Half-Stair=
+Outer Stair=
+Stair=
+Inner Stair=
 Work Bench=
+@1 @2=
+Hammer=
+Cut=
+Repair=
+Crafting=
+Storage=
+Back=
