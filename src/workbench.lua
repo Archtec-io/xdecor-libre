@@ -295,6 +295,14 @@ for i = 1, #nodes do
 			tiles = {def.tile_images[1]}
 		end
 
+		-- Erase `tileable_vertical=false` from tiles because it
+		-- lead to buggy textures (e.g. with default:permafrost_with_moss)
+		for t=1, #tiles do
+			if type(tiles[t]) == "table" and tiles[t].tileable_vertical == false then
+				tiles[t].tileable_vertical = nil
+			end
+		end
+
 		if not minetest.registered_nodes["stairs:slab_" .. item_name] then
 			stairs.register_stair_and_slab(item_name, node,
 				groups, tiles, S("@1 Stair", def.description),
