@@ -397,7 +397,7 @@ for name, def in pairs(xdecor_doors) do
 		gain_open = def.gain_open,
 		gain_close = def.gain_close,
 		protected = door_access(name),
-		groups = {choppy = 2, cracky = 2, oddly_breakable_by_hand = 1, door = 1},
+		groups = {choppy = 2, cracky = 2, oddly_breakable_by_hand = 1, door = 1, node = 1},
 		recipe = def.recipe,
 		mesecons = mesecons_register,
 	})
