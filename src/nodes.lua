@@ -441,15 +441,16 @@ xdecor.register("rooster", {
 	sounds = default.node_sound_metal_defaults(),
 })
 
+-- Lantern which attaches to the floor.
+-- Has a hanging variant
 xdecor.register("lantern", {
 	description = S("Lantern"),
 	light_source = 13,
 	drawtype = "plantlike",
 	inventory_image = "xdecor_lantern_inv.png",
 	wield_image = "xdecor_lantern_inv.png",
-	paramtype2 = "wallmounted",
 	walkable = false,
-	groups = {snappy = 3, attached_node = 1},
+	groups = {snappy = 3, attached_node = 3},
 	tiles = {
 		{
 			name = "xdecor_lantern.png",
@@ -458,6 +459,86 @@ xdecor.register("lantern", {
 	},
 	selection_box = xdecor.pixelbox(16, {{4, 0, 4, 8, 16, 8}}),
 	sounds = default.node_sound_metal_defaults(),
+	on_place = function(itemstack, placer, pointed_thing)
+		-- Decide whether the lantern attaches the the floor
+		-- (default) or the ceiling.
+		if pointed_thing.type ~= "node" then
+			return
+		end
+		local leftover, place_pos, nodename
+		local up = vector.new(pointed_thing.above.x, pointed_thing.above.y+1, pointed_thing.above.z)
+		local upnode = minetest.get_node(up)
+		local updef = minetest.registered_nodes[upnode.name]
+		local down = vector.new(pointed_thing.above.x, pointed_thing.above.y-1, pointed_thing.above.z)
+		local downnode = minetest.get_node(down)
+		local downdef = minetest.registered_nodes[downnode.name]
+		if pointed_thing.under.y > pointed_thing.above.y then
+			nodename = "xdecor:lantern_hanging"
+		elseif downdef and not downdef.walkable and updef and updef.walkable then
+			nodename = "xdecor:lantern_hanging"
+		else
+			nodename = "xdecor:lantern"
+		end
+		leftover, place_pos = minetest.item_place_node(ItemStack(nodename), placer, pointed_thing)
+		if place_pos == nil then
+			return
+		end
+		if leftover:get_count() == 0 and
+				not minetest.setting_getbool("creative_mode") then
+			itemstack:take_item()
+		end
+
+		-- Play 'place' sound manually if needed
+		if nodename == "xdecor:lantern_hanging" then
+			minetest.sound_play(default.node_sound_metal_defaults().place, {pos=place_pos}, true)
+		end
+
+		return itemstack
+	end,
+})
+
+-- Same as lantern, but attaches to ceiling
+xdecor.register("lantern_hanging", {
+	description = S("Hanging Lantern"),
+	light_source = 13,
+	drawtype = "plantlike",
+	inventory_image = "xdecor_lantern_inv.png^xdecor_lantern_hanging_overlay_inv.png",
+	wield_image = "xdecor_lantern_inv.png",
+	walkable = false,
+	groups = {snappy = 3, attached_node = 4, not_in_creative_inventory = 1},
+	tiles = {
+		{
+			name = "xdecor_lantern.png",
+			animation = {type="vertical_frames", length = 1.5}
+		}
+	},
+	selection_box = xdecor.pixelbox(16, {{4, 0, 4, 8, 16, 8}}),
+	sounds = default.node_sound_metal_defaults(),
+	drop = "xdecor:lantern",
+})
+
+-- Update legacy lantern (back when they were wallmounted)
+-- that are hanging to the proper node.
+minetest.register_lbm({
+	label = "Update hanging lanterns",
+	name = "xdecor:update_hanging_lanterns",
+	nodenames = {"xdecor:lantern"},
+	run_at_every_load = false,
+	action = function(pos, node)
+		if node.param2 == 0 then -- wallmounted 0 value means attached to the ceiling
+			-- Only convert the node if it needs to hang
+			-- (walkable node above, non-walkable node below)
+			local up = vector.new(pos.x, pos.y+1, pos.z)
+			local upnode = minetest.get_node(up)
+			local updef = minetest.registered_nodes[upnode.name]
+			local down = vector.new(pos.x, pos.y-1, pos.z)
+			local downnode = minetest.get_node(down)
+			local downdef = minetest.registered_nodes[downnode.name]
+			if updef and updef.walkable and downdef and not downdef.walkable then
+				minetest.swap_node(pos, {name="xdecor:hanging_lantern"})
+			end
+		end
+	end,
 })
 
 local xdecor_lightbox = {
