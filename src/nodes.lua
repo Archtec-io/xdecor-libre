@@ -116,12 +116,26 @@ register_storage("cabinet_half", S("Half Wooden Cabinet"), {
 if minetest.get_modpath("moreblocks") then
 	minetest.register_alias("xdecor:empty_shelf", "moreblocks:empty_shelf")
 else
-	register_storage("empty_shelf", S("Empty Shelf"), {
+	-- Node renamed from "Empty Shelf" because it was misleading.
+	-- (you can still put things in it, making it non-empty)
+	register_storage("empty_shelf", S("Plain Shelf"), {
 		on_rotate = screwdriver.rotate_simple,
 		tiles = {
 			"default_wood.png", "default_wood.png", "default_wood.png",
 			"default_wood.png", "default_wood.png^xdecor_empty_shelf.png"
-		}
+		},
+	})
+
+	-- Update infotext of old empty_shelf nodes to "Plain Shelf"
+	minetest.register_lbm({
+		label = "Update plain shelf infotext",
+		name = "xdecor:empty_shelf_to_plain_shelf",
+		nodenames = {"xdecor:empty_shelf"},
+		run_at_every_load = false,
+		action = function(pos, node)
+			local meta = minetest.get_meta(pos)
+			meta:set_string("infotext", S("Plain Shelf"))
+		end,
 	})
 end
 
