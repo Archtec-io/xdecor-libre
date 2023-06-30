@@ -24,8 +24,10 @@ blocks with special features:
                where you put the ender chest
 * Mailbox: Lets you receive items from other players
 * Item Frame: You can place an item into it to show it off
-* Trampoline: Jump on it to bounce off. No fall damage
-* Cauldron: For cooking soups
+* Cushion: Reduces fall damage
+* Cushion Block: Reduces fall damage even more
+* Trampoline: Jump on it to bounce off. Very low fall damage
+* Cauldron: For storing water and cooking soups
     * Recipe: Pour water in, light a fire below it and throw
       in some food items. Collect the soup with a bowl
 * Chessboard: Play Chess against another player or the computer
@@ -48,14 +50,39 @@ The following bugs of X-Decor (as of 30/06/2023) are fixed:
 * Changed prison door recipe colliding with Minetest Game's Iron Bar Door
 * Beehives no longer show that the bees are busy when they're not
 * Fixed incorrect/incomplete node sounds
-* Renamed "Empty Shelf" to "Plain Shelf"
 * Fix poorly placed buttons in enchantment screen
 * Fix broken texture of cut Permafrost with Moss nodes
 * Fix awkward lantern rotation
 * Lanterns can no longer attach to sides
 * Fix item stacking issues of curtains
+* Cauldrons no longer turn river water to normal water
+* Fix boiling water in cauldrons not reliably cooling down
+* Fix boiling water sound not playing when rejoining
+* Fix rope and painting not compatible with itemframe
+* Fix itemframe, lever being offset when put into itemframe
+* Show short item description in itemframe instead of itemstring
 * Made several strings translatable
+* Minor typo fixes
+
+Maintenance updates:
+* Renamed blocks
+    * "Empty Shelf" to "Plain Shelf"
+    * "Slide Door" to "Paper Door"
+    * "Rooster" to "Weathercock"
+    * "Stone Tile" to "Polished Stone Tile"
+    * "Desert Stone Tile" to "Polished Desert Stone Tile"
+    * "Iron Light Box" to "Steel Lattice Light Box"
+    * "Wooden Light Box" to "Wooden Cross Light Box"
+    * "Wooden Light Box 2" to "Wooden Rhombus Light Box"
+* Added fuel recipes for wooden-based things
+* Changed a few confusing recipes to make more sense
+* Improved textures for cut glass, obsidian glass and woodframed glass
+* Improved side texture of wood frame
+* Add honey and cushion block to creative inventory
+* Doors now count as nodes in creative inventory
 * Translation updates
+* Add support for playerphysics mod
+* Add description to every setting
 
 #### List of replaced files
 
