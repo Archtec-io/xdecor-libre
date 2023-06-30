@@ -798,7 +798,56 @@ xdecor.register("woodframed_glass", {
 	tiles = {"xdecor_woodframed_glass.png", "xdecor_woodframed_glass_detail.png"},
 	use_texture_alpha = ALPHA_CLIP,
 	groups = {cracky = 2, oddly_breakable_by_hand = 1},
-	sounds = default.node_sound_glass_defaults()
+	sounds = default.node_sound_glass_defaults(),
+	_xdecor_custom_noncube_tiles = {
+		stair = {
+			"xdecor_woodframed_glass_split.png",
+			"xdecor_woodframed_glass.png",
+			"xdecor_woodframed_glass_stairside_flip.png",
+			"xdecor_woodframed_glass_stairside.png",
+			"xdecor_woodframed_glass.png",
+			"xdecor_woodframed_glass_split.png",
+		},
+		stair_inner = {
+			"xdecor_woodframed_glass_stairside.png^[transformR270",
+			"xdecor_woodframed_glass.png",
+			"xdecor_woodframed_glass_stairside_flip.png",
+			"xdecor_woodframed_glass.png",
+			"xdecor_woodframed_glass.png",
+			"xdecor_woodframed_glass_stairside.png",
+		},
+		stair_outer = {
+			"xdecor_woodframed_glass_stairside.png^[transformR90",
+			"xdecor_woodframed_glass.png",
+			"xdecor_woodframed_glass_outer_stairside.png",
+			"xdecor_woodframed_glass_stairside_flip.png",
+			"xdecor_woodframed_glass_stairside.png^[transformR90",
+			"xdecor_woodframed_glass_outer_stairside.png",
+		},
+		halfstair = {
+			"xdecor_woodframed_glass_cube.png",
+			"xdecor_woodframed_glass.png",
+			"xdecor_woodframed_glass_stairside_flip.png",
+			"xdecor_woodframed_glass_stairside.png",
+			"xdecor_woodframed_glass_split.png^[transformR90",
+			"xdecor_woodframed_glass_cube.png",
+		},
+		slab = {
+			"xdecor_woodframed_glass.png",
+			"xdecor_woodframed_glass.png",
+			"xdecor_woodframed_glass_split.png",
+		},
+		cube = { "xdecor_woodframed_glass_cube.png" },
+		thinstair = { "xdecor_woodframed_glass_split.png" },
+		micropanel = { "xdecor_woodframed_glass_split.png" },
+		panel = {
+			"xdecor_woodframed_glass_split.png",
+			"xdecor_woodframed_glass_split.png",
+			"xdecor_woodframed_glass_cube.png",
+			"xdecor_woodframed_glass_cube.png",
+			"xdecor_woodframed_glass_split.png",
+		},
+	},
 })
 
 local devices = {

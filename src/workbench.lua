@@ -1,3 +1,5 @@
+dofile(minetest.get_modpath("xdecor") .. "/src/glasscut.lua")
+
 local workbench = {}
 local nodes = {}
 
@@ -303,20 +305,58 @@ for i = 1, #nodes do
 			end
 		end
 
-		if not minetest.registered_nodes["stairs:slab_" .. item_name] then
-			stairs.register_stair_and_slab(item_name, node,
-				groups, tiles, S("@1 Stair", def.description),
-				S("@1 Slab", def.description), def.sounds)
+		local custom_tiles = xdecor.glasscuts[node]
+		if custom_tiles then
+			if not custom_tiles.nanoslab then
+				custom_tiles.nanoslab = custom_tiles.cube
+			end
+			if not custom_tiles.micropanel then
+				custom_tiles.micropanel = custom_tiles.micropanel
+			end
+			if not custom_tiles.doublepanel then
+				custom_tiles.doublepanel = custom_tiles.panel
+			end
 		end
 
-		minetest.register_node(":" .. node .. "_" .. d[1], {
+		if not minetest.registered_nodes["stairs:slab_" .. item_name] then
+			if custom_tiles and (custom_tiles.slab or custom_tiles.stair) then
+				if custom_tiles.stair then
+					stairs.register_stair(item_name, node,
+						groups, custom_tiles.stair, S("@1 Stair", def.description),
+						def.sounds)
+					stairs.register_stair_inner(item_name, node,
+						groups, custom_tiles.stair_inner, "", def.sounds)
+					stairs.register_stair_outer(item_name, node,
+						groups, custom_tiles.stair_outer, "", def.sounds)
+				end
+				if custom_tiles.slab then
+					stairs.register_slab(item_name, node,
+						groups, custom_tiles.slab, S("@1 Slab", def.description),
+						def.sounds)
+				end
+			else
+				stairs.register_stair_and_slab(item_name, node,
+					groups, tiles, S("@1 Stair", def.description),
+					S("@1 Slab", def.description), def.sounds)
+			end
+		end
+
+		local cutname = d[1]
+		local tiles_special_cut
+		if custom_tiles and custom_tiles[cutname] then
+			tiles_special_cut = custom_tiles[cutname]
+		else
+			tiles_special_cut = tiles
+		end
+
+		minetest.register_node(":" .. node .. "_" .. cutname, {
 			-- @1: Base node description (e.g. "Stone"); @2: modifier (e.g. "Nanoslab")
 			description = S("@1 @2", def.description, d[4]),
 			paramtype = "light",
 			paramtype2 = "facedir",
 			drawtype = "nodebox",
 			sounds = def.sounds,
-			tiles = tiles,
+			tiles = tiles_special_cut,
 			use_texture_alpha = def.use_texture_alpha,
 			groups = groups,
 			node_box = xdecor.pixelbox(16, d[3]),
