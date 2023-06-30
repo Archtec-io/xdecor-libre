@@ -55,8 +55,11 @@ function mailbox:formspec(pos, owner, is_owner)
 				local stack_name = stack:match("[%w_:]+")
 				local stack_count = stack:match("%s(%d+)") or 1
 
+				-- List of donors. A line looks like this:
+				--    <donor name> <item icon> × <item count>
 				giver = giver .. "#FFFF00," .. giver_name .. "," .. i ..
-					",#FFFFFF,x " .. stack_count .. ","
+					-- Times a certain item count; used for the mailbox donor list
+					",#FFFFFF," .. FS("× @1", stack_count) .. ","
 
 				img = img .. i .. "=" ..
 					img_col(stack_name) .. "^\\[resize:16x16,"
