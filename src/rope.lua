@@ -1,6 +1,8 @@
 local rope = {}
 local S = minetest.get_translator("xdecor")
 
+local ropesounds = default.node_sound_leaves_defaults()
+
 -- Code by Mirko K. (modified by Temperest, Wulfsdad, kilbith and Wuzzy) (License: GPL).
 function rope.place(itemstack, placer, pointed_thing)
 	if pointed_thing.type == "node" then
@@ -22,6 +24,8 @@ function rope.place(itemstack, placer, pointed_thing)
 		local oldnode = minetest.get_node(pos)
 		local stackname = itemstack:get_name()
 
+		local start_pos = table.copy(pos)
+		local ropes_placed = false
 		while oldnode.name == "air" and not itemstack:is_empty() do
 			local newnode = {name = stackname, param1 = 0}
 			minetest.set_node(pos, newnode)
@@ -30,6 +34,10 @@ function rope.place(itemstack, placer, pointed_thing)
 			end
 			pos.y = pos.y - 1
 			oldnode = minetest.get_node(pos)
+		end
+		-- Play placement sound manually
+		if rope_placed then
+			minetest.sound_play(ropesounds.place, {pos=start_pos}, true)
 		end
 	end
 
@@ -48,6 +56,9 @@ function rope.remove(pos, oldnode, digger, rope_name)
 	end
 
 	if num == 0 then return end
+
+	-- Play dig sound manually
+	minetest.sound_play(ropesounds.dug, {pos=pos}, true)
 
 	local creative = minetest.is_creative_enabled(digger:get_player_name())
 	if not creative or not digger_inv:contains_item("main", rope_name) then
@@ -86,7 +97,7 @@ xdecor.register("rope", {
 			minetest.record_protection_violation(pos, player_name)
 		end
 	end,
-	sounds = default.node_sound_leaves_defaults(),
+	sounds = ropesounds,
 })
 
 -- Recipes
