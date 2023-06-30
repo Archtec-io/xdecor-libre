@@ -1,3 +1,5 @@
+dofile(minetest.get_modpath("xdecor") .. "/src/glasscut.lua")
+
 local workbench = {}
 local nodes = {}
 
@@ -303,7 +305,7 @@ for i = 1, #nodes do
 			end
 		end
 
-		local custom_tiles = def._xdecor_custom_noncube_tiles
+		local custom_tiles = xdecor.glasscuts[node]
 		if custom_tiles then
 			if not custom_tiles.nanoslab then
 				custom_tiles.nanoslab = custom_tiles.cube
