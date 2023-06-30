@@ -159,7 +159,6 @@ minetest.register_craftitem("xdecor:honey", {
 		food_honey = 1,
 		food_sugar = 1,
 		flammable = 2,
-		not_in_creative_inventory = 1,
 	},
 })
 

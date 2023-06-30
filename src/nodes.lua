@@ -295,7 +295,7 @@ xdecor.register("cushion", {
 xdecor.register("cushion_block", {
 	description = S("Cushion Block"),
 	tiles = {"xdecor_cushion.png"},
-	groups = {snappy = 3, flammable = 3, fall_damage_add_percent = -75, not_in_creative_inventory = 1}
+	groups = {snappy = 3, flammable = 3, fall_damage_add_percent = -75},
 })
 
 local function door_access(name)
