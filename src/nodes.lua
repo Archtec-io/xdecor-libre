@@ -221,6 +221,17 @@ local curtain_colors = {
 	red = S("Red Curtain"),
 }
 
+-- For preserve_metadata for curtains.
+-- Erases metadata from the drops
+-- because the item metadata should be empty
+-- to allow proper item stacking.
+local cleanup_curtain_meta = function(_,_,_,drops)
+	for d=1, #drops do
+		local meta = drops[d]:get_meta()
+		meta:set_string("palette_index", "")
+	end
+end
+
 for c, desc in pairs(curtain_colors) do
 	xdecor.register("curtain_" .. c, {
 		description = desc,
@@ -237,7 +248,8 @@ for c, desc in pairs(curtain_colors) do
 		on_rightclick = function(pos, node, _, itemstack)
 			minetest.set_node(pos, {name = "xdecor:curtain_open_" .. c, param2 = node.param2})
 			return itemstack
-		end
+		end,
+		preserve_metadata = cleanup_curtain_meta,
 	})
 
 	xdecor.register("curtain_open_" .. c, {
@@ -252,7 +264,8 @@ for c, desc in pairs(curtain_colors) do
 		on_rightclick = function(pos, node, _, itemstack)
 			minetest.set_node(pos, {name="xdecor:curtain_" .. c, param2 = node.param2})
 			return itemstack
-		end
+		end,
+		preserve_metadata = cleanup_curtain_meta,
 	})
 
 	minetest.register_craft({
