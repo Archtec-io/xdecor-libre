@@ -69,6 +69,8 @@ xdecor.register("rope", {
 		if not minetest.is_protected(pos, player_name) or
 			minetest.get_player_privs(player_name).protection_bypass then
 			rope.remove(pos, node, puncher, "xdecor:rope")
+		else
+			minetest.record_protection_violation(pos, player_name)
 		end
 	end,
 	sounds = default.node_sound_leaves_defaults(),
