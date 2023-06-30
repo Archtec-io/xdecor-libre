@@ -69,8 +69,8 @@ local function xdecor_stairs_alternative(nodename, def)
 			stairs.register_stair_and_slab(name,nodename,
 				def.groups,
 				def.tiles,
-				("%s Stair"):format(def.description),
-				("%s Slab"):format(def.description),
+				S("@1 Stair", def.description),
+				S("@1 Slab", def.description),
 				def.sounds
 			)
 		end

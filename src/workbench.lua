@@ -16,22 +16,22 @@ end
 
 -- Nodeboxes definitions
 workbench.defs = {
-	-- Name YieldX  YZ  WH  L
-	{"nanoslab",	16, { 0, 0,  0, 8,  1, 8  }},
-	{"micropanel",	16, { 0, 0,  0, 16, 1, 8  }},
-	{"microslab",	8,  { 0, 0,  0, 16, 1, 16 }},
-	{"thinstair",	8,  { 0, 7,  0, 16, 1, 8  },
-			 { 0, 15, 8, 16, 1, 8  }},
-	{"cube", 	4,  { 0, 0,  0, 8,  8, 8  }},
-	{"panel",	4,  { 0, 0,  0, 16, 8, 8  }},
-	{"slab", 	2,  nil			  },
-	{"doublepanel", 2,  { 0, 0,  0, 16, 8, 8  },
-			 { 0, 8,  8, 16, 8, 8  }},
-	{"halfstair",	2,  { 0, 0,  0, 8,  8, 16 },
-			 { 0, 8,  8, 8,  8, 8  }},
-	{"stair_outer",	1,  nil			  },
-	{"stair",	1,  nil			  },
-	{"stair_inner",	1,  nil			  }
+	-- Name Yield Nodeboxes (X Y Z W H L)  Description
+	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }}, S("Nanoslab")},
+	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }}, S("Micropanel")},
+	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, S("Microslab")},
+	{"thinstair",   8,  {{ 0, 7,  0, 16, 1, 8  },
+			{ 0, 15, 8, 16, 1, 8  }}, S("Thin Stair")},
+	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, S("Cube")},
+	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, S("Panel")},
+	{"slab",        2,  nil, S("Slab") },
+	{"doublepanel", 2,  {{ 0, 0,  0, 16, 8, 8  },
+			{ 0, 8,  8, 16, 8, 8  }}, S("Double Panel")},
+	{"halfstair",   2,  {{ 0, 0,  0, 8,  8, 16 },
+			{ 0, 8,  8, 8,  8, 8  }}, S("Half-Stair")},
+	{"stair_outer", 1,  nil, S("Outer Stair")},
+	{"stair",       1,  nil, S("Stair")},
+	{"stair_inner", 1,  nil, S("Inner Stair")},
 }
 
 local repairable_tools = {"pick", "axe", "shovel", "sword", "hoe", "armor", "shield"}
@@ -295,16 +295,15 @@ for i = 1, #nodes do
 			tiles = {def.tile_images[1]}
 		end
 
-		--TODO: Translation support for Stairs/Slab
 		if not minetest.registered_nodes["stairs:slab_" .. item_name] then
 			stairs.register_stair_and_slab(item_name, node,
-				groups, tiles, def.description .. " Stair",
-				def.description .. " Slab", def.sounds)
+				groups, tiles, S("@1 Stair", def.description),
+				S("@1 Slab", def.description), def.sounds)
 		end
 
 		minetest.register_node(":" .. node .. "_" .. d[1], {
-			--TODO: Translation support
-			description = def.description .. " " .. d[1]:gsub("^%l", string.upper),
+			-- @1: Base node description (e.g. "Stone"); @2: modifier (e.g. "Nanoslab")
+			description = S("@1 @2", def.description, d[4]),
 			paramtype = "light",
 			paramtype2 = "facedir",
 			drawtype = "nodebox",
@@ -312,8 +311,7 @@ for i = 1, #nodes do
 			tiles = tiles,
 			use_texture_alpha = def.use_texture_alpha,
 			groups = groups,
-			-- `unpack` has been changed to `table.unpack` in newest Lua versions
-			node_box = xdecor.pixelbox(16, {unpack(d, 3)}),
+			node_box = xdecor.pixelbox(16, d[3]),
 			sunlight_propagates = true,
 			on_place = minetest.rotate_node
 		})
