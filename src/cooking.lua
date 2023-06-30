@@ -49,24 +49,36 @@ function cauldron.filling(pos, node, clicker, itemstack)
 	local inv = clicker:get_inventory()
 	local wield_item = clicker:get_wielded_item():get_name()
 
-	if wield_item:sub(1,7) == "bucket:" then
-		if wield_item:sub(-6) == "_empty" and not (node.name:sub(-6) == "_empty") then
+	do
+		if wield_item == "bucket:bucket_empty" and node.name:sub(-6) ~= "_empty" then
+			local bucket_item
+			if node.name:sub(-11) == "river_water" then
+				bucket_item = "bucket:bucket_river_water 1"
+			else
+				bucket_item = "bucket:bucket_water 1"
+			end
 			if itemstack:get_count() > 1 then
-				if inv:room_for_item("main", "bucket:bucket_water 1") then
+				if inv:room_for_item("main", bucket_item) then
 					itemstack:take_item()
-					inv:add_item("main", "bucket:bucket_water 1")
+					inv:add_item("main", bucket_item)
 				else
 					minetest.chat_send_player(clicker:get_player_name(),
 						S("No room in your inventory to add a bucket of water."))
 					return itemstack
 				end
 			else
-				itemstack:replace("bucket:bucket_water")
+				itemstack:replace(bucket_item)
 			end
 			minetest.set_node(pos, {name = "xdecor:cauldron_empty", param2 = node.param2})
 
-		elseif wield_item:sub(-6) == "_water" and node.name:sub(-6) == "_empty" then
-			minetest.set_node(pos, {name = "xdecor:cauldron_idle", param2 = node.param2})
+		elseif minetest.get_item_group(wield_item, "water_bucket") == 1 and node.name:sub(-6) == "_empty" then
+			local newnode
+			if wield_item == "bucket:bucket_river_water" then
+				newnode = "xdecor:cauldron_idle_river_water"
+			else
+				newnode = "xdecor:cauldron_idle"
+			end
+			minetest.set_node(pos, {name = newnode, param2 = node.param2})
 			itemstack:replace("bucket:bucket_empty")
 		end
 
@@ -81,7 +93,12 @@ function cauldron.idle_timer(pos)
 	end
 
 	local node = minetest.get_node(pos)
-	minetest.set_node(pos, {name = "xdecor:cauldron_boiling", param2 = node.param2})
+	if node.name:sub(-11) == "river_water" then
+		node.name = "xdecor:cauldron_boiling_river_water"
+	else
+		node.name = "xdecor:cauldron_boiling"
+	end
+	minetest.set_node(pos, node)
 	return true
 end
 
@@ -128,7 +145,13 @@ function cauldron.boiling_timer(pos)
 	local node_under = {x = pos.x, y = pos.y - 1, z = pos.z}
 
 	if not minetest.get_node(node_under).name:find("fire") then
-		minetest.set_node(pos, {name = "xdecor:cauldron_idle", param2 = node.param2})
+		local newnode
+		if node.name:sub(-11) == "river_water" then
+			newnode = "xdecor:cauldron_idle_river_water"
+		else
+			newnode = "xdecor:cauldron_idle"
+		end
+		minetest.set_node(pos, {name = newnode, param2 = node.param2})
 	end
 
 	return true
@@ -174,7 +197,7 @@ xdecor.register("cauldron_empty", {
 })
 
 xdecor.register("cauldron_idle", {
-	description = S("Cauldron (idle)"),
+	description = S("Cauldron with Water (idle)"),
 	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {"xdecor_cauldron_top_idle.png", "xdecor_cauldron_sides.png"},
@@ -187,8 +210,22 @@ xdecor.register("cauldron_idle", {
 	on_timer = cauldron.idle_timer,
 })
 
+xdecor.register("cauldron_idle_river_water", {
+	description = S("Cauldron with River Water (idle)"),
+	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
+	on_rotate = screwdriver.rotate_simple,
+	tiles = {"xdecor_cauldron_top_idle_river_water.png", "xdecor_cauldron_sides.png"},
+	sounds = default.node_sound_metal_defaults(),
+	drop = "xdecor:cauldron_empty",
+	infotext = S("Cauldron (idle)"),
+	collision_box = xdecor.pixelbox(16, cauldron.cbox),
+	on_rightclick = cauldron.filling,
+	on_construct = cauldron.idle_construct,
+	on_timer = cauldron.idle_timer,
+})
+
 xdecor.register("cauldron_boiling", {
-	description = S("Cauldron (active)"),
+	description = S("Cauldron with Water (active)"),
 	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
@@ -211,8 +248,34 @@ xdecor.register("cauldron_boiling", {
 	end,
 })
 
+xdecor.register("cauldron_boiling_river_water", {
+	description = S("Cauldron with River Water (active)"),
+	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
+	on_rotate = screwdriver.rotate_simple,
+	drop = "xdecor:cauldron_empty",
+	infotext = S("Cauldron (active) - Drop foods inside to make a soup"),
+	damage_per_second = 2,
+	tiles = {
+		{
+			name = "xdecor_cauldron_top_anim_boiling_river_water.png",
+			animation = {type = "vertical_frames", length = 3.0}
+		},
+		"xdecor_cauldron_sides.png"
+	},
+	sounds = default.node_sound_metal_defaults(),
+	collision_box = xdecor.pixelbox(16, cauldron.cbox),
+	on_rightclick = cauldron.filling,
+	on_construct = cauldron.boiling_construct,
+	on_timer = cauldron.boiling_timer,
+	on_destruct = function(pos)
+		cauldron.stop_sound(pos)
+	end,
+})
+
+
+
 xdecor.register("cauldron_soup", {
-	description = S("Cauldron (active)"),
+	description = S("Cauldron with Soup (active)"),
 	groups = {cracky = 2, oddly_breakable_by_hand = 1, not_in_creative_inventory = 1},
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
