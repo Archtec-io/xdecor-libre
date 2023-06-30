@@ -352,7 +352,7 @@ local xdecor_doors = {
 			{"default:paper", "default:paper"},
 			{"group:wood", "group:wood"}
 		},
-		desc = S("Slide Door"),
+		desc = S("Paper Door"),
 	},
 	woodglass = {
 		recipe = {
@@ -447,7 +447,7 @@ xdecor.register("ivy", {
 })
 
 xdecor.register("rooster", {
-	description = S("Rooster"),
+	description = S("Weathercock"),
 	drawtype = "torchlike",
 	inventory_image = "xdecor_rooster.png",
 	walkable = false,
@@ -572,9 +572,9 @@ minetest.register_lbm({
 })
 
 local xdecor_lightbox = {
-	iron = S("Iron Light Box"),
-	wooden = S("Wooden Light Box"),
-	wooden2 = S("Wooden Light Box 2"),
+	iron = S("Steel Lattice Light Box"),
+	wooden = S("Wooden Cross Light Box"),
+	wooden2 = S("Wooden Rhombus Light Box"),
 }
 
 for l, desc in pairs(xdecor_lightbox) do
@@ -724,10 +724,10 @@ end
 
 register_hard_node("cactusbrick", S("Cactus Brick"))
 register_hard_node("coalstone_tile", S("Coal Stone Tile"))
-register_hard_node("desertstone_tile", S("Desert Stone Tile"))
+register_hard_node("desertstone_tile", S("Polished Desert Stone Block"))
 register_hard_node("hard_clay", S("Hardened Clay"))
 register_hard_node("moonbrick", S("Moon Brick"))
-register_hard_node("stone_tile", S("Stone Tile"))
+register_hard_node("stone_tile", S("Polished Stone Block"))
 register_hard_node("stone_rune", S("Runestone"))
 
 register_hard_node("packed_ice", S("Packed Ice"), {
