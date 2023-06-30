@@ -1,6 +1,11 @@
 local cauldron, sounds = {}, {}
 local S = minetest.get_translator("xdecor")
 
+local infotext_empty = S("Cauldron (empty)")
+local infotext_idle = S("Cauldron (idle)")
+local infotext_boiling = S("Cauldron (active) - Drop foods inside to make a soup")
+local infotext_soup = S("Cauldron (active) - Use a bowl to eat the soup")
+
 -- Add more ingredients here that make a soup.
 local ingredients_list = {
 	"apple", "mushroom", "honey", "pumpkin", "egg", "bread", "meat",
@@ -56,6 +61,8 @@ end
 
 function cauldron.idle_construct(pos)
 	local timer = minetest.get_node_timer(pos)
+	local meta = minetest.get_meta(pos)
+	meta:set_string("infotext", infotext_idle)
 	timer:start(10.0)
 	cauldron.stop_sound(pos)
 end
@@ -64,7 +71,7 @@ function cauldron.boiling_construct(pos)
 	cauldron.start_sound(pos)
 
 	local meta = minetest.get_meta(pos)
-	meta:set_string("infotext", S("Cauldron (active) - Drop foods inside to make a soup"))
+	meta:set_string("infotext", infotext_boiling)
 
 	local timer = minetest.get_node_timer(pos)
 	timer:start(5.0)
@@ -216,10 +223,12 @@ xdecor.register("cauldron_empty", {
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {"xdecor_cauldron_top_empty.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
-	infotext = S("Cauldron (empty)"),
+	infotext = infotext_empty,
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_rightclick = cauldron.filling,
 	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("infotext", infotext_empty)
 		cauldron.stop_sound(pos)
 	end,
 })
@@ -231,7 +240,7 @@ xdecor.register("cauldron_idle", {
 	tiles = {"xdecor_cauldron_top_idle.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
 	drop = "xdecor:cauldron_empty",
-	infotext = S("Cauldron (idle)"),
+	infotext = infotext_idle,
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_rightclick = cauldron.filling,
 	on_construct = cauldron.idle_construct,
@@ -245,7 +254,7 @@ xdecor.register("cauldron_idle_river_water", {
 	tiles = {"xdecor_cauldron_top_idle_river_water.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
 	drop = "xdecor:cauldron_empty",
-	infotext = S("Cauldron (idle)"),
+	infotext = infotext_idle,
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_rightclick = cauldron.filling,
 	on_construct = cauldron.idle_construct,
@@ -257,7 +266,7 @@ xdecor.register("cauldron_boiling", {
 	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
-	infotext = S("Cauldron (active) - Drop foods inside to make a soup"),
+	infotext = infotext_boiling,
 	damage_per_second = 2,
 	tiles = {
 		{
@@ -281,7 +290,7 @@ xdecor.register("cauldron_boiling_river_water", {
 	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
-	infotext = S("Cauldron (active) - Drop foods inside to make a soup"),
+	infotext = infotext_boiling,
 	damage_per_second = 2,
 	tiles = {
 		{
@@ -307,7 +316,7 @@ xdecor.register("cauldron_soup", {
 	groups = {cracky = 2, oddly_breakable_by_hand = 1, not_in_creative_inventory = 1},
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
-	infotext = S("Cauldron (active) - Use a bowl to eat the soup"),
+	infotext = infotext_soup,
 	damage_per_second = 2,
 	tiles = {
 		{
@@ -318,6 +327,11 @@ xdecor.register("cauldron_soup", {
 	},
 	sounds = default.node_sound_metal_defaults(),
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
+	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("infotext", infotext_soup)
+		cauldron.start_sound(pos)
+	end,
 	on_rightclick = cauldron.take_soup,
 	on_destruct = function(pos)
 		cauldron.stop_sound(pos)
@@ -364,7 +378,7 @@ minetest.register_craft({
 minetest.register_lbm({
 	label = "Restart boiling cauldron sounds",
 	name = "xdecor:restart_boiling_cauldron_sounds",
-	nodenames = {"xdecor:cauldron_boiling", "xdecor:cauldron_boiling_river_water"},
+	nodenames = {"xdecor:cauldron_boiling", "xdecor:cauldron_boiling_river_water", "xdecor:cauldron_soup"},
 	run_at_every_load = true,
 	action = function(pos, node)
 		cauldron.start_sound(pos)
