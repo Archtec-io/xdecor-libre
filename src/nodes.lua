@@ -624,8 +624,12 @@ xdecor.register("painting_1", {
 	node_placement_prediction = "",
 	on_place = function(itemstack, placer, pointed_thing)
 		local num = math.random(4)
-		local leftover = minetest.item_place_node(
+		local leftover, place_pos = minetest.item_place_node(
 			ItemStack("xdecor:painting_" .. num), placer, pointed_thing)
+
+		if not place_pos then
+			return itemstack
+		end
 
 		if leftover:get_count() == 0 and
 				not minetest.setting_getbool("creative_mode") then
@@ -633,7 +637,7 @@ xdecor.register("painting_1", {
 		end
 
 		-- Play 'place' sound manually
-		minetest.sound_play(default.node_sound_wood_defaults().place, {pos=pointed_thing.above}, true)
+		minetest.sound_play(default.node_sound_wood_defaults().place, {pos=place_pos}, true)
 
 		return itemstack
 	end,
