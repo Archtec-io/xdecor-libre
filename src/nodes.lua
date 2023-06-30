@@ -9,7 +9,7 @@ local function register_pane(name, desc, def)
 		tiles = {"xdecor_" .. name .. ".png"},
 		drawtype = "airlike",
 		paramtype = "light",
-		textures = {"xdecor_" .. name .. ".png", "" ,"xdecor_" .. name .. ".png"},
+		textures = def.textures or {"xdecor_" .. name .. ".png", "" ,"xdecor_" .. name .. ".png"},
 		inventory_image = "xdecor_" .. name .. ".png",
 		wield_image = "xdecor_" .. name .. ".png",
 		groups = def.groups,
@@ -50,6 +50,7 @@ register_pane("rusty_bar", S("Rusty Iron Bars"), {
 
 register_pane("wood_frame", S("Wood Frame"), {
 	sounds = default.node_sound_wood_defaults(),
+	textures = {"xdecor_wood_frame.png", "", "xdecor_wood_frame_top.png"},
 	groups = {choppy = 2, pane = 1, flammable = 2},
 	recipe = {
 		{"group:wood", "group:stick", "group:wood"},
