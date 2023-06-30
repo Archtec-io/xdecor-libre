@@ -1,5 +1,4 @@
 # textdomain: xdecor
-
 Chess=Echecs
 Chess Board=Echiquier
 Someone else plays white pieces!=Quelqu’un d’autre joue les pièces blanches !
@@ -128,6 +127,8 @@ Wood Framed Glass=Verre encadré par du bois
 Radio=
 Speaker=
 @1 Stair=
+Inner @1 Stair=
+Outer @1 Stair=
 @1 Slab=
 Rope=Corde
 Nanoslab=

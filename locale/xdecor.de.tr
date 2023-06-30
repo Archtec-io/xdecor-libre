@@ -1,5 +1,4 @@
 # textdomain: xdecor
-
 Chess=Schach
 Chess Board=Schachbrett
 Someone else plays white pieces!=Jemand anderes spielt Weiß!
@@ -128,6 +127,8 @@ Wood Framed Glass=Holzeingefasstes Glas
 Radio=Radio
 Speaker=Lautsprecher
 @1 Stair=@1-Treppe
+Inner @1 Stair=
+Outer @1 Stair=
 @1 Slab=@1-Platte
 Rope=Seil
 Nanoslab=Nanoplatte

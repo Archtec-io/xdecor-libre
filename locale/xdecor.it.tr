@@ -1,6 +1,4 @@
 # textdomain: xdecor
-# Author: Salvo 'LtWorf' Tomaselli <tiposchi@tiscali.it>
-
 Chess=Scacchi
 Chess Board=Scacchiera
 Someone else plays white pieces!=Qualcun altro gioca con il bianco!
@@ -129,6 +127,8 @@ Wood Framed Glass=Cornice in legno con vetro
 Radio=
 Speaker=
 @1 Stair=
+Inner @1 Stair=
+Outer @1 Stair=
 @1 Slab=
 Rope=Corda
 Nanoslab=

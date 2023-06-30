@@ -1,5 +1,4 @@
 # textdomain: xdecor
-
 Chess=
 Chess Board=
 Someone else plays white pieces!=
@@ -128,6 +127,8 @@ Wood Framed Glass=
 Radio=
 Speaker=
 @1 Stair=
+Inner @1 Stair=
+Outer @1 Stair=
 @1 Slab=
 Rope=
 Nanoslab=
