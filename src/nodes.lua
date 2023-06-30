@@ -197,7 +197,8 @@ xdecor.register("chair", {
 		pos.y = pos.y + 0  -- Sitting position
 		xdecor.sit(pos, node, clicker, pointed_thing)
 		return itemstack
-	end
+	end,
+	_xdecor_itemframe_offset = -1.5,
 })
 
 xdecor.register("cobweb", {

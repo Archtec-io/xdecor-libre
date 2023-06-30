@@ -115,7 +115,8 @@ xdecor.register("lever_off", {
 		end
 
 		return itemstack
-	end
+	end,
+	_xdecor_itemframe_offset = -3.5,
 })
 
 xdecor.register("lever_on", {

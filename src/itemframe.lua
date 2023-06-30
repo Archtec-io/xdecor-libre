@@ -1,3 +1,10 @@
+-- Item frames.
+
+-- Hint:
+-- If your item appears behind or too far in front of the item frame, add
+--     _xdecor_itemframe_offset = <number>
+-- to your item definition to fix it.
+
 local itemframe, tmp = {}, {}
 local S = minetest.get_translator("xdecor")
 screwdriver = screwdriver or {}
@@ -28,7 +35,15 @@ local function update_item(pos, node)
 	local posad = facedir[node.param2]
 	if not posad or itemstring == "" then return end
 
-	pos = vector.add(pos, vector.multiply(posad, 6.5/16))
+	local itemdef = ItemStack(itemstring):get_definition()
+	local offset_plus = 0
+	if itemdef and itemdef._xdecor_itemframe_offset then
+		offset_plus = itemdef._xdecor_itemframe_offset
+		offset_plus = math.min(6, math.max(-6, offset_plus))
+	end
+	local offset = (6.5+offset_plus)/16
+
+	pos = vector.add(pos, vector.multiply(posad, offset))
 	tmp.nodename = node.name
 	tmp.texture = ItemStack(itemstring):get_name()
 
@@ -154,7 +169,8 @@ xdecor.register("itemframe", {
 	on_rightclick = itemframe.rightclick,
 	on_punch = itemframe.punch,
 	can_dig = itemframe.dig,
-	after_destruct = remove_item
+	after_destruct = remove_item,
+	_xdecor_itemframe_offset = -3.5,
 })
 
 minetest.register_entity("xdecor:f_item", {
