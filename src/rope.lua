@@ -25,7 +25,9 @@ function rope.place(itemstack, placer, pointed_thing)
 		while oldnode.name == "air" and not itemstack:is_empty() do
 			local newnode = {name = stackname, param1 = 0}
 			minetest.set_node(pos, newnode)
-			itemstack:take_item()
+			if not minetest.is_creative_enabled(placer:get_player_name()) then
+				itemstack:take_item()
+			end
 			pos.y = pos.y - 1
 			oldnode = minetest.get_node(pos)
 		end
@@ -46,7 +48,18 @@ function rope.remove(pos, oldnode, digger, rope_name)
 	end
 
 	if num == 0 then return end
-	digger_inv:add_item("main", rope_name.." "..num)
+
+	local creative = minetest.is_creative_enabled(digger:get_player_name())
+	if not creative or not digger_inv:contains_item("main", rope_name) then
+		if creative then
+			num = 1
+		end
+		local item = rope_name.." "..num
+		local leftover = digger_inv:add_item("main", rope_name.." "..num)
+		if not leftover:is_empty() then
+			minetest.add_item(pos, leftover)
+		end
+	end
 
 	return true
 end
