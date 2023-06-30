@@ -1,5 +1,3 @@
-dofile(minetest.get_modpath("xdecor") .. "/src/glasscut.lua")
-
 local workbench = {}
 local nodes = {}
 
@@ -325,9 +323,9 @@ for i = 1, #nodes do
 						groups, custom_tiles.stair, S("@1 Stair", def.description),
 						def.sounds)
 					stairs.register_stair_inner(item_name, node,
-						groups, custom_tiles.stair_inner, "", def.sounds)
+						groups, custom_tiles.stair_inner, "", def.sounds, nil, S("Inner @1 Stair", def.description))
 					stairs.register_stair_outer(item_name, node,
-						groups, custom_tiles.stair_outer, "", def.sounds)
+						groups, custom_tiles.stair_outer, "", def.sounds, nil, S("Outer @1 Stair", def.description))
 				end
 				if custom_tiles.slab then
 					stairs.register_slab(item_name, node,

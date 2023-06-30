@@ -68,13 +68,31 @@ local function xdecor_stairs_alternative(nodename, def)
 				}
 			)
 		elseif minetest.get_modpath("stairs") then
-			stairs.register_stair_and_slab(name,nodename,
-				def.groups,
-				def.tiles,
-				S("@1 Stair", def.description),
-				S("@1 Slab", def.description),
-				def.sounds
-			)
+			local custom_tiles = xdecor.glasscuts[nodename]
+			if custom_tiles and (custom_tiles.slab or custom_tiles.stair) then
+				if custom_tiles.stair then
+					stairs.register_stair(name, nodename,
+						def.groups, custom_tiles.stair, S("@1 Stair", def.description),
+						def.sounds)
+					stairs.register_stair_inner(name, nodename,
+						def.groups, custom_tiles.stair_inner, "", def.sounds, nil, S("Inner @1 Stair", def.description))
+					stairs.register_stair_outer(name, nodename,
+						def.groups, custom_tiles.stair_outer, "", def.sounds, nil, S("Outer @1 Stair", def.description))
+				end
+				if custom_tiles.slab then
+					stairs.register_slab(name, nodename,
+						def.groups, custom_tiles.slab, S("@1 Slab", def.description),
+						def.sounds)
+				end
+			else
+				stairs.register_stair_and_slab(name,nodename,
+					def.groups,
+					def.tiles,
+					S("@1 Stair", def.description),
+					S("@1 Slab", def.description),
+					def.sounds
+				)
+			end
 		end
 	end
 
