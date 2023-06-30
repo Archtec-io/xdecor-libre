@@ -92,7 +92,7 @@ Wooden Pressure Plate=
 ### nodes.lua ###
 
 Bamboo Frame=
-Baricade=
+Barricade=
 Barrel=
 Cactus Brick=
 Candle=
