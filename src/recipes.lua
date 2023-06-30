@@ -298,3 +298,105 @@ minetest.register_craft({
 	recipe = {"xdecor:wooden_lightbox"},
 })
 
+
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:empty_shelf",
+	burntime = 30,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:multishelf",
+	burntime = 30,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:cabinet",
+	burntime = 30,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:barrel",
+	burntime = 30,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:cabinet_half",
+	burntime = 15,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:workbench",
+	burntime = 15,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:table",
+	burntime = 12,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "doors:woodglass_door",
+	burntime = 13,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "doors:screen_door",
+	burntime = 10,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "doors:slide_door",
+	burntime = 8,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xpanes:wood_frame_flat",
+	burntime = 5,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xpanes:bamboo_frame_flat",
+	burntime = 3,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "doors:japanese_door",
+	burntime = 8,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:chair",
+	burntime = 6,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:baricade",
+	burntime = 6,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:wood_tile",
+	burntime = 10,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:chessboard",
+	burntime = 4,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:painting",
+	burntime = 3,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:tatami",
+	burntime = 1,
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "xdecor:ivy",
+	burntime = 1,
+})
+
