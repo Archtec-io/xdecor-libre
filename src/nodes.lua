@@ -538,6 +538,9 @@ xdecor.register("painting_1", {
 			itemstack:take_item()
 		end
 
+		-- Play 'place' sound manually
+		minetest.sound_play(default.node_sound_wood_defaults().place, {pos=pointed_thing.above}, true)
+
 		return itemstack
 	end,
 	sounds = default.node_sound_wood_defaults(),
