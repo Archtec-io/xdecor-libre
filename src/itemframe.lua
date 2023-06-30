@@ -160,7 +160,8 @@ xdecor.register("itemframe", {
 minetest.register_entity("xdecor:f_item", {
 	visual = "wielditem",
 	visual_size = {x = 0.33, y = 0.33},
-	collisionbox = {0},
+	collisionbox = {0,0,0,0,0,0},
+	pointable = false,
 	physical = false,
 	textures = {"air"},
 	on_activate = function(self, staticdata)
