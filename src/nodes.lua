@@ -474,11 +474,26 @@ xdecor.register("lantern", {
 	selection_box = xdecor.pixelbox(16, {{4, 0, 4, 8, 16, 8}}),
 	sounds = default.node_sound_metal_defaults(),
 	on_place = function(itemstack, placer, pointed_thing)
+		if pointed_thing.type ~= "node" then
+			return itemstack
+		end
+
+		-- Use pointed node's on_rightclick function first, if present
+		if placer and not placer:get_player_control().sneak then
+			local node = minetest.get_node(pointed_thing.under)
+			if minetest.registered_nodes[node.name] and minetest.registered_nodes[node.name].on_rightclick then
+				return minetest.registered_nodes[node.name].on_rightclick(pointed_thing.under, node, placer, itemstack) or itemstack
+			end
+		end
+		-- Check protection
+		if minetest.is_protected(pointed_thing.above, placer:get_player_name()) and
+				not minetest.check_player_privs(placer, "protection_bypass") then
+			minetest.record_protection_violation(pointed_thing.above, placer:get_player_name())
+			return itemstack
+		end
+
 		-- Decide whether the lantern attaches the the floor
 		-- (default) or the ceiling.
-		if pointed_thing.type ~= "node" then
-			return
-		end
 		local leftover, place_pos, nodename
 		local up = vector.new(pointed_thing.above.x, pointed_thing.above.y+1, pointed_thing.above.z)
 		local upnode = minetest.get_node(up)
@@ -624,6 +639,24 @@ xdecor.register("painting_1", {
 	node_box = painting_box,
 	node_placement_prediction = "",
 	on_place = function(itemstack, placer, pointed_thing)
+		if pointed_thing.type ~= "node" then
+			return itemstack
+		end
+
+		-- Use pointed node's on_rightclick function first, if present
+		if placer and not placer:get_player_control().sneak then
+			local node = minetest.get_node(pointed_thing.under)
+			if minetest.registered_nodes[node.name] and minetest.registered_nodes[node.name].on_rightclick then
+				return minetest.registered_nodes[node.name].on_rightclick(pointed_thing.under, node, placer, itemstack) or itemstack
+			end
+		end
+		-- Check protection
+		if minetest.is_protected(pointed_thing.above, placer:get_player_name()) and
+				not minetest.check_player_privs(placer, "protection_bypass") then
+			minetest.record_protection_violation(pointed_thing.above, placer:get_player_name())
+			return itemstack
+		end
+
 		local num = math.random(4)
 		local leftover, place_pos = minetest.item_place_node(
 			ItemStack("xdecor:painting_" .. num), placer, pointed_thing)

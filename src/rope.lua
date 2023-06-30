@@ -1,16 +1,26 @@
 local rope = {}
 local S = minetest.get_translator("xdecor")
 
--- Code by Mirko K. (modified by Temperest, Wulfsdad and kilbith) (License: GPL).
+-- Code by Mirko K. (modified by Temperest, Wulfsdad, kilbith and Wuzzy) (License: GPL).
 function rope.place(itemstack, placer, pointed_thing)
 	if pointed_thing.type == "node" then
+		-- Use pointed node's on_rightclick function first, if present
+		if placer and not placer:get_player_control().sneak then
+			local node = minetest.get_node(pointed_thing.under)
+			if minetest.registered_nodes[node.name] and minetest.registered_nodes[node.name].on_rightclick then
+				return minetest.registered_nodes[node.name].on_rightclick(pointed_thing.under, node, placer, itemstack) or itemstack
+			end
+		end
 		local pos = pointed_thing.above
-		local oldnode = minetest.get_node(pos)
-		local stackname = itemstack:get_name()
-
-		if minetest.is_protected(pos, placer:get_player_name()) then
+		-- Check protection
+		if minetest.is_protected(pos, placer:get_player_name()) and
+				not minetest.check_player_privs(placer, "protection_bypass") then
+			minetest.record_protection_violation(pos, placer:get_player_name())
 			return itemstack
 		end
+
+		local oldnode = minetest.get_node(pos)
+		local stackname = itemstack:get_name()
 
 		while oldnode.name == "air" and not itemstack:is_empty() do
 			local newnode = {name = stackname, param1 = 0}
