@@ -1,4 +1,5 @@
 local mod_playerphysics = minetest.get_modpath("playerphysics") ~= nil
+local mod_player_api = minetest.get_modpath("player_api") ~= nil
 
 local function top_face(pointed_thing)
 	if not pointed_thing then return end
@@ -6,6 +7,7 @@ local function top_face(pointed_thing)
 end
 
 function xdecor.sit(pos, node, clicker, pointed_thing)
+	if not mod_player_api then return end
 	if not top_face(pointed_thing) then return end
 	local player_name = clicker:get_player_name()
 	local objs = minetest.get_objects_inside_radius(pos, 0.1)
@@ -58,6 +60,9 @@ function xdecor.sit(pos, node, clicker, pointed_thing)
 end
 
 function xdecor.sit_dig(pos, digger)
+	if not mod_player_api then
+		return true
+	end
 	for _, player in pairs(minetest.get_objects_inside_radius(pos, 0.1)) do
 		if player:is_player() and
 			    player_api.player_attached[player:get_player_name()] then
