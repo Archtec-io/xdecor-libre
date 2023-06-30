@@ -497,7 +497,7 @@ xdecor.register("lantern", {
 			return
 		end
 		if leftover:get_count() == 0 and
-				not minetest.setting_getbool("creative_mode") then
+				not minetest.is_creative_enabled(placer:get_player_name()) then
 			itemstack:take_item()
 		end
 
@@ -632,7 +632,7 @@ xdecor.register("painting_1", {
 		end
 
 		if leftover:get_count() == 0 and
-				not minetest.setting_getbool("creative_mode") then
+				not minetest.is_creative_enabled(placer:get_player_name()) then
 			itemstack:take_item()
 		end
 
