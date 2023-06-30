@@ -29,7 +29,7 @@ local template_suffixes = {
 		"_stairside.png^[transformR90",
 		".png",
 		"_outer_stairside.png",
-		"_stairside.png^[transformFX",
+		"_stairside.png",
 		"_stairside.png^[transformR90",
 		"_outer_stairside.png",
 	},
