@@ -90,7 +90,9 @@ local function xdecor_stairs_alternative(nodename, def)
 					def.tiles,
 					S("@1 Stair", def.description),
 					S("@1 Slab", def.description),
-					def.sounds
+					def.sounds, nil,
+					S("Inner @1 Stair", def.description),
+					S("Outer @1 Stair", def.description)
 				)
 			end
 		end

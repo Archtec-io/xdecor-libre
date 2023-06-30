@@ -334,8 +334,12 @@ for i = 1, #nodes do
 				end
 			else
 				stairs.register_stair_and_slab(item_name, node,
-					groups, tiles, S("@1 Stair", def.description),
-					S("@1 Slab", def.description), def.sounds)
+					groups, tiles,
+					S("@1 Stair", def.description),
+					S("@1 Slab", def.description),
+					def.sounds, nil,
+					S("Inner @1 Stair", def.description),
+					S("Outer @1 Stair", def.description))
 			end
 		end
 
