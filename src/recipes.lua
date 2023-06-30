@@ -90,8 +90,7 @@ minetest.register_craft({
 minetest.register_craft({
 	output = "xdecor:desertstone_tile",
 	recipe = {
-		{"default:desert_cobble", "default:desert_cobble"},
-		{"default:desert_cobble", "default:desert_cobble"}
+		{"default:desert_stone_block"},
 	}
 })
 
@@ -206,19 +205,18 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "xdecor:stone_tile 2",
+	output = "xdecor:stone_tile",
 	recipe = {
-		{"default:cobble", "default:cobble"},
-		{"default:cobble", "default:cobble"}
+		{"default:stone_block"},
 	}
 })
 
 minetest.register_craft({
 	output = "xdecor:stone_rune 4",
 	recipe = {
-		{"default:stone", "default:stone", "default:stone"},
-		{"default:stone", "", "default:stone"},
-		{"default:stone", "default:stone", "default:stone"}
+		{"default:stone_block", "default:stone_block", "default:stone_block"},
+		{"default:stone_block", "", "default:stone_block"},
+		{"default:stone_block", "default:stone_block", "default:stone_block"}
 	}
 })
 
@@ -294,7 +292,10 @@ minetest.register_craft({
 
 minetest.register_craft({
 	output = "xdecor:wooden2_lightbox",
-	type = "shapeless",
-	recipe = {"xdecor:wooden_lightbox"},
+	recipe = {
+		{"group:stick", "group:stick", "group:stick"},
+		{"default:torch", "default:glass", "default:torch"},
+		{"group:stick", "group:stick", "group:stick"}
+	},
 })
 

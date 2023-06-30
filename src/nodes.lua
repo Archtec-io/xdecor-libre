@@ -41,9 +41,8 @@ register_pane("rusty_bar", S("Rusty Iron Bars"), {
 	sounds = default.node_sound_stone_defaults(),
 	groups = {cracky = 2, pane = 1},
 	recipe = {
-		{"", "default:dirt", ""},
-		{"default:steel_ingot", "default:steel_ingot", "default:steel_ingot"},
-		{"default:steel_ingot", "default:steel_ingot", "default:steel_ingot"}
+		{"default:iron_lump", "default:iron_lump", "default:iron_lump"},
+		{"default:iron_lump", "default:iron_lump", "default:iron_lump"},
 	},
 	sounds = default.node_sound_metal_defaults(),
 })
