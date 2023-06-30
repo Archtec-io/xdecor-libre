@@ -58,9 +58,9 @@ function enchanting:get_tooltip(enchant, orig_caps, fleshy)
 end
 
 local enchant_buttons = {
-	"image_button[3.9,0.85;4,0.92;bg_btn.png;fast;"..FS("Efficiency").."]" ..
-	"image_button[3.9,1.77;4,1.12;bg_btn.png;durable;"..FS("Durability").."]",
-	"image_button[3.9,2.9;4,0.92;bg_btn.png;sharp;"..FS("Sharpness").."]",
+	"image_button[3.6,0.67;4.75,0.85;bg_btn.png;fast;"..FS("Efficiency").."]" ..
+	"image_button[3.6,1.65;4.75,1.05;bg_btn.png;durable;"..FS("Durability").."]",
+	"image_button[3.6,2.8;4.75,0.85;bg_btn.png;sharp;"..FS("Sharpness").."]",
 }
 
 function enchanting.formspec(pos, num)
