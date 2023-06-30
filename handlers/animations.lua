@@ -1,3 +1,5 @@
+local mod_playerphysics = minetest.get_modpath("playerphysics") ~= nil
+
 local function top_face(pointed_thing)
 	if not pointed_thing then return end
 	return pointed_thing.above.y > pointed_thing.under.y
@@ -20,7 +22,12 @@ function xdecor.sit(pos, node, clicker, pointed_thing)
 		pos.y = pos.y - 0.5
 		clicker:set_pos(pos)
 		clicker:set_eye_offset(vector.new(), vector.new())
-		clicker:set_physics_override({speed = 1, jump = 1, gravity = 1})
+		if mod_playerphysics then
+			playerphysics.remove_physics_factor(clicker, "speed", "xdecor:sit_speed")
+			playerphysics.remove_physics_factor(clicker, "jump", "xdecor:sit_jump")
+		else
+			clicker:set_physics_override({speed = 1, jump = 1})
+		end
 		default.player_attached[player_name] = false
 		default.player_set_animation(clicker, "stand", 30)
 
@@ -28,7 +35,12 @@ function xdecor.sit(pos, node, clicker, pointed_thing)
 			not ctrl.sneak and vector.equals(vel, vector.new()) then
 
 		clicker:set_eye_offset({x = 0, y = -7, z = 2}, vector.new())
-		clicker:set_physics_override({speed = 0, jump = 0, gravity = 1})
+		if mod_playerphysics then
+			playerphysics.add_physics_factor(clicker, "speed", "xdecor:sit_speed", 0)
+			playerphysics.add_physics_factor(clicker, "jump", "xdecor:sit_jump", 0)
+		else
+			clicker:set_physics_override({speed = 0, jump = 0})
+		end
 		clicker:set_pos(pos)
 		default.player_attached[player_name] = true
 		default.player_set_animation(clicker, "sit", 30)
