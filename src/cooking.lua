@@ -16,6 +16,21 @@ cauldron.cbox = {
 	{0,  0, 0,  16, 8,  16}
 }
 
+-- Returns true if the node at pos is above fire
+local function is_heated(pos)
+	local below_node = {x = pos.x, y = pos.y - 1, z = pos.z}
+	local nn = minetest.get_node(below_node).name
+	-- Check fire group
+	if minetest.get_item_group(nn, "fire") == 1 then
+		return true
+	-- Hacky: If the string "fire" is in the node name
+	elseif nn:find("fire") then
+		return true
+	else
+		return false
+	end
+end
+
 function cauldron.stop_sound(pos)
 	local spos = minetest.hash_node_position(pos)
 	if sounds[spos] then
@@ -87,8 +102,7 @@ function cauldron.filling(pos, node, clicker, itemstack)
 end
 
 function cauldron.idle_timer(pos)
-	local below_node = {x = pos.x, y = pos.y - 1, z = pos.z}
-	if not minetest.get_node(below_node).name:find("fire") then
+	if not is_heated(pos) then
 		return true
 	end
 
@@ -112,7 +126,21 @@ local function eatable(itemstring)
 end
 
 function cauldron.boiling_timer(pos)
+	-- Cool down cauldron if there is no fire
 	local node = minetest.get_node(pos)
+	if not is_heated(pos) then
+		local newnode
+		if node.name:sub(-11) == "river_water" then
+			newnode = "xdecor:cauldron_idle_river_water"
+		else
+			newnode = "xdecor:cauldron_idle"
+		end
+		minetest.set_node(pos, {name = newnode, param2 = node.param2})
+		return true
+	end
+
+	-- Count the ingredients in the cauldron
+
 	local objs = minetest.get_objects_inside_radius(pos, 0.5)
 
 	if not next(objs) then
@@ -134,6 +162,7 @@ function cauldron.boiling_timer(pos)
 		end
 	end
 
+	-- Remove ingredients and turn liquid into soup
 	if #ingredients >= 2 then
 		for _, obj in pairs(objs) do
 			obj:remove()
@@ -142,17 +171,6 @@ function cauldron.boiling_timer(pos)
 		minetest.set_node(pos, {name = "xdecor:cauldron_soup", param2 = node.param2})
 	end
 
-	local node_under = {x = pos.x, y = pos.y - 1, z = pos.z}
-
-	if not minetest.get_node(node_under).name:find("fire") then
-		local newnode
-		if node.name:sub(-11) == "river_water" then
-			newnode = "xdecor:cauldron_idle_river_water"
-		else
-			newnode = "xdecor:cauldron_idle"
-		end
-		minetest.set_node(pos, {name = newnode, param2 = node.param2})
-	end
 
 	return true
 end
