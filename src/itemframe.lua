@@ -53,11 +53,37 @@ local function drop_item(pos, node)
 	timer:stop()
 end
 
+function itemframe.set_infotext(meta)
+	local itemstring = meta:get_string("item")
+	local owner = meta:get_string("owner")
+	if itemstring == "" then
+		if owner ~= "" then
+			meta:set_string("infotext", S("@1 (owned by @2)", S("Item Frame"), owner))
+		else
+			meta:set_string("infotext", S("Item Frame"))
+		end
+	else
+		local itemstack = ItemStack(itemstring)
+		local tooltip = itemstack:get_short_description()
+		if tooltip == "" then
+			tooltip = itemstack:get_name()
+		end
+		if itemstring == "" then
+			tooltip = S("Item Frame")
+		end
+		if owner ~= "" then
+			meta:set_string("infotext", S("@1 (owned by @2)", tooltip, owner))
+		else
+			meta:set_string("infotext", tooltip)
+		end
+	end
+end
+
 function itemframe.after_place(pos, placer, itemstack)
 	local meta = minetest.get_meta(pos)
 	local name = placer:get_player_name()
 	meta:set_string("owner", name)
-	meta:set_string("infotext", S("@1 (owned by @2)", S("Item Frame"), name))
+	itemframe.set_infotext(meta)
 end
 
 function itemframe.timer(pos)
@@ -85,12 +111,8 @@ function itemframe.rightclick(pos, node, clicker, itemstack)
 	drop_item(pos, node)
 	local itemstring = itemstack:take_item():to_string()
 	meta:set_string("item", itemstring)
+	itemframe.set_infotext(meta)
 	update_item(pos, node)
-	if itemstring == "" then
-		meta:set_string("infotext", S("@1 (owned by @2)", S("Item Frame"), owner))
-	else
-		meta:set_string("infotext", S("@1 (owned by @2)", itemstring, owner))
-	end
 	return itemstack
 end
 
@@ -184,3 +206,15 @@ minetest.register_craft({
 		{"group:stick", "group:stick", "group:stick"}
 	}
 })
+
+minetest.register_lbm({
+	label = "Update itemframe infotexts",
+	name = "xdecor:update_itemframe_infotexts",
+	nodenames = {"xdecor:itemframe"},
+	run_at_every_load = true,
+	action = function(pos, node)
+		local meta = minetest.get_meta(pos)
+		itemframe.set_infotext(meta)
+	end,
+})
+
