@@ -35,7 +35,23 @@ function cauldron.stop_sound(pos)
 	local spos = minetest.hash_node_position(pos)
 	if sounds[spos] then
 		minetest.sound_stop(sounds[spos])
+		sounds[spos] = nil
 	end
+end
+
+function cauldron.start_sound(pos)
+	local spos = minetest.hash_node_position(pos)
+	-- Stop sound if one already exists.
+	-- Only 1 sound per position at maximum allowed.
+	if sounds[spos] then
+		cauldron.stop_sound(pos)
+	end
+	sounds[spos] = minetest.sound_play("xdecor_boiling_water", {
+		pos = pos,
+		max_hear_distance = 5,
+		gain = 0.8,
+		loop = true
+	})
 end
 
 function cauldron.idle_construct(pos)
@@ -45,13 +61,7 @@ function cauldron.idle_construct(pos)
 end
 
 function cauldron.boiling_construct(pos)
-	local spos = minetest.hash_node_position(pos)
-	sounds[spos] = minetest.sound_play("xdecor_boiling_water", {
-		pos = pos,
-		max_hear_distance = 5,
-		gain = 0.8,
-		loop = true
-	})
+	cauldron.start_sound(pos)
 
 	local meta = minetest.get_meta(pos)
 	meta:set_string("infotext", S("Cauldron (active) - Drop foods inside to make a soup"))
@@ -350,3 +360,14 @@ minetest.register_craft({
 		{"default:iron_lump", "default:iron_lump", "default:iron_lump"}
 	}
 })
+
+minetest.register_lbm({
+	label = "Restart boiling cauldron sounds",
+	name = "xdecor:restart_boiling_cauldron_sounds",
+	nodenames = {"xdecor:cauldron_boiling", "xdecor:cauldron_boiling_river_water"},
+	run_at_every_load = true,
+	action = function(pos, node)
+		cauldron.start_sound(pos)
+	end,
+})
+
