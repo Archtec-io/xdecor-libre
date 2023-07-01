@@ -1470,7 +1470,7 @@ if ENABLE_CHESS_GAMES then
 	})
 else
 	minetest.register_lbm({
-		label = "Clear chessboard formspec+infotext (disable Chess games)",
+		label = "Clear chessboard formspec+infotext+inventory (disable Chess games)",
 		name = "xdecor:chessboard_clear",
 		nodenames = {"realchess:chessboard"},
 		run_at_every_load = true,
@@ -1478,6 +1478,8 @@ else
 			local meta = minetest.get_meta(pos)
 			meta:set_string("formspec", "")
 			meta:set_string("infotext", "")
+			local inv = meta:get_inventory()
+			inv:set_size("board", 0)
 		end,
 	})
 end
