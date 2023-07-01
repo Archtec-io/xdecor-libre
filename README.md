@@ -77,7 +77,8 @@ Maintenance updates:
     * "Wooden Light Box 2" to "Wooden Rhombus Light Box"
 * Added fuel recipes for wooden-based things
 * Changed a few confusing recipes to make more sense
-* Improved textures for cut glass, obsidian glass and woodframed glass
+* Improved textures for cut glass, obsidian glass, woodframed glass,
+  permafrost with moss and permafrost with stones
 * Improved side texture of wood frame and rusty bar
 * Add honey and cushion block to creative inventory
 * Doors now count as nodes in creative inventory
