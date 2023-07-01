@@ -113,6 +113,12 @@ function hive.timer(pos)
 	return true
 end
 
+function hive.blast(pos)
+	local drops = xdecor.get_inventory_drops(pos, {"honey"})
+	minetest.remove_node(pos)
+	return drops
+end
+
 xdecor.register("hive", {
 	description = S("Artificial Hive"),
 	tiles = {"xdecor_hive_top.png", "xdecor_hive_top.png",
@@ -122,6 +128,7 @@ xdecor.register("hive", {
 	sounds = default.node_sound_wood_defaults(),
 	on_construct = hive.construct,
 	on_timer = hive.timer,
+	on_blast = hive.blast,
 
 	can_dig = function(pos)
 		local inv = minetest.get_meta(pos):get_inventory()

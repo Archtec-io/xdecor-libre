@@ -156,6 +156,12 @@ function workbench.dig(pos)
 	       inv:is_empty("tool") and inv:is_empty("storage")
 end
 
+function workbench.blast(pos)
+	local drops = xdecor.get_inventory_drops(pos, {"input", "hammer", "tool", "storage"})
+	minetest.remove_node(pos)
+	return drops
+end
+
 function workbench.timer(pos)
 	local timer = minetest.get_node_timer(pos)
 	local inv = minetest.get_meta(pos):get_inventory()
@@ -257,6 +263,7 @@ xdecor.register("workbench", {
 	},
 	on_rotate = screwdriver.rotate_simple,
 	can_dig = workbench.dig,
+	on_blast = workbench.blast,
 	on_timer = workbench.timer,
 	on_construct = workbench.construct,
 	on_receive_fields = workbench.fields,

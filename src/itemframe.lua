@@ -152,6 +152,10 @@ function itemframe.dig(pos, player)
 	return admin or player_name == owner
 end
 
+function itemframe.blast(pos)
+	return
+end
+
 xdecor.register("itemframe", {
 	description = S("Item Frame"),
 	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3},
@@ -169,6 +173,7 @@ xdecor.register("itemframe", {
 	on_rightclick = itemframe.rightclick,
 	on_punch = itemframe.punch,
 	can_dig = itemframe.dig,
+	on_blast = itemframe.blast,
 	after_destruct = remove_item,
 	_xdecor_itemframe_offset = -3.5,
 })

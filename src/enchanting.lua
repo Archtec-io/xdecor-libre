@@ -133,6 +133,12 @@ function enchanting.dig(pos)
 	return inv:is_empty("tool") and inv:is_empty("mese")
 end
 
+function enchanting.blast(pos)
+	local drops = xdecor.get_inventory_drops(pos, {"tool", "mese"})
+	minetest.remove_node(pos)
+	return drops
+end
+
 local function allowed(tool)
 	if not tool then return end
 
@@ -226,6 +232,7 @@ xdecor.register("enchantment_table", {
 	sounds = default.node_sound_stone_defaults(),
 	on_rotate = screwdriver.rotate_simple,
 	can_dig = enchanting.dig,
+	on_blast = enchanting.blast,
 	on_timer = enchanting.timer,
 	on_construct = enchanting.construct,
 	on_destruct = enchanting.destruct,

@@ -60,6 +60,7 @@ The following bugs of X-Decor (as of 30/06/2023) are fixed:
 * Fix boiling water sound not playing when rejoining
 * Fix rope and painting not compatible with itemframe
 * Fix itemframe, lever being offset when put into itemframe
+* Fix storage formspecs not closing if exploded
 * Show short item description in itemframe instead of itemstring
 * Made several strings translatable
 * Minor typo fixes
@@ -80,6 +81,7 @@ Maintenance updates:
 * Improved side texture of wood frame
 * Add honey and cushion block to creative inventory
 * Doors now count as nodes in creative inventory
+* Storage blocks now drop their inventory when exploded
 * Translation updates
 * Add support for playerphysics mod
 * Add description to every setting

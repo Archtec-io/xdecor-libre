@@ -1422,6 +1422,10 @@ function realchess.dig(pos, player)
 				timeout_format(timeout_limit)))
 end
 
+function realchess.blast(pos)
+	minetest.remove_node(pos)
+end
+
 minetest.register_node(":realchess:chessboard", {
 	description = S("Chess Board"),
 	drawtype = "nodebox",
@@ -1436,6 +1440,7 @@ minetest.register_node(":realchess:chessboard", {
 	node_box = {type = "fixed", fixed = {-.375, -.5, -.375, .375, -.4375, .375}},
 	sunlight_propagates = true,
 	on_rotate = screwdriver.rotate_simple,
+	on_blast = realchess.blast,
 	can_dig = realchess.dig,
 	on_construct = realchess.init,
 	on_receive_fields = realchess.fields,

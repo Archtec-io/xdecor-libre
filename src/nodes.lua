@@ -78,6 +78,12 @@ xdecor.register("barrel", {
 	sounds = default.node_sound_wood_defaults()
 })
 
+local function blast_storage(pos)
+	local drops = xdecor.get_inventory_drops(pos, {"main"})
+	minetest.remove_node(pos)
+	return drops
+end
+
 local function register_storage(name, desc, def)
 	xdecor.register(name, {
 		description = desc,
@@ -88,6 +94,7 @@ local function register_storage(name, desc, def)
 		node_box = def.node_box,
 		on_rotate = def.on_rotate,
 		on_place = def.on_place,
+		on_blast = blast_storage,
 		groups = def.groups or {choppy = 2, oddly_breakable_by_hand = 1, flammable = 2},
 		sounds = default.node_sound_wood_defaults()
 	})

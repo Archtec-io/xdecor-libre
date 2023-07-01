@@ -98,6 +98,10 @@ function mailbox.dig(pos, player)
 	return inv:is_empty("mailbox") and player_name == owner
 end
 
+function mailbox.blast(pos)
+	return
+end
+
 function mailbox.after_place_node(pos, placer)
 	local meta = minetest.get_meta(pos)
 	local player_name = placer:get_player_name()
@@ -176,6 +180,7 @@ xdecor.register("mailbox", {
 	sounds = default.node_sound_metal_defaults(),
 	on_rotate = screwdriver.rotate_simple,
 	can_dig = mailbox.dig,
+	on_blast = mailbox.blast,
 	on_rightclick = mailbox.rightclick,
 	allow_metadata_inventory_take = mailbox.allow_take,
 	allow_metadata_inventory_move = mailbox.allow_move,
