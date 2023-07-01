@@ -4,6 +4,10 @@ local FS = function(...) return minetest.formspec_escape(S(...)) end
 local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaque" or false
 screwdriver = screwdriver or {}
 
+-- Chess games are disabled because they are currently too broken.
+-- Set this to true to enable this again and try your luck.
+local ENABLE_CHESS_GAMES = false
+
 local function index_to_xy(idx)
 	if not idx then
 		return nil
@@ -1426,7 +1430,7 @@ function realchess.blast(pos)
 	minetest.remove_node(pos)
 end
 
-minetest.register_node(":realchess:chessboard", {
+local chessboarddef = {
 	description = S("Chess Board"),
 	drawtype = "nodebox",
 	paramtype = "light",
@@ -1440,14 +1444,44 @@ minetest.register_node(":realchess:chessboard", {
 	node_box = {type = "fixed", fixed = {-.375, -.5, -.375, .375, -.4375, .375}},
 	sunlight_propagates = true,
 	on_rotate = screwdriver.rotate_simple,
-	on_blast = realchess.blast,
-	can_dig = realchess.dig,
-	on_construct = realchess.init,
-	on_receive_fields = realchess.fields,
-	allow_metadata_inventory_move = realchess.move,
-	on_metadata_inventory_move = realchess.on_move,
-	allow_metadata_inventory_take = function() return 0 end
-})
+}
+if ENABLE_CHESS_GAMES then
+	-- Extend chess board node definition if chess games are enabled
+	chessboarddef.on_blast = realchess.blast
+	chessboarddef.can_dig = realchess.dig
+	chessboarddef.on_construct = realchess.init
+	chessboarddef.on_receive_fields = realchess.fields
+	chessboarddef.allow_metadata_inventory_move = realchess.move
+	chessboarddef.on_metadata_inventory_move = realchess.on_move
+	chessboarddef.allow_metadata_inventory_take = function() return 0 end
+
+	minetest.register_lbm({
+		label = "Re-initialize chessboard (enable Chess games)",
+		name = "xdecor:chessboard_reinit",
+		nodenames = {"realchess:chessboard"},
+		run_at_every_load = true,
+		action = function(pos, node)
+			-- Init chessboard only if it was already d
+			local meta = minetest.get_meta(pos)
+			if meta:get_string("formspec", "") then
+				realchess.init(pos)
+			end
+		end,
+	})
+else
+	minetest.register_lbm({
+		label = "Clear chessboard formspec+infotext (disable Chess games)",
+		name = "xdecor:chessboard_clear",
+		nodenames = {"realchess:chessboard"},
+		run_at_every_load = true,
+		action = function(pos, node)
+			local meta = minetest.get_meta(pos)
+			meta:set_string("formspec", "")
+			meta:set_string("infotext", "")
+		end,
+	})
+end
+minetest.register_node(":realchess:chessboard", chessboarddef)
 
 local function register_piece(name, white_desc, black_desc, count)
 	for _, color in pairs({"black", "white"}) do

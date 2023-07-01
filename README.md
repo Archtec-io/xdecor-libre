@@ -30,9 +30,11 @@ blocks with special features:
 * Cauldron: For storing water and cooking soups
     * Recipe: Pour water in, light a fire below it and throw
       in some food items. Collect the soup with a bowl
-* Chessboard: Play Chess against another player or the computer
 * Lever: Pull the lever to activate doors next to it
 * Pressure Plate: Step on it to activate doors next to it
+
+The chessboard, radio and speaker are purely decorative
+and have no special functionality.
 
 ### X-Decor-libre vs X-Decor
 
@@ -44,7 +46,7 @@ X-Decor with clearly documented licenses and to fix bugs. No new features are
 planned.
 
 #### List of changes
-The following bugs of X-Decor (as of 30/06/2023) are fixed:
+The following bugs of X-Decor (as of 01/07/2023) are fixed:
 
 * Changed packed ice recipe to avoid recipe collision with Ethereal
 * Changed prison door recipe colliding with Minetest Game's Iron Bar Door
@@ -66,7 +68,8 @@ The following bugs of X-Decor (as of 30/06/2023) are fixed:
 * Minor typo fixes
 
 Maintenance updates:
-* Renamed blocks
+* Chess games were disabled because they were too broken
+* Renamed blocks:
     * "Empty Shelf" to "Plain Shelf"
     * "Slide Door" to "Paper Door"
     * "Rooster" to "Weathercock"
