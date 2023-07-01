@@ -143,8 +143,11 @@ xdecor.register("hive", {
 		return 0
 	end,
 
-	on_metadata_inventory_take = function(pos, _, _, stack)
-		if stack:get_count() == HONEY_MAX then
+	on_metadata_inventory_take = function(pos, list, index, stack)
+		local inv = minetest.get_inventory({type="node", pos=pos})
+		local remainstack = inv:get_stack(list, index)
+		-- Trigger if taking anything from full honey slot
+		if remainstack:get_count() + stack:get_count() >= HONEY_MAX then
 			local timer = minetest.get_node_timer(pos)
 			timer:start(math.random(TIMER_MIN, TIMER_MAX))
 			if not is_sleeptime() and count_flowers(pos) >= NEEDED_FLOWERS then
