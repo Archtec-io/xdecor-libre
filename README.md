@@ -85,6 +85,7 @@ Maintenance updates:
 * Improved side texture of wood frame and rusty bar
 * Add honey and cushion block to creative inventory
 * Doors now count as nodes in creative inventory
+* Cobwebs are no longer considered (fake) liquids
 * Storage blocks now drop their inventory when exploded
 * Translation updates
 * Add support for playerphysics mod
