@@ -382,12 +382,12 @@ minetest.register_craft({
 })
 minetest.register_craft({
 	type = "fuel",
-	recipe = "xdecor:chessboard",
+	recipe = "realchess:chessboard",
 	burntime = 4,
 })
 minetest.register_craft({
 	type = "fuel",
-	recipe = "xdecor:painting",
+	recipe = "xdecor:painting_1",
 	burntime = 3,
 })
 minetest.register_craft({
