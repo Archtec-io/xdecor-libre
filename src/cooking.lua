@@ -4,7 +4,8 @@ local S = minetest.get_translator("xdecor")
 local infotext_empty = S("Cauldron (empty)")
 local infotext_idle = S("Cauldron (idle)")
 local infotext_boiling = S("Cauldron (active) - Drop foods inside to make a soup")
-local infotext_soup = S("Cauldron (active) - Use a bowl to eat the soup")
+local infotext_soup_boiling = S("Cauldron (active) - Use a bowl to eat the soup")
+local infotext_soup_idle = S("Cauldron (inactive) - Use a bowl to eat the soup")
 
 -- Add more ingredients here that make a soup.
 local ingredients_list = {
@@ -77,6 +78,16 @@ function cauldron.boiling_construct(pos)
 	timer:start(5.0)
 end
 
+function cauldron.idle_construct(pos)
+	local timer = minetest.get_node_timer(pos)
+	local meta = minetest.get_meta(pos)
+	meta:set_string("infotext", infotext_idle)
+	timer:start(10.0)
+	cauldron.stop_sound(pos)
+end
+
+
+
 function cauldron.filling(pos, node, clicker, itemstack)
 	local inv = clicker:get_inventory()
 	local wield_item = clicker:get_wielded_item():get_name()
@@ -124,7 +135,9 @@ function cauldron.idle_timer(pos)
 	end
 
 	local node = minetest.get_node(pos)
-	if node.name:sub(-11) == "river_water" then
+	if node.name:sub(-4) == "soup" then
+		node.name = "xdecor:cauldron_soup"
+	elseif node.name:sub(-11) == "river_water" then
 		node.name = "xdecor:cauldron_boiling_river_water"
 	else
 		node.name = "xdecor:cauldron_boiling"
@@ -147,7 +160,9 @@ function cauldron.boiling_timer(pos)
 	local node = minetest.get_node(pos)
 	if not is_heated(pos) then
 		local newnode
-		if node.name:sub(-11) == "river_water" then
+		if node.name:sub(-4) == "soup" then
+			newnode = "xdecor:cauldron_idle_soup"
+		elseif node.name:sub(-11) == "river_water" then
 			newnode = "xdecor:cauldron_idle_river_water"
 		else
 			newnode = "xdecor:cauldron_idle"
@@ -156,8 +171,13 @@ function cauldron.boiling_timer(pos)
 		return true
 	end
 
-	-- Count the ingredients in the cauldron
+	if node.name:sub(-4) == "soup" then
+		return true
+	end
 
+	-- Cooking:
+
+	-- Count the ingredients in the cauldron
 	local objs = minetest.get_objects_inside_radius(pos, 0.5)
 
 	if not next(objs) then
@@ -261,6 +281,26 @@ xdecor.register("cauldron_idle_river_water", {
 	on_timer = cauldron.idle_timer,
 })
 
+xdecor.register("cauldron_idle_soup", {
+	description = S("Cauldron with Soup (idle)"),
+	groups = {cracky = 2, oddly_breakable_by_hand = 1, not_in_creative_inventory = 1},
+	on_rotate = screwdriver.rotate_simple,
+	drop = "xdecor:cauldron_empty",
+	infotext = infotext_soup_idle,
+	tiles = {"xdecor_cauldron_top_idle_soup.png", "xdecor_cauldron_sides.png"},
+	sounds = default.node_sound_metal_defaults(),
+	collision_box = xdecor.pixelbox(16, cauldron.cbox),
+	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("infotext", infotext_soup_idle)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(10.0)
+		cauldron.stop_sound(pos)
+	end,
+	on_timer = cauldron.idle_timer,
+	on_rightclick = cauldron.take_soup,
+})
+
 xdecor.register("cauldron_boiling", {
 	description = S("Cauldron with Water (active)"),
 	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
@@ -316,7 +356,7 @@ xdecor.register("cauldron_soup", {
 	groups = {cracky = 2, oddly_breakable_by_hand = 1, not_in_creative_inventory = 1},
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
-	infotext = infotext_soup,
+	infotext = infotext_soup_boiling,
 	damage_per_second = 2,
 	tiles = {
 		{
@@ -328,10 +368,14 @@ xdecor.register("cauldron_soup", {
 	sounds = default.node_sound_metal_defaults(),
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_construct = function(pos)
-		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext", infotext_soup)
 		cauldron.start_sound(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("infotext", infotext_soup_boiling)
+
+		local timer = minetest.get_node_timer(pos)
+		timer:start(5.0)
 	end,
+	on_timer = cauldron.boiling_timer,
 	on_rightclick = cauldron.take_soup,
 	on_destruct = function(pos)
 		cauldron.stop_sound(pos)
