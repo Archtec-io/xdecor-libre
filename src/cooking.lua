@@ -27,10 +27,7 @@ local function is_heated(pos)
 	local below_node = {x = pos.x, y = pos.y - 1, z = pos.z}
 	local nn = minetest.get_node(below_node).name
 	-- Check fire group
-	if minetest.get_item_group(nn, "fire") == 1 then
-		return true
-	-- Hacky: If the string "fire" is in the node name
-	elseif nn:find("fire") then
+	if minetest.get_item_group(nn, "fire") ~= 0 then
 		return true
 	else
 		return false

@@ -61,6 +61,7 @@ The following bugs of X-Decor (as of 01/07/2023) are fixed:
 * Fix boiling water in cauldrons not reliably cooling down
 * Fix boiling water sound not playing when rejoining
 * Fix cauldron with soup boiling forever
+* Fix cauldrons being heated up by fireflies
 * Fix rope and painting not compatible with itemframe
 * Fix itemframe, lever being offset when put into itemframe
 * Fix storage formspecs not closing if exploded
