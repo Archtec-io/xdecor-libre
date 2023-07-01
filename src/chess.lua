@@ -6,7 +6,7 @@ screwdriver = screwdriver or {}
 
 -- Chess games are disabled because they are currently too broken.
 -- Set this to true to enable this again and try your luck.
-local ENABLE_CHESS_GAMES = false
+local ENABLE_CHESS_GAMES = true
 
 local function index_to_xy(idx)
 	if not idx then
@@ -716,9 +716,15 @@ function realchess.init(pos)
 	inv:set_size("board", 64)
 end
 
+do local ignore_next_invocation = false -- HACK to ignore the next invocation in case of a swap
 function realchess.move(pos, from_list, from_index, to_list, to_index, _, player)
 	if from_list ~= "board" and to_list ~= "board" then
 		return 0
+	end
+
+	if ignore_next_invocation then
+		ignore_next_invocation = false
+		return 1
 	end
 
 	local meta        = minetest.get_meta(pos)
@@ -732,17 +738,18 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 	local thisMove    -- Will replace lastMove when move is legal
 
 	if pieceFrom:find("white") then
-		if playerWhite ~= "" and playerWhite ~= playerName then
-			minetest.chat_send_player(playerName, chat_prefix .. S("Someone else plays white pieces!"))
-			return 0
-		end
-
-		if lastMove ~= "" and lastMove ~= "black" then
-			return 0
-		end
-
 		if pieceTo:find("white") then
 			-- Don't replace pieces of same color
+			return 0
+		end
+
+		if lastMove == "white" then
+			-- let the other invocation decide in case of a capture
+			return pieceTo == "" and 0 or 1
+		end
+
+		if playerWhite ~= "" and playerWhite ~= playerName then
+			minetest.chat_send_player(playerName, chat_prefix .. S("Someone else plays white pieces!"))
 			return 0
 		end
 
@@ -750,23 +757,26 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 		thisMove = "white"
 
 	elseif pieceFrom:find("black") then
-		if playerBlack ~= "" and playerBlack ~= playerName then
-			minetest.chat_send_player(playerName, chat_prefix .. S("Someone else plays black pieces!"))
-			return 0
-		end
-
-		if lastMove ~= "" and lastMove ~= "white" then
-			return 0
-		end
-
 		if pieceTo:find("black") then
 			-- Don't replace pieces of same color
+			return 0
+		end
+
+		if lastMove == "black" then
+			-- let the other invocation decide in case of a capture
+			return pieceTo == "" and 0 or 1
+		end
+
+		if playerBlack ~= "" and playerBlack ~= playerName then
+			minetest.chat_send_player(playerName, chat_prefix .. S("Someone else plays black pieces!"))
 			return 0
 		end
 
 		playerBlack = playerName
 		thisMove = "black"
 	end
+
+	ignore_next_invocation = pieceTo ~= ""
 
 	-- MOVE LOGIC
 
@@ -1242,7 +1252,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 	get_eaten_list(meta, pieceTo, pieceTo_s)
 
 	return 1
-end
+end end
 
 local function ai_move(inv, meta)
 	local board_t = board_to_table(inv)
@@ -1353,12 +1363,14 @@ end
 function realchess.on_move(pos, from_list, from_index)
 	local meta = minetest.get_meta(pos)
 	local inv  = meta:get_inventory()
-	inv:set_stack(from_list, from_index, "")
-
-	if meta:get_string("mode") == "single" then
+	if not inv:get_stack(from_list, from_index):get_name():find(meta:get_string("lastMove")) then
+		inv:set_stack(from_list, from_index, "")
+	end
+	-- The AI always plays black; make sure it doesn't move twice in the case of a swap:
+	-- Only let it play if it didn't already play.
+	if meta:get_string("mode") == "single" and meta:get_string("lastMove") ~= "black" then
 		ai_move(inv, meta)
 	end
-
 	return false
 end
 
@@ -1455,6 +1467,7 @@ if ENABLE_CHESS_GAMES then
 	chessboarddef.on_metadata_inventory_move = realchess.on_move
 	chessboarddef.allow_metadata_inventory_take = function() return 0 end
 
+	-- TODO switch to `minetest.show_formspec` to avoid LBMs
 	minetest.register_lbm({
 		label = "Re-initialize chessboard (enable Chess games)",
 		name = "xdecor:chessboard_reinit",
