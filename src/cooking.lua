@@ -1,11 +1,25 @@
 local cauldron, sounds = {}, {}
 local S = minetest.get_translator("xdecor")
 
-local infotext_empty = S("Cauldron (empty)")
-local infotext_idle = S("Cauldron (idle)")
-local infotext_boiling = S("Cauldron (active) - Drop foods inside to make a soup")
-local infotext_soup_boiling = S("Cauldron (active) - Use a bowl to eat the soup")
-local infotext_soup_idle = S("Cauldron (inactive) - Use a bowl to eat the soup")
+local hint_fire = S("Light a fire below to heat it up")
+local hint_eat = S("Use a bowl to eat the soup")
+local hint_recipe = S("Drop foods inside to make a soup")
+
+local infotexts = {
+	["xdecor:cauldron_empty"] = S("Cauldron (empty)"),
+	["xdecor:cauldron_idle"] = S("Cauldron (cold water)").."\n"..hint_fire,
+	["xdecor:cauldron_idle_river_water"] = S("Cauldron (cold river water)").."\n"..hint_fire,
+	["xdecor:cauldron_idle_soup"] = S("Cauldron (cold soup)").."\n"..hint_eat,
+	["xdecor:cauldron_boiling"] = S("Cauldron (boiling water)").."\n"..hint_recipe,
+	["xdecor:cauldron_boiling_river_water"] = S("Cauldron (boiling river water)").."\n"..hint_recipe,
+	["xdecor:cauldron_soup"] = S("Cauldron (boiling soup)").."\n"..hint_eat,
+}
+
+local function set_infotext(meta, node)
+	if infotexts[node.name] then
+		meta:set_string("infotext", infotexts[node.name])
+	end
+end
 
 -- Add more ingredients here that make a soup.
 local ingredients_list = {
@@ -59,8 +73,9 @@ end
 
 function cauldron.idle_construct(pos)
 	local timer = minetest.get_node_timer(pos)
+	local node = minetest.get_node(pos)
 	local meta = minetest.get_meta(pos)
-	meta:set_string("infotext", infotext_idle)
+	set_infotext(meta, node)
 	timer:start(10.0)
 	cauldron.stop_sound(pos)
 end
@@ -69,20 +84,12 @@ function cauldron.boiling_construct(pos)
 	cauldron.start_sound(pos)
 
 	local meta = minetest.get_meta(pos)
-	meta:set_string("infotext", infotext_boiling)
+	local node = minetest.get_node(pos)
+	set_infotext(meta, node)
 
 	local timer = minetest.get_node_timer(pos)
 	timer:start(5.0)
 end
-
-function cauldron.idle_construct(pos)
-	local timer = minetest.get_node_timer(pos)
-	local meta = minetest.get_meta(pos)
-	meta:set_string("infotext", infotext_idle)
-	timer:start(10.0)
-	cauldron.stop_sound(pos)
-end
-
 
 
 function cauldron.filling(pos, node, clicker, itemstack)
@@ -236,28 +243,27 @@ end
 
 xdecor.register("cauldron_empty", {
 	description = S("Cauldron"),
-	groups = {cracky=2, oddly_breakable_by_hand=1},
+	groups = {cracky=2, oddly_breakable_by_hand=1,cauldron=1},
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {"xdecor_cauldron_top_empty.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
-	infotext = infotext_empty,
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_rightclick = cauldron.filling,
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext", infotext_empty)
+		local node = minetest.get_node(pos)
+		set_infotext(meta, node)
 		cauldron.stop_sound(pos)
 	end,
 })
 
 xdecor.register("cauldron_idle", {
-	description = S("Cauldron with Water (idle)"),
-	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
+	description = S("Cauldron with Water (cold)"),
+	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1,cauldron=2},
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {"xdecor_cauldron_top_idle.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
 	drop = "xdecor:cauldron_empty",
-	infotext = infotext_idle,
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_rightclick = cauldron.filling,
 	on_construct = cauldron.idle_construct,
@@ -265,13 +271,12 @@ xdecor.register("cauldron_idle", {
 })
 
 xdecor.register("cauldron_idle_river_water", {
-	description = S("Cauldron with River Water (idle)"),
-	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
+	description = S("Cauldron with River Water (cold)"),
+	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1,cauldron=2},
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {"xdecor_cauldron_top_idle_river_water.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
 	drop = "xdecor:cauldron_empty",
-	infotext = infotext_idle,
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_rightclick = cauldron.filling,
 	on_construct = cauldron.idle_construct,
@@ -279,17 +284,17 @@ xdecor.register("cauldron_idle_river_water", {
 })
 
 xdecor.register("cauldron_idle_soup", {
-	description = S("Cauldron with Soup (idle)"),
-	groups = {cracky = 2, oddly_breakable_by_hand = 1, not_in_creative_inventory = 1},
+	description = S("Cauldron with Soup (cold)"),
+	groups = {cracky = 2, oddly_breakable_by_hand = 1, not_in_creative_inventory = 1,cauldron=2},
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
-	infotext = infotext_soup_idle,
 	tiles = {"xdecor_cauldron_top_idle_soup.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext", infotext_soup_idle)
+		local node = minetest.get_node(pos)
+		set_infotext(meta, node)
 		local timer = minetest.get_node_timer(pos)
 		timer:start(10.0)
 		cauldron.stop_sound(pos)
@@ -299,11 +304,10 @@ xdecor.register("cauldron_idle_soup", {
 })
 
 xdecor.register("cauldron_boiling", {
-	description = S("Cauldron with Water (active)"),
-	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
+	description = S("Cauldron with Water (boiling)"),
+	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1,cauldron=3},
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
-	infotext = infotext_boiling,
 	damage_per_second = 2,
 	tiles = {
 		{
@@ -323,11 +327,10 @@ xdecor.register("cauldron_boiling", {
 })
 
 xdecor.register("cauldron_boiling_river_water", {
-	description = S("Cauldron with River Water (active)"),
-	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
+	description = S("Cauldron with River Water (boiling)"),
+	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1,cauldron=3},
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
-	infotext = infotext_boiling,
 	damage_per_second = 2,
 	tiles = {
 		{
@@ -349,11 +352,10 @@ xdecor.register("cauldron_boiling_river_water", {
 
 
 xdecor.register("cauldron_soup", {
-	description = S("Cauldron with Soup (active)"),
-	groups = {cracky = 2, oddly_breakable_by_hand = 1, not_in_creative_inventory = 1},
+	description = S("Cauldron with Soup (boiling)"),
+	groups = {cracky = 2, oddly_breakable_by_hand = 1, not_in_creative_inventory = 1,cauldron=3},
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
-	infotext = infotext_soup_boiling,
 	damage_per_second = 2,
 	tiles = {
 		{
@@ -367,7 +369,8 @@ xdecor.register("cauldron_soup", {
 	on_construct = function(pos)
 		cauldron.start_sound(pos)
 		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext", infotext_soup_boiling)
+		local node = minetest.get_node(pos)
+		set_infotext(meta, node)
 
 		local timer = minetest.get_node_timer(pos)
 		timer:start(5.0)
@@ -426,3 +429,13 @@ minetest.register_lbm({
 	end,
 })
 
+minetest.register_lbm({
+	label = "Update cauldron infotexts",
+	name = "xdecor:update_cauldron_infotexts",
+	nodenames = {"group:cauldron"},
+	run_at_every_load = false,
+	action = function(pos, node)
+		local meta = minetest.get_meta(pos)
+		set_infotext(meta, node)
+	end,
+})
