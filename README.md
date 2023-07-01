@@ -66,7 +66,6 @@ The following bugs of X-Decor (as of 01/07/2023) are fixed:
 * Fix itemframe, lever being offset when put into itemframe
 * Fix storage formspecs not closing if exploded
 * Show short item description in itemframe instead of itemstring
-* Made several strings translatable
 * Minor typo fixes
 
 Maintenance updates:
@@ -75,8 +74,8 @@ Maintenance updates:
     * "Empty Shelf" to "Plain Shelf"
     * "Slide Door" to "Paper Door"
     * "Rooster" to "Weathercock"
-    * "Stone Tile" to "Polished Stone Tile"
-    * "Desert Stone Tile" to "Polished Desert Stone Tile"
+    * "Stone Tile" to "Polished Stone Block"
+    * "Desert Stone Tile" to "Polished Desert Stone Block"
     * "Iron Light Box" to "Steel Lattice Light Box"
     * "Wooden Light Box" to "Wooden Cross Light Box"
     * "Wooden Light Box 2" to "Wooden Rhombus Light Box"
@@ -89,6 +88,7 @@ Maintenance updates:
 * Doors now count as nodes in creative inventory
 * Cobwebs are no longer considered (fake) liquids
 * Storage blocks now drop their inventory when exploded
+* Made several strings translatable
 * Translation updates
 * Add support for playerphysics mod
 * Add description to every setting
