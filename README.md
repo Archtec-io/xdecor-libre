@@ -78,7 +78,7 @@ Maintenance updates:
 * Added fuel recipes for wooden-based things
 * Changed a few confusing recipes to make more sense
 * Improved textures for cut glass, obsidian glass and woodframed glass
-* Improved side texture of wood frame
+* Improved side texture of wood frame and rusty bar
 * Add honey and cushion block to creative inventory
 * Doors now count as nodes in creative inventory
 * Storage blocks now drop their inventory when exploded

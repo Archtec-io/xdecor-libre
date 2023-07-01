@@ -39,6 +39,7 @@ register_pane("chainlink", S("Chainlink"), {
 
 register_pane("rusty_bar", S("Rusty Iron Bars"), {
 	sounds = default.node_sound_stone_defaults(),
+	textures = {"xdecor_rusty_bar.png", "", "xdecor_rusty_bar_top.png"},
 	groups = {cracky = 2, pane = 1},
 	recipe = {
 		{"default:iron_lump", "default:iron_lump", "default:iron_lump"},
