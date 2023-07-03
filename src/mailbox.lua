@@ -86,6 +86,7 @@ function mailbox:formspec(pos, owner, is_owner)
 		(minetest.colorize and
 			minetest.colorize("#FFFF00", owner) or owner)) .. "]" ..
 		"list[nodemeta:" .. spos .. ";drop;3.5,0;1,1;]" ..
+		"listring[]" ..
 		xbg .. default.get_hotbar_bg(0, 1.25)
 end
 
