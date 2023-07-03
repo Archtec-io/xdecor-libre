@@ -69,7 +69,7 @@ function mailbox:formspec(pos, owner, is_owner)
 		return "size[9.5,9]"
 			.."label[0,0;"..FS("Mailbox").."]"
 			.."label[6,0;"..FS("Last donators").."]"
-			..[[ box[6,0.72;3.3,3.5;#555555]
+			..[[ box[6,0.72;3.3,3.9;#555555]
 			listring[current_player;main]
 			list[current_player;main;0.75,5.25;8,4;]
 			tableoptions[background=#00000000;highlight=#00000000;border=false] ]] ..
