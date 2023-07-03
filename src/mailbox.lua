@@ -3,6 +3,9 @@ screwdriver = screwdriver or {}
 local S = minetest.get_translator("xdecor")
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 
+-- Max. length of the list of givers in mailbox formspec
+local GIVER_LIST_LENGTH = 7
+
 local function get_img(img)
 	if not img then return end
 	local img_name = img:match("(.*)%.png")
@@ -47,7 +50,7 @@ function mailbox:formspec(pos, owner, is_owner)
 	local giver, img = "", ""
 
 	if is_owner then
-		for i = 1, 7 do
+		for i = 1, GIVER_LIST_LENGTH do
 			local giving = meta:get_string("giver" .. i)
 			if giving ~= "" then
 				local stack = meta:get_string("stack" .. i)
@@ -148,7 +151,7 @@ function mailbox.on_put(pos, listname, _, stack, player)
 		inv:set_list("drop", {})
 		inv:add_item("mailbox", stack)
 
-		for i = 7, 2, -1 do
+		for i = GIVER_LIST_LENGTH, 2, -1 do
 			meta:set_string("giver" .. i, meta:get_string("giver" .. (i - 1)))
 			meta:set_string("stack" .. i, meta:get_string("stack" .. (i - 1)))
 		end
@@ -159,6 +162,9 @@ function mailbox.on_put(pos, listname, _, stack, player)
 end
 
 function mailbox.allow_take(pos, listname, index, stack, player)
+	if listname == "drop" then
+		return 0
+	end
 	local meta = minetest.get_meta(pos)
 
 	if player:get_player_name() ~= meta:get_string("owner") then
