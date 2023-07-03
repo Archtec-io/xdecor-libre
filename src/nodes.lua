@@ -567,7 +567,7 @@ minetest.register_lbm({
 			local downnode = minetest.get_node(down)
 			local downdef = minetest.registered_nodes[downnode.name]
 			if updef and updef.walkable and downdef and not downdef.walkable then
-				minetest.swap_node(pos, {name="xdecor:hanging_lantern"})
+				minetest.swap_node(pos, {name="xdecor:lantern_hanging"})
 			end
 		end
 	end,
