@@ -504,10 +504,15 @@ xdecor.register("lantern", {
 		local down = vector.new(pointed_thing.above.x, pointed_thing.above.y-1, pointed_thing.above.z)
 		local downnode = minetest.get_node(down)
 		local downdef = minetest.registered_nodes[downnode.name]
+		local sound_play = false
 		if pointed_thing.under.y > pointed_thing.above.y then
 			nodename = "xdecor:lantern_hanging"
+			if downdef and not downdef.walkable then
+				sound_play = true
+			end
 		elseif downdef and not downdef.walkable and updef and updef.walkable then
 			nodename = "xdecor:lantern_hanging"
+			sound_play = true
 		else
 			nodename = "xdecor:lantern"
 		end
@@ -520,8 +525,7 @@ xdecor.register("lantern", {
 			itemstack:take_item()
 		end
 
-		-- Play 'place' sound manually if needed
-		if nodename == "xdecor:lantern_hanging" then
+		if sound_play then
 			minetest.sound_play(default.node_sound_metal_defaults().place, {pos=place_pos}, true)
 		end
 
