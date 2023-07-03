@@ -737,7 +737,7 @@ register_hard_node("stone_tile", S("Polished Stone Block"))
 register_hard_node("stone_rune", S("Runestone"))
 
 register_hard_node("packed_ice", S("Packed Ice"), {
-	groups = {cracky = 1, puts_out_fire = 1, slippery = 3},
+	groups = {cracky = 1, cools_lava = 1, slippery = 3},
 	sounds = default.node_sound_glass_defaults()
 })
 
