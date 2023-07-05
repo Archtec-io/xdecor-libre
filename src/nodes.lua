@@ -42,6 +42,7 @@ register_pane("rusty_bar", S("Rusty Iron Bars"), {
 	textures = {"xdecor_rusty_bar.png", "", "xdecor_rusty_bar_top.png"},
 	groups = {cracky = 2, pane = 1},
 	recipe = {
+		{"", "default:dirt", ""},
 		{"default:iron_lump", "default:iron_lump", "default:iron_lump"},
 		{"default:iron_lump", "default:iron_lump", "default:iron_lump"},
 	},
