@@ -63,6 +63,7 @@ Your tool last longer=
 Your tool digs faster=
 Artificial Hive=
 Honey=
+Made by bees=
 The bees are busy making honey.=
 The bees are looking for flowers.=
 The bees want to pollinate more flowers.=

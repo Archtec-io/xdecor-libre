@@ -182,3 +182,20 @@ minetest.register_craft({
 		{"group:stick", "group:stick", "group:stick"}
 	}
 })
+
+if minetest.get_modpath("unified_inventory") then
+	unified_inventory.register_craft_type("xdecor:hive", {
+		description = S("Made by bees"),
+		icon = "hive_bee.png",
+		width = 1,
+		height = 1,
+		uses_crafting_grid = false
+	})
+
+	unified_inventory.register_craft({
+		output = "xdecor:honey",
+		type = "xdecor:hive",
+		items = {"xdecor:hive"},
+		width = 1
+	})
+end
