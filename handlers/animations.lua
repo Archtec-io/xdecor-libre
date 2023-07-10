@@ -21,7 +21,6 @@ function xdecor.sit(pos, node, clicker, pointed_thing)
 	end
 
 	if player_api.player_attached[player_name] then
-		pos.y = pos.y - 0.5
 		clicker:set_pos(pos)
 		clicker:set_eye_offset(vector.new(), vector.new())
 		if mod_playerphysics then
