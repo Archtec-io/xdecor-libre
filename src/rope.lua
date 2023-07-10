@@ -64,6 +64,7 @@ function rope.remove(pos, oldnode, digger, rope_name)
 	-- Play dig sound manually
 	minetest.sound_play(ropesounds.dug, {pos=pos}, true)
 
+	-- Give/drop rope items
 	local creative = minetest.is_creative_enabled(digger:get_player_name())
 	if not creative or not digger_inv:contains_item("main", rope_name) then
 		if creative then
@@ -84,7 +85,7 @@ xdecor.register("rope", {
 	drawtype = "plantlike",
 	walkable = false,
 	climbable = true,
-	groups = {snappy = 3, flammable = 3},
+	groups = {dig_immediate = 3, flammable = 3},
 	tiles = {"xdecor_rope.png"},
 	inventory_image = "xdecor_rope_inv.png",
 	wield_image = "xdecor_rope_inv.png",
@@ -92,15 +93,9 @@ xdecor.register("rope", {
 	node_placement_prediction = "",
 	on_place = rope.place,
 
-	on_punch = function(pos, node, puncher, pointed_thing)
-		local player_name = puncher:get_player_name()
-
-		if not minetest.is_protected(pos, player_name) or
-			minetest.get_player_privs(player_name).protection_bypass then
-			rope.remove(pos, node, puncher, "xdecor:rope")
-		else
-			minetest.record_protection_violation(pos, player_name)
-		end
+	after_dig_node = function(pos, oldnode, oldmetadata, digger)
+		pos = vector.new(pos.x, pos.y-1, pos.z)
+		rope.remove(pos, oldnode, digger, "xdecor:rope")
 	end,
 	sounds = ropesounds,
 })
