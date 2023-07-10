@@ -23,10 +23,13 @@ function rope.place(itemstack, placer, pointed_thing)
 
 		local oldnode = minetest.get_node(pos)
 		local stackname = itemstack:get_name()
+		-- Limit max. rope length to max. stack size
+		-- Prevents the rope to extend infinitely in Creative Mode
+		local max_ropes = itemstack:get_stack_max()
 
 		local start_pos = table.copy(pos)
-		local ropes_placed = false
-		while oldnode.name == "air" and not itemstack:is_empty() do
+		local ropes_placed = 0
+		while oldnode.name == "air" and not itemstack:is_empty() and ropes_placed < max_ropes do
 			local newnode = {name = stackname, param1 = 0}
 			minetest.set_node(pos, newnode)
 			if not minetest.is_creative_enabled(placer:get_player_name()) then
@@ -34,9 +37,10 @@ function rope.place(itemstack, placer, pointed_thing)
 			end
 			pos.y = pos.y - 1
 			oldnode = minetest.get_node(pos)
+			ropes_placed = ropes_placed + 1
 		end
 		-- Play placement sound manually
-		if rope_placed then
+		if ropes_placed > 0 then
 			minetest.sound_play(ropesounds.place, {pos=start_pos}, true)
 		end
 	end

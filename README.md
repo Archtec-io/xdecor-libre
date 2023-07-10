@@ -94,6 +94,7 @@ Maintenance updates:
 * Add description to every setting
 * Add tooltip extensions for some interactive items (uses `tt` mod)
 * Add crafting guide support for `unified_inventory` mod (honey)
+* Rope no longer extends infinitely in Creative Mode
 
 #### List of replaced files
 
