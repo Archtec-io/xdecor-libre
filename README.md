@@ -67,6 +67,7 @@ The following bugs of X-Decor (as of 01/07/2023) are fixed:
 * Fix storage formspecs not closing if exploded
 * Show short item description in itemframe instead of itemstring
 * Minor typo fixes
+* Fix bad rope placement prediction
 
 Maintenance updates:
 * Chess games were disabled because they were too broken

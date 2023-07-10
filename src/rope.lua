@@ -89,6 +89,7 @@ xdecor.register("rope", {
 	inventory_image = "xdecor_rope_inv.png",
 	wield_image = "xdecor_rope_inv.png",
 	selection_box = xdecor.pixelbox(8, {{3, 0, 3, 2, 8, 2}}),
+	node_placement_prediction = "",
 	on_place = rope.place,
 
 	on_punch = function(pos, node, puncher, pointed_thing)
