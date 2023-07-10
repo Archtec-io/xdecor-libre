@@ -180,6 +180,7 @@ end
 
 xdecor.register("mailbox", {
 	description = S("Mailbox"),
+	_tt_help = S("Lets other players give you things"),
 	tiles = {"xdecor_mailbox_top.png", "xdecor_mailbox_bottom.png",
 		 "xdecor_mailbox_side.png", "xdecor_mailbox_side.png",
 		 "xdecor_mailbox.png", "xdecor_mailbox.png"},

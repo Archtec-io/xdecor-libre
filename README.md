@@ -92,6 +92,8 @@ Maintenance updates:
 * Translation updates
 * Add support for playerphysics mod
 * Add description to every setting
+* Add tooltip extensions for some interactive items (uses `tt` mod)
+* Add crafting guide support for `unified_inventory` mod (honey)
 
 #### List of replaced files
 

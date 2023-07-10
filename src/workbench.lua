@@ -254,6 +254,7 @@ end
 
 xdecor.register("workbench", {
 	description = S("Work Bench"),
+	_tt_help = S("For cutting blocks, repairing tools with a hammer, crafting and storing items"),
 	groups = {cracky = 2, choppy = 2, oddly_breakable_by_hand = 1},
 	sounds = default.node_sound_wood_defaults(),
 	tiles = {

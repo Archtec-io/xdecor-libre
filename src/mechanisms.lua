@@ -57,6 +57,7 @@ end
 function plate.register(material, desc, def)
 	xdecor.register("pressure_" .. material .. "_off", {
 		description = def.description or (desc .. " Pressure Plate"),
+		_tt_help = S("Opens doors when stepped on"),
 		tiles = {"xdecor_pressure_" .. material .. ".png"},
 		use_texture_alpha = ALPHA_OPAQUE,
 		drawtype = "nodebox",
@@ -95,6 +96,7 @@ plate.register("stone", "Stone", {
 
 xdecor.register("lever_off", {
 	description = S("Lever"),
+	_tt_help = S("Opens doors when pulled"),
 	tiles = {"xdecor_lever_off.png"},
 	use_texture_alpha = ALPHA_OPAQUE,
 	drawtype = "nodebox",

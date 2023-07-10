@@ -89,6 +89,7 @@ end
 local function register_storage(name, desc, def)
 	xdecor.register(name, {
 		description = desc,
+		_tt_help = def._tt_help,
 		inventory = {size = def.inv_size or 24},
 		infotext = desc,
 		tiles = def.tiles,
@@ -103,6 +104,7 @@ local function register_storage(name, desc, def)
 end
 
 register_storage("cabinet", S("Wooden Cabinet"), {
+	_tt_help = S("24 inventory slots"),
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {
 		"xdecor_cabinet_sides.png", "xdecor_cabinet_sides.png",
@@ -113,6 +115,7 @@ register_storage("cabinet", S("Wooden Cabinet"), {
 
 register_storage("cabinet_half", S("Half Wooden Cabinet"), {
 	inv_size = 8,
+	_tt_help = S("8 inventory slots"),
 	node_box = xdecor.nodebox.slab_y(0.5, 0.5),
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {
@@ -128,6 +131,7 @@ else
 	-- Node renamed from "Empty Shelf" because it was misleading.
 	-- (you can still put things in it, making it non-empty)
 	register_storage("empty_shelf", S("Plain Shelf"), {
+		_tt_help = S("24 inventory slots"),
 		on_rotate = screwdriver.rotate_simple,
 		tiles = {
 			"default_wood.png", "default_wood.png", "default_wood.png",
@@ -149,6 +153,7 @@ else
 end
 
 register_storage("multishelf", S("Multi Shelf"), {
+	_tt_help = S("24 inventory slots"),
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {
 		"default_wood.png", "default_wood.png", "default_wood.png",
@@ -409,6 +414,7 @@ end
 
 xdecor.register("enderchest", {
 	description = S("Ender Chest"),
+	_tt_help = S("Interdimensional inventory"),
 	tiles = {
 		"xdecor_enderchest_top.png", "xdecor_enderchest_top.png",
 		"xdecor_enderchest_side.png", "xdecor_enderchest_side.png",

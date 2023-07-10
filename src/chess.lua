@@ -1459,6 +1459,7 @@ local chessboarddef = {
 }
 if ENABLE_CHESS_GAMES then
 	-- Extend chess board node definition if chess games are enabled
+	chessboarddef._tt_help = S("Play a game of Chess against another player or the computer")
 	chessboarddef.on_blast = realchess.blast
 	chessboarddef.can_dig = realchess.dig
 	chessboarddef.on_construct = realchess.init

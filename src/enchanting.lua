@@ -222,6 +222,7 @@ end
 
 xdecor.register("enchantment_table", {
 	description = S("Enchantment Table"),
+	_tt_help = S("Enchant your tools with mese crystals"),
 	tiles = {
 		"xdecor_enchantment_top.png",  "xdecor_enchantment_bottom.png",
 		"xdecor_enchantment_side.png", "xdecor_enchantment_side.png",

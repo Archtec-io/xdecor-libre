@@ -243,6 +243,7 @@ end
 
 xdecor.register("cauldron_empty", {
 	description = S("Cauldron"),
+	_tt_help = S("For storing water and cooking soup"),
 	groups = {cracky=2, oddly_breakable_by_hand=1,cauldron=1},
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {"xdecor_cauldron_top_empty.png", "xdecor_cauldron_sides.png"},
