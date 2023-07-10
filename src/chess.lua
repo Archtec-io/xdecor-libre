@@ -6,7 +6,7 @@ screwdriver = screwdriver or {}
 
 -- Chess games are disabled because they are currently too broken.
 -- Set this to true to enable this again and try your luck.
-local ENABLE_CHESS_GAMES = true
+local ENABLE_CHESS_GAMES = false
 
 local function index_to_xy(idx)
 	if not idx then
