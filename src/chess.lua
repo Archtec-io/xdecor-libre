@@ -784,6 +784,7 @@ function realchess.init(pos)
 	meta:set_string("moves_raw", "")
 	meta:set_string("moves", ","..MOVES_LIST_SYMBOL_EMPTY..",,"..MOVES_LIST_SYMBOL_EMPTY..",")
 	meta:set_string("eaten", "")
+	meta:set_string("eaten_img", "")
 	meta:set_string("mode", "")
 
 	inv:set_list("board", pieces)
