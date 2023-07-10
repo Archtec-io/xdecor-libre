@@ -2,6 +2,7 @@ local realchess = {}
 local S = minetest.get_translator("xdecor")
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaque" or false
+local MOVES_LIST_SYMBOL_EMPTY = 69
 screwdriver = screwdriver or {}
 
 -- Chess games are disabled because they are currently too broken.
@@ -30,7 +31,7 @@ local function get_square(a, b)
 end
 
 local chat_prefix = minetest.colorize("#FFFF00", "["..S("Chess").."] ")
-local letters = {'A','B','C','D','E','F','G','H'}
+local letters = {'a','b','c','d','e','f','g','h'}
 
 local function board_to_table(inv)
 	local t = {}
@@ -590,7 +591,7 @@ for i = 1, #pieces do
 		x = x + 1
 	end
 end
-pieces_str = pieces_str .. "69=mailbox_blank16.png"
+pieces_str = pieces_str .. MOVES_LIST_SYMBOL_EMPTY .. "=mailbox_blank16.png"
 
 local fs_init = [[
 	size[4,1.2;]
@@ -610,8 +611,8 @@ local fs = [[
 	tableoptions[background=#00000000;highlight=#00000000;border=false]
 	]]
 	.."button[10.5,8.5;2,2;new;"..FS("New game").."]"
-	.."tablecolumns[image," .. pieces_str ..
-		";text;color;text;color;text;image," .. pieces_str .. "]"
+	-- move; white piece; white halfmove; black piece; black halfmove
+	.."tablecolumns[text;image," .. pieces_str .. ";text;image," .. pieces_str .. ";text]"
 
 local function update_formspec(meta)
 	local black_king_attacked = meta:get_string("blackAttacked") == "true"
@@ -621,6 +622,7 @@ local function update_formspec(meta)
 	local playerBlack = meta:get_string("playerBlack")
 
 	local moves     = meta:get_string("moves")
+	local m_sel_idx = meta:get_int("move_no") or 1
 	local eaten_img = meta:get_string("eaten_img")
 	local lastMove  = meta:get_string("lastMove")
 	local turnBlack = minetest.colorize("#000001", (lastMove == "white" and playerBlack ~= "") and
@@ -632,31 +634,101 @@ local function update_formspec(meta)
 	local formspec = fs ..
 		"label[1.9,0.3;"  .. turnBlack .. (black_king_attacked and " " .. check_s or "") .. "]" ..
 		"label[1.9,9.15;" .. turnWhite .. (white_king_attacked and " " .. check_s or "") .. "]" ..
-		"table[8.9,1.05;5.07,3.75;moves;" .. moves:sub(1,-2) .. ";1]" ..
+		"table[8.9,1.05;5.07,3.75;moves;" .. moves .. ";"..m_sel_idx.."]" ..
 		eaten_img
 
 	meta:set_string("formspec", formspec)
 end
 
-local function get_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_idx, to_idx)
-	local from_x, from_y  = index_to_xy(from_idx)
-	local to_x, to_y      = index_to_xy(to_idx)
-	local moves           = meta:get_string("moves")
-	local pieceFrom_s     = pieceFrom:match(":(%w+_%w+)")
-	local pieceFrom_si_id = pieces_str:match("(%d+)=" .. pieceFrom_s)
-	local pieceTo_si_id   = pieceTo_s ~= "" and pieces_str:match("(%d+)=" .. pieceTo_s) or ""
+local function add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_idx, to_idx)
+	local moves_raw = meta:get_string("moves_raw")
+	if moves_raw ~= "" then
+		moves_raw = moves_raw .. ";"
+	end
+	moves_raw = moves_raw .. pieceFrom .. "," .. pieceTo .. "," .. pieceTo_s .. "," .. from_idx .. "," .. to_idx
+	meta:set_string("moves_raw", moves_raw)
+end
 
-	local coordFrom = letters[from_x + 1] .. math.abs(from_y - 8)
-	local coordTo   = letters[to_x   + 1] .. math.abs(to_y   - 8)
+-- Create the full formspec string for the sequence of moves.
+-- Uses Figurine Algebraic Notation.
+local function update_moves_table(meta)
+	local moves_raw = meta:get_string("moves_raw")
+	if moves_raw == "" then
+		meta:set_string("moves", ","..MOVES_LIST_SYMBOL_EMPTY..",,"..MOVES_LIST_SYMBOL_EMPTY..",")
+		return
+	end
 
-	local new_moves = pieceFrom_si_id .. "," ..
-		coordFrom .. "," ..
-			(pieceTo ~= "" and "#33FF33" or "#FFFFFF") .. ", > ,#FFFFFF," ..
-		coordTo .. "," ..
-		(pieceTo ~= "" and pieceTo_si_id or "69") .. "," ..
-		moves
+	local moves_split = string.split(moves_raw, ";")
+	local moves_out = ""
+	local move_no = 0
+	for m=1, #moves_split do
+		local move_split = string.split(moves_split[m], ",", true)
+		local pieceFrom = move_split[1]
+		local pieceTo = move_split[2]
+		local pieceTo_s = move_split[3]
+		local from_idx = tonumber(move_split[4])
+		local to_idx = tonumber(move_split[5])
 
-	meta:set_string("moves", new_moves)
+		local from_x, from_y  = index_to_xy(from_idx)
+		local to_x, to_y      = index_to_xy(to_idx)
+		local pieceFrom_s     = pieceFrom:match(":(%w+_%w+)")
+		local pieceFrom_si_id
+		-- Show no piece icon for pawn
+		if pieceFrom:sub(11,14) == "pawn" then
+			pieceFrom_si_id = MOVES_LIST_SYMBOL_EMPTY
+		else
+			pieceFrom_si_id = pieces_str:match("(%d+)=" .. pieceFrom_s)
+		end
+		local pieceTo_si_id   = pieceTo_s ~= "" and pieces_str:match("(%d+)=" .. pieceTo_s) or ""
+
+		local coordFrom = letters[from_x + 1] .. math.abs(from_y - 8)
+		local coordTo   = letters[to_x   + 1] .. math.abs(to_y   - 8)
+
+		-- true if White plays, false if Black plays
+		local curPlayerIsWhite = m % 2 == 1
+
+		if curPlayerIsWhite then
+			move_no = move_no + 1
+			-- Add move number (e.g. " 3.")
+			moves_out = moves_out .. string.format("% d.", move_no) .. ","
+		end
+		local eatenSymbol = ""
+		if pieceTo ~= "" then
+			eatenSymbol = "x"
+		end
+
+		---- Add halfmove of current player
+		-- Castling
+		if pieceFrom:sub(11,14) == "king" and ((curPlayerIsWhite and from_y == 7 and to_y == 7) or (not curPlayerIsWhite and from_y == 0 and to_y == 0)) then
+			moves_out = moves_out .. MOVES_LIST_SYMBOL_EMPTY .. ","
+			-- queenside castling / shortside castling
+			if to_x == 2 then
+				-- write "0-0-0"
+				moves_out = moves_out .. "0-0-0"
+			-- kingside castling / shortside castling
+			elseif to_x == 6 then
+				-- write "0-0"
+				moves_out = moves_out .. "0-0"
+			end
+		-- Normal halfmove
+		else
+			moves_out = moves_out ..
+				pieceFrom_si_id .. "," .. -- piece image ID
+				coordFrom .. eatenSymbol .. coordTo -- coords in long algebraic notation, e.g. "e2e3"
+		end
+
+		-- If White moved, fill up the rest of the row with empty space.
+		-- Required for validity of the table
+		if curPlayerIsWhite and m == #moves_split then
+			moves_out = moves_out .. "," .. MOVES_LIST_SYMBOL_EMPTY
+		end
+
+		if m ~= #moves_split then
+			moves_out = moves_out .. ","
+		end
+	end
+	meta:set_string("moves", moves_out)
+	meta:set_int("move_no", move_no)
 end
 
 local function get_eaten_list(meta, pieceTo, pieceTo_s)
@@ -708,7 +780,9 @@ function realchess.init(pos)
 	meta:set_int("castlingWhiteL", 1)
 	meta:set_int("castlingWhiteR", 1)
 
-	meta:set_string("moves", "")
+	meta:set_int("move_no", 0)
+	meta:set_string("moves_raw", "")
+	meta:set_string("moves", ","..MOVES_LIST_SYMBOL_EMPTY..",,"..MOVES_LIST_SYMBOL_EMPTY..",")
 	meta:set_string("eaten", "")
 	meta:set_string("mode", "")
 
@@ -1248,7 +1322,8 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 	end
 
 	local pieceTo_s = pieceTo ~= "" and pieceTo:match(":(%w+_%w+)") or ""
-	get_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_index, to_index)
+	add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_index, to_index)
+	update_moves_table(meta)
 	get_eaten_list(meta, pieceTo, pieceTo_s)
 
 	return 1
@@ -1349,7 +1424,8 @@ local function ai_move(inv, meta)
 				meta:set_string("lastMove", "black")
 				meta:set_int("lastMoveTime", minetest.get_gametime())
 
-				get_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, choice_from, choice_to)
+				add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, choice_from, choice_to)
+				update_moves_table(meta)
 				get_eaten_list(meta, pieceTo, pieceTo_s)
 
 				update_formspec(meta)
