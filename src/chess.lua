@@ -52,6 +52,80 @@ local piece_values = {
 	king   = 900
 }
 
+local rowDirs = {-1, -1, -1, 0, 0, 1, 1, 1}
+local colDirs = {-1, 0, 1, -1, 1, -1, 0, 1}
+
+local rowDirsKnight = { 2,  1, 2, 1, -2, -1, -2, -1}
+local colDirsKnight = {-1, -2, 1, 2,  1,  2, -1, -2}
+
+local bishopThreats = {true,  false, true,  false, false, true,  false, true}
+local rookThreats   = {false, true,  false, true,  true,  false, true,  false}
+local queenThreats  = {true,  true,  true,  true,  true,  true,  true,  true}
+local kingThreats   = {true,  true,  true,  true,  true,  true,  true,  true}
+
+local function attacked(color, idx, board)
+	local threatDetected = false
+	local kill           = color == "white"
+	local pawnThreats    = {kill, false, kill, false, false, not kill, false, not kill}
+
+	for dir = 1, 8 do
+		if not threatDetected then
+			local col, row = index_to_xy(idx)
+			col, row = col + 1, row + 1
+
+			for step = 1, 8 do
+				row = row + rowDirs[dir]
+				col = col + colDirs[dir]
+
+				if row >= 1 and row <= 8 and col >= 1 and col <= 8 then
+					local square            = get_square(row, col)
+					local square_name       = board[square]
+					local piece, pieceColor = square_name:match(":(%w+)_(%w+)")
+
+					if piece then
+						if pieceColor ~= color then
+							if piece == "bishop" and bishopThreats[dir] then
+								threatDetected = true
+							elseif piece == "rook" and rookThreats[dir] then
+								threatDetected = true
+							elseif piece == "queen" and queenThreats[dir] then
+								threatDetected = true
+							else
+								if step == 1 then
+									if piece == "pawn" and pawnThreats[dir] then
+										threatDetected = true
+									end
+									if piece == "king" and kingThreats[dir] then
+										threatDetected = true
+									end
+								end
+							end
+						end
+						break
+					end
+				end
+			end
+
+			local colK, rowK = index_to_xy(idx)
+			colK, rowK = colK + 1, rowK + 1
+			rowK = rowK + rowDirsKnight[dir]
+			colK = colK + colDirsKnight[dir]
+
+			if rowK >= 1 and rowK <= 8 and colK >= 1 and colK <= 8 then
+				local square            = get_square(rowK, colK)
+				local square_name       = board[square]
+				local piece, pieceColor = square_name:match(":(%w+)_(%w+)")
+
+				if piece and pieceColor ~= color and piece == "knight" then
+					threatDetected = true
+				end
+			end
+		end
+	end
+
+	return threatDetected
+end
+
 local function get_possible_moves(board, from_idx)
 	local piece, color = board[from_idx]:match(":(%w+)_(%w+)")
 	if not piece then
@@ -414,6 +488,10 @@ local function get_possible_moves(board, from_idx)
 			if dx > 1 or dy > 1 then
 				moves[to_idx] = nil
 			end
+
+			if attacked(color, xy_to_index(to_x, to_y), board) then
+				moves[to_idx] = nil
+			end
 		end
 	end
 
@@ -459,80 +537,6 @@ local function best_move(moves)
 	local choice_from, choice_to = choices[random].from, choices[random].to
 
 	return tonumber(choice_from), choice_to
-end
-
-local rowDirs = {-1, -1, -1, 0, 0, 1, 1, 1}
-local colDirs = {-1, 0, 1, -1, 1, -1, 0, 1}
-
-local rowDirsKnight = { 2,  1, 2, 1, -2, -1, -2, -1}
-local colDirsKnight = {-1, -2, 1, 2,  1,  2, -1, -2}
-
-local bishopThreats = {true,  false, true,  false, false, true,  false, true}
-local rookThreats   = {false, true,  false, true,  true,  false, true,  false}
-local queenThreats  = {true,  true,  true,  true,  true,  true,  true,  true}
-local kingThreats   = {true,  true,  true,  true,  true,  true,  true,  true}
-
-local function attacked(color, idx, board)
-	local threatDetected = false
-	local kill           = color == "white"
-	local pawnThreats    = {kill, false, kill, false, false, not kill, false, not kill}
-
-	for dir = 1, 8 do
-		if not threatDetected then
-			local col, row = index_to_xy(idx)
-			col, row = col + 1, row + 1
-
-			for step = 1, 8 do
-				row = row + rowDirs[dir]
-				col = col + colDirs[dir]
-
-				if row >= 1 and row <= 8 and col >= 1 and col <= 8 then
-					local square            = get_square(row, col)
-					local square_name       = board[square]
-					local piece, pieceColor = square_name:match(":(%w+)_(%w+)")
-
-					if piece then
-						if pieceColor ~= color then
-							if piece == "bishop" and bishopThreats[dir] then
-								threatDetected = true
-							elseif piece == "rook" and rookThreats[dir] then
-								threatDetected = true
-							elseif piece == "queen" and queenThreats[dir] then
-								threatDetected = true
-							else
-								if step == 1 then
-									if piece == "pawn" and pawnThreats[dir] then
-										threatDetected = true
-									end
-									if piece == "king" and kingThreats[dir] then
-										threatDetected = true
-									end
-								end
-							end
-						end
-						break
-					end
-				end
-			end
-
-			local colK, rowK = index_to_xy(idx)
-			colK, rowK = colK + 1, rowK + 1
-			rowK = rowK + rowDirsKnight[dir]
-			colK = colK + colDirsKnight[dir]
-
-			if rowK >= 1 and rowK <= 8 and colK >= 1 and colK <= 8 then
-				local square            = get_square(rowK, colK)
-				local square_name       = board[square]
-				local piece, pieceColor = square_name:match(":(%w+)_(%w+)")
-
-				if piece and pieceColor ~= color and piece == "knight" then
-					threatDetected = true
-				end
-			end
-		end
-	end
-
-	return threatDetected
 end
 
 local function locate_kings(board)
