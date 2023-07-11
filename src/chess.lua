@@ -863,6 +863,11 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 			return 0
 		end
 
+		if lastMove == "" then
+			-- Nobody has moved yet, and Black cannot move first
+			return 0
+		end
+
 		playerBlack = playerName
 		thisMove = "black"
 	end
