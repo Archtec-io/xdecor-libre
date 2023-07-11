@@ -3,6 +3,7 @@ local S = minetest.get_translator("xdecor")
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaque" or false
 local MOVES_LIST_SYMBOL_EMPTY = 69
+local AI_NAME = S("Dumb AI")
 screwdriver = screwdriver or {}
 
 -- Chess games are disabled because they are currently too broken.
@@ -1423,7 +1424,7 @@ local function ai_move(inv, meta)
 				end
 
 				if meta:get_string("playerBlack") == "" then
-					meta:set_string("playerBlack", S("Dumb AI"))
+					meta:set_string("playerBlack", AI_NAME)
 				end
 
 				meta:set_string("lastMove", "black")
@@ -1478,6 +1479,9 @@ function realchess.fields(pos, _, fields, sender)
 
 	if fields.single or fields.multi then
 		meta:set_string("mode", (fields.single and "single" or "multi"))
+		if fields.single then
+			meta:set_string("playerBlack", AI_NAME)
+		end
 		update_formspec(meta)
 		return
 	end
