@@ -178,7 +178,7 @@ local function get_possible_moves(board, from_idx)
 						end
 					end
 				else
-					-- Mocing up
+					-- Moving up
 					-- Ensure that no piece disturbs the way
 					for i = to_y + 1, from_y - 1 do
 						if board[xy_to_index(from_x, i)] ~= "" then
@@ -187,9 +187,9 @@ local function get_possible_moves(board, from_idx)
 					end
 				end
 			elseif from_y == to_y then
-				-- Mocing horizontally
+				-- Moving horizontally
 				if from_x < to_x then
-					-- mocing right
+					-- moving right
 					-- ensure that no piece disturbs the way
 					for i = from_x + 1, to_x - 1 do
 						if board[xy_to_index(i, from_y)] ~= "" then
@@ -197,7 +197,7 @@ local function get_possible_moves(board, from_idx)
 						end
 					end
 				else
-					-- Mocing left
+					-- Moving left
 					-- Ensure that no piece disturbs the way
 					for i = to_x + 1, from_x - 1 do
 						if board[xy_to_index(i, from_y)] ~= "" then
@@ -325,7 +325,7 @@ local function get_possible_moves(board, from_idx)
 						end
 					end
 				else
-					-- Mocing up
+					-- Moving up
 					-- Ensure that no piece disturbs the way
 					for i = to_y + 1, from_y - 1 do
 						if board[xy_to_index(from_x, i)] ~= "" then
@@ -361,9 +361,9 @@ local function get_possible_moves(board, from_idx)
 				end
 			else
 				if from_y == to_y then
-					-- Mocing horizontally
+					-- Moving horizontally
 					if from_x < to_x then
-						-- mocing right
+						-- moving right
 						-- ensure that no piece disturbs the way
 						for i = from_x + 1, to_x - 1 do
 							if board[xy_to_index(i, from_y)] ~= "" then
@@ -371,7 +371,7 @@ local function get_possible_moves(board, from_idx)
 							end
 						end
 					else
-						-- Mocing left
+						-- Moving left
 						-- Ensure that no piece disturbs the way
 						for i = to_x + 1, from_x - 1 do
 							if board[xy_to_index(i, from_y)] ~= "" then
@@ -811,15 +811,20 @@ function realchess.init(pos)
 	meta:set_string("eaten_img", "")
 end
 
-do local ignore_next_invocation = false -- HACK to ignore the next invocation in case of a swap
-function realchess.move(pos, from_list, from_index, to_list, to_index, _, player)
+-- The move logic of Chess.
+-- This is meant to be called when the player *ATTEMPTS* to move a piece
+-- from one slot of the inventory to another one and reacts accordingly.
+-- If the move is valid, the inventory is changed to reflect the new
+-- situation. If the move is invalid, nothing happens.
+--
+-- * pos: Chessboard node pos
+-- * from_list: Inventory list of source square
+-- * from_index: Inventory index of source square
+-- * to_list: Inventory list of destination square
+-- * to_index: Inventory list of destination square
+function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 	if from_list ~= "board" and to_list ~= "board" then
-		return 0
-	end
-
-	if ignore_next_invocation then
-		ignore_next_invocation = false
-		return 1
+		return
 	end
 
 	local meta        = minetest.get_meta(pos)
@@ -835,7 +840,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 	if pieceFrom:find("white") then
 		if pieceTo:find("white") then
 			-- Don't replace pieces of same color
-			return 0
+			return
 		end
 
 		if lastMove == "white" then
@@ -845,7 +850,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 
 		if playerWhite ~= "" and playerWhite ~= playerName then
 			minetest.chat_send_player(playerName, chat_prefix .. S("Someone else plays white pieces!"))
-			return 0
+			return
 		end
 
 		playerWhite = playerName
@@ -854,34 +859,34 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 	elseif pieceFrom:find("black") then
 		if pieceTo:find("black") then
 			-- Don't replace pieces of same color
-			return 0
+			return
 		end
 
 		if lastMove == "black" then
 			-- let the other invocation decide in case of a capture
-			return pieceTo == "" and 0 or 1
+			return
 		end
 
 		if playerBlack ~= "" and playerBlack ~= playerName then
 			minetest.chat_send_player(playerName, chat_prefix .. S("Someone else plays black pieces!"))
-			return 0
+			return
 		end
 
 		if lastMove == "" then
 			-- Nobody has moved yet, and Black cannot move first
-			return 0
+			return
 		end
 
 		playerBlack = playerName
 		thisMove = "black"
 	end
 
-	ignore_next_invocation = pieceTo ~= ""
-
 	-- MOVE LOGIC
 
 	local from_x, from_y = index_to_xy(from_index)
 	local to_x, to_y     = index_to_xy(to_index)
+
+	local promoteTo = nil
 
 	-- PAWN
 	if pieceFrom:sub(11,14) == "pawn" then
@@ -892,23 +897,23 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				-- single step
 				if from_x == to_x then
 					if pieceTo ~= "" then
-						return 0
+						return
 					elseif to_index >= 1 and to_index <= 8 then
 						-- promote
-						inv:set_stack(from_list, from_index, "realchess:queen_white")
+						promoteTo = "realchess:queen_white"
 					end
 				elseif from_x - 1 == to_x or from_x + 1 == to_x then
 					if to_index >= 1 and to_index <= 8 and pieceTo:find("black") then
 						-- promote
-						inv:set_stack(from_list, from_index, "realchess:queen_white")
+						promoteTo = "realchess:queen_white"
 					end
 				else
-					return 0
+					return
 				end
 			elseif from_y - 2 == to_y then
 				-- double step
 				if pieceTo ~= "" or from_y < 6 or pawnWhiteMove ~= "" then
-					return 0
+					return
 				end
 				-- store this double step in meta (needed for en passant check)
 				local pawn_no = pieceFrom:sub(-1)
@@ -917,7 +922,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				local halfmove_no = #mrsplit + 1
 				meta:set_int("doublePawnStepW"..pawn_no, halfmove_no)
 			else
-				return 0
+				return
 			end
 
 			--[[
@@ -931,7 +936,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 
 			if from_x == to_x then
 				if pieceTo ~= "" then
-					return 0
+					return
 				end
 			elseif from_x - 1 == to_x or from_x + 1 == to_x then
 				-- capture
@@ -957,10 +962,10 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 					end
 				end
 				if not can_capture then
-					return 0
+					return
 				end
 			else
-				return 0
+				return
 			end
 
 		elseif thisMove == "black" then
@@ -970,23 +975,23 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				-- single step
 				if from_x == to_x then
 					if pieceTo ~= "" then
-						return 0
+						return
 					elseif to_index >= 57 and to_index <= 64 then
 						-- promote
-						inv:set_stack(from_list, from_index, "realchess:queen_black")
+						promoteTo = "realchess:queen_black"
 					end
 				elseif from_x - 1 == to_x or from_x + 1 == to_x then
 					if to_index >= 57 and to_index <= 64 and pieceTo:find("white") then
 						-- promote
-						inv:set_stack(from_list, from_index, "realchess:queen_black")
+						promoteTo = "realchess:queen_black"
 					end
 				else
-					return 0
+					return
 				end
 			elseif from_y + 2 == to_y then
 				-- double step
 				if pieceTo ~= "" or from_y > 1 or pawnBlackMove ~= "" then
-					return 0
+					return
 				end
 				-- store this double step in meta (needed for en passant check)
 				local pawn_no = pieceFrom:sub(-1)
@@ -995,7 +1000,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				local halfmove_no = #mrsplit + 1
 				meta:set_int("doublePawnStepB"..pawn_no, halfmove_no)
 			else
-				return 0
+				return
 			end
 
 			--[[
@@ -1009,7 +1014,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 
 			if from_x == to_x then
 				if pieceTo ~= "" then
-					return 0
+					return
 				end
 			elseif from_x - 1 == to_x or from_x + 1 == to_x then
 				-- capture
@@ -1035,13 +1040,13 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 					end
 				end
 				if not can_capture then
-					return 0
+					return
 				end
 			else
-				return 0
+				return
 			end
 		else
-			return 0
+			return
 		end
 
 	-- ROOK
@@ -1053,40 +1058,40 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				-- Ensure that no piece disturbs the way
 				for i = from_y + 1, to_y - 1 do
 					if inv:get_stack(from_list, xy_to_index(from_x, i)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			else
-				-- Mocing up
+				-- Moving up
 				-- Ensure that no piece disturbs the way
 				for i = to_y + 1, from_y - 1 do
 					if inv:get_stack(from_list, xy_to_index(from_x, i)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			end
 		elseif from_y == to_y then
-			-- Mocing horizontally
+			-- Moving horizontally
 			if from_x < to_x then
-				-- mocing right
+				-- moving right
 				-- ensure that no piece disturbs the way
 				for i = from_x + 1, to_x - 1 do
 					if inv:get_stack(from_list, xy_to_index(i, from_y)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			else
-				-- Mocing left
+				-- Moving left
 				-- Ensure that no piece disturbs the way
 				for i = to_x + 1, from_x - 1 do
 					if inv:get_stack(from_list, xy_to_index(i, from_y)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			end
 		else
 			-- Attempt to move arbitrarily -> abort
-			return 0
+			return
 		end
 
 		if thisMove == "white" or thisMove == "black" then
@@ -1112,7 +1117,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 
 		-- Ensure that dx == 1 and dy == 2
 		if dx ~= 1 or dy ~= 2 then
-			return 0
+			return
 		end
 		-- Just ensure that destination cell does not contain friend piece
 		-- ^ It was done already thus everything ok
@@ -1128,7 +1133,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 		if dy < 0 then dy = -dy end
 
 		-- Ensure dx and dy are equal
-		if dx ~= dy then return 0 end
+		if dx ~= dy then return end
 
 		if from_x < to_x then
 			if from_y < to_y then
@@ -1137,7 +1142,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				for i = 1, dx - 1 do
 					if inv:get_stack(
 						from_list, xy_to_index(from_x + i, from_y + i)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			else
@@ -1146,7 +1151,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				for i = 1, dx - 1 do
 					if inv:get_stack(
 						from_list, xy_to_index(from_x + i, from_y - i)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			end
@@ -1157,7 +1162,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				for i = 1, dx - 1 do
 					if inv:get_stack(
 						from_list, xy_to_index(from_x - i, from_y + i)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			else
@@ -1166,7 +1171,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				for i = 1, dx - 1 do
 					if inv:get_stack(
 						from_list, xy_to_index(from_x - i, from_y - i)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			end
@@ -1183,7 +1188,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 
 		-- Ensure valid relative move
 		if dx ~= 0 and dy ~= 0 and dx ~= dy then
-			return 0
+			return
 		end
 
 		if from_x == to_x then
@@ -1192,7 +1197,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				-- Ensure that no piece disturbs the way
 				for i = from_y + 1, to_y - 1 do
 					if inv:get_stack(from_list, xy_to_index(from_x, i)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			else
@@ -1200,7 +1205,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				-- Ensure that no piece disturbs the way
 				for i = to_y + 1, from_y - 1 do
 					if inv:get_stack(from_list, xy_to_index(from_x, i)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			end
@@ -1210,7 +1215,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				-- Ensure that no piece disturbs the way
 				for i = from_x + 1, to_x - 1 do
 					if inv:get_stack(from_list, xy_to_index(i, from_y)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			elseif from_y < to_y then
@@ -1219,7 +1224,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				for i = 1, dx - 1 do
 					if inv:get_stack(
 						from_list, xy_to_index(from_x + i, from_y + i)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			else
@@ -1228,7 +1233,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				for i = 1, dx - 1 do
 					if inv:get_stack(
 						from_list, xy_to_index(from_x + i, from_y - i)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			end
@@ -1238,7 +1243,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				-- Ensure that no piece disturbs the way and destination cell does
 				for i = to_x + 1, from_x - 1 do
 					if inv:get_stack(from_list, xy_to_index(i, from_y)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			elseif from_y < to_y then
@@ -1247,7 +1252,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				for i = 1, dx - 1 do
 					if inv:get_stack(
 						from_list, xy_to_index(from_x - i, from_y + i)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			else
@@ -1256,7 +1261,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 				for i = 1, dx - 1 do
 					if inv:get_stack(
 						from_list, xy_to_index(from_x - i, from_y - i)):get_name() ~= "" then
-						return 0
+						return
 					end
 				end
 			end
@@ -1279,12 +1284,12 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 					if castlingWhiteL == 1 and idx57 == "realchess:rook_white_1" then
 						for i = 58, from_index - 1 do
 							if inv:get_stack(from_list, i):get_name() ~= "" then
-								return 0
+								return
 							end
 						end
 						for i = from_index, from_index - 2, -1 do
 							if attacked("white", i, board) then
-								return 0
+								return
 							end
 						end
 						inv:set_stack(from_list, 57, "")
@@ -1298,12 +1303,12 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 					if castlingWhiteR == 1 and idx64 == "realchess:rook_white_2" then
 						for i = from_index + 1, 63 do
 							if inv:get_stack(from_list, i):get_name() ~= "" then
-								return 0
+								return
 							end
 						end
 						for i = from_index, from_index + 2, 1 do
 							if attacked("white", i, board) then
-								return 0
+								return
 							end
 						end
 						inv:set_stack(from_list, 62, "realchess:rook_white_2")
@@ -1321,12 +1326,12 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 					if castlingBlackL == 1 and idx1 == "realchess:rook_black_1" then
 						for i = 2, from_index - 1 do
 							if inv:get_stack(from_list, i):get_name() ~= "" then
-								return 0
+								return
 							end
 						end
 						for i = from_index, from_index - 2, -1 do
 							if attacked("black", i, board) then
-								return 0
+								return
 							end
 						end
 						inv:set_stack(from_list, 1, "")
@@ -1340,12 +1345,12 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 					if castlingBlackR == 1 and idx8 == "realchess:rook_black_2" then
 						for i = from_index + 1, 7 do
 							if inv:get_stack(from_list, i):get_name() ~= "" then
-								return 0
+								return
 							end
 						end
 						for i = from_index, from_index + 2, 1 do
 							if attacked("black", i, board) then
-								return 0
+								return
 							end
 						end
 						inv:set_stack(from_list, 6, "realchess:rook_black_2")
@@ -1366,7 +1371,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 			end
 
 			if dx > 1 or dy > 1 then
-				return 0
+				return
 			end
 		end
 
@@ -1386,14 +1391,14 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 
 	local black_king_idx, white_king_idx = locate_kings(board)
 	if not black_king_idx or not white_king_idx then
-		return 0
+		return
 	end
 	local blackAttacked = attacked("black", black_king_idx, board)
 	local whiteAttacked = attacked("white", white_king_idx, board)
 
 	if blackAttacked then
 		if thisMove == "black" then
-			return 0
+			return
 		else
 			meta:set_string("blackAttacked", "true")
 		end
@@ -1403,7 +1408,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 
 	if whiteAttacked then
 		if thisMove == "white" then
-			return 0
+			return
 		else
 			meta:set_string("whiteAttacked", "true")
 		end
@@ -1425,8 +1430,16 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 	add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_index, to_index)
 	add_to_eaten_list(meta, pieceTo, pieceTo_s)
 
-	return 1
-end end
+	local movePiece
+	if promoteTo then
+		movePiece = promoteTo
+	else
+		movePiece = pieceFrom
+	end
+	realchess.move_piece(meta, movePiece, from_list, from_index, to_list, to_index)
+
+	return
+end
 
 local function ai_move(inv, meta)
 	local board_t = board_to_table(inv)
@@ -1534,22 +1547,6 @@ local function ai_move(inv, meta)
 	end
 end
 
-function realchess.on_move(pos, from_list, from_index)
-	local meta = minetest.get_meta(pos)
-	local inv  = meta:get_inventory()
-	if not inv:get_stack(from_list, from_index):get_name():find(meta:get_string("lastMove")) then
-		inv:set_stack(from_list, from_index, "")
-	end
-	-- The AI always plays black; make sure it doesn't move twice in the case of a swap:
-	-- Only let it play if it didn't already play.
-	if meta:get_string("mode") == "single" and meta:get_string("lastMove") ~= "black" then
-		ai_move(inv, meta)
-	else
-		update_formspec(meta)
-	end
-	return false
-end
-
 local function timeout_format(timeout_limit)
 	local time_remaining = timeout_limit - minetest.get_gametime()
 	local minutes        = math.floor(time_remaining / 60)
@@ -1617,6 +1614,21 @@ function realchess.dig(pos, player)
 				timeout_format(timeout_limit)))
 end
 
+-- Helper function for realchess.move.
+-- To be called when a valid normal move should be taken.
+-- Will also update the state for the Chessboard.
+function realchess.move_piece(meta, pieceFrom, from_list, from_index, to_list, to_index)
+	local inv = meta:get_inventory()
+	inv:set_stack(from_list, from_index, "")
+	inv:set_stack(to_list, to_index, pieceFrom)
+	update_formspec(meta)
+	-- The AI always plays black; make sure it doesn't move twice in the case of a swap:
+	-- Only let it play if it didn't already play.
+	if meta:get_string("mode") == "single" and meta:get_string("lastMove") ~= "black" then
+		ai_move(inv, meta)
+	end
+end
+
 function realchess.blast(pos)
 	minetest.remove_node(pos)
 end
@@ -1643,9 +1655,24 @@ if ENABLE_CHESS_GAMES then
 	chessboarddef.can_dig = realchess.dig
 	chessboarddef.on_construct = realchess.init
 	chessboarddef.on_receive_fields = realchess.fields
-	chessboarddef.allow_metadata_inventory_move = realchess.move
-	chessboarddef.on_metadata_inventory_move = realchess.on_move
+	-- The move logic of Chess is here (at least for players)
+	chessboarddef.allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, _, player)
+		-- Normally, the allow function is meant to just check if an inventory move
+		-- is allowed but instead we abuse it to detect where the player is *attempting*
+		-- to move pieces to.
+		-- This function may manipulate the inventory. This is a bit dirty
+		-- because this is not really what the allow function is meant to do.
+		realchess.move(pos, from_list, from_index, to_list, to_index, player)
+		-- We always return 0 to disable all *builtin* inventory moves, since
+		-- we do it ourselves. This should be fine because there shouldn't be a
+		-- conflict between this mod and Minetest then.
+		return 0
+	end
 	chessboarddef.allow_metadata_inventory_take = function() return 0 end
+	chessboarddef.allow_metadata_inventory_put = function() return 0 end
+	-- Note: There is no on_move function because we put the entire move handling
+	-- into the allow function above. The reason for this is of Minetest's
+	-- awkward behavior when swapping items.
 
 	-- TODO switch to `minetest.show_formspec` to avoid LBMs
 	minetest.register_lbm({
@@ -1654,7 +1681,7 @@ if ENABLE_CHESS_GAMES then
 		nodenames = {"realchess:chessboard"},
 		run_at_every_load = true,
 		action = function(pos, node)
-			-- Init chessboard only if it was already d
+			-- Init chessboard only if neccessary
 			local meta = minetest.get_meta(pos)
 			if meta:get_string("formspec", "") then
 				realchess.init(pos)
