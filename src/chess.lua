@@ -1258,6 +1258,8 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 		local dx = from_x - to_x
 		local dy = from_y - to_y
 		local check = true
+		local inv = meta:get_inventory()
+		local board = board_to_table(inv)
 
 		if thisMove == "white" then
 			if from_y == 7 and to_y == 7 then
@@ -1271,7 +1273,11 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 								return 0
 							end
 						end
-
+						for i = from_index, from_index - 2, -1 do
+							if attacked("white", i, board) then
+								return 0
+							end
+						end
 						inv:set_stack(from_list, 57, "")
 						inv:set_stack(from_list, 60, "realchess:rook_white_1")
 						check = false
@@ -1286,7 +1292,11 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 								return 0
 							end
 						end
-
+						for i = from_index, from_index + 2, 1 do
+							if attacked("white", i, board) then
+								return 0
+							end
+						end
 						inv:set_stack(from_list, 62, "realchess:rook_white_2")
 						inv:set_stack(from_list, 64, "")
 						check = false
@@ -1305,7 +1315,11 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 								return 0
 							end
 						end
-
+						for i = from_index, from_index - 2, -1 do
+							if attacked("black", i, board) then
+								return 0
+							end
+						end
 						inv:set_stack(from_list, 1, "")
 						inv:set_stack(from_list, 4, "realchess:rook_black_1")
 						check = false
@@ -1320,7 +1334,11 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 								return 0
 							end
 						end
-
+						for i = from_index, from_index + 2, 1 do
+							if attacked("black", i, board) then
+								return 0
+							end
+						end
 						inv:set_stack(from_list, 6, "realchess:rook_black_2")
 						inv:set_stack(from_list, 8, "")
 						check = false
