@@ -666,14 +666,15 @@ local function get_moves_formstring(meta)
 			-- Add move number (e.g. " 3.")
 			moves_out = moves_out .. string.format("% d.", move_no) .. ","
 		end
-		local eatenSymbol = ""
-		local enPassantSymbol = ""
+		local betweenCoordsSymbol = "–" -- to be inserted between source and destination coords
+						-- dash for normal moves, × for capturing moves
+		local enPassantSymbol = "" -- symbol for en passant captures
 		if pieceTo ~= "" then
 			-- normal capture
-			eatenSymbol = "x"
+			betweenCoordsSymbol = "×"
 		elseif pieceTo == "" and pieceFrom:sub(11,14) == "pawn" and from_x ~= to_x then
 			-- 'en passant' capture
-			eatenSymbol = "x"
+			betweenCoordsSymbol = "×"
 			enPassantSymbol = " e. p."
 		end
 
@@ -683,18 +684,18 @@ local function get_moves_formstring(meta)
 			moves_out = moves_out .. MOVES_LIST_SYMBOL_EMPTY .. ","
 			-- queenside castling
 			if to_x == 2 then
-				-- write "0-0-0"
-				moves_out = moves_out .. "0-0-0"
+				-- write "0–0–0"
+				moves_out = moves_out .. "0–0–0"
 			-- kingside castling
 			elseif to_x == 6 then
-				-- write "0-0"
-				moves_out = moves_out .. "0-0"
+				-- write "0–0"
+				moves_out = moves_out .. "0–0"
 			end
 		-- Normal halfmove
 		else
 			moves_out = moves_out ..
 				pieceFrom_si_id .. "," .. -- piece image ID
-				coordFrom .. eatenSymbol .. coordTo .. -- coords in long algebraic notation, e.g. "e2e3"
+				coordFrom .. betweenCoordsSymbol .. coordTo .. -- coords in long algebraic notation, e.g. "e2e3"
 				enPassantSymbol -- written in case of an 'en passant' capture
 		end
 
