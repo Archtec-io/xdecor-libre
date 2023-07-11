@@ -625,15 +625,19 @@ local function update_formspec(meta)
 	local m_sel_idx = meta:get_int("move_no") or 1
 	local eaten_img = meta:get_string("eaten_img")
 	local lastMove  = meta:get_string("lastMove")
-	local turnBlack = minetest.colorize("#000001", (lastMove == "white" and playerBlack ~= "") and
-			  playerBlack .. "..." or playerBlack)
-	local turnWhite = minetest.colorize("#000001", (lastMove == "black" and playerWhite ~= "") and
-			  playerWhite .. "..." or playerWhite)
+	-- arrow to show whose turn it is
+	local blackArr  = (lastMove == "white" and "image[1,0.2;0.7,0.7;chess_turn_black.png]") or ""
+	local whiteArr  = ((lastMove == "" or lastMove == "black") and "image[1,9.05;0.7,0.7;chess_turn_white.png]") or ""
+	local turnBlack = minetest.colorize("#000001", playerBlack)
+	local turnWhite = minetest.colorize("#000001", playerWhite)
+	-- display the word "check" if the player is in check
 	local check_s   = minetest.colorize("#FF0000", "\\["..FS("check").."\\]")
 
 	local formspec = fs ..
 		"label[1.9,0.3;"  .. turnBlack .. (black_king_attacked and " " .. check_s or "") .. "]" ..
+		blackArr ..
 		"label[1.9,9.15;" .. turnWhite .. (white_king_attacked and " " .. check_s or "") .. "]" ..
+		whiteArr ..
 		"table[8.9,1.05;5.07,3.75;moves;" .. moves .. ";"..m_sel_idx.."]" ..
 		eaten_img
 
@@ -701,11 +705,11 @@ local function update_moves_table(meta)
 		-- Castling
 		if pieceFrom:sub(11,14) == "king" and ((curPlayerIsWhite and from_y == 7 and to_y == 7) or (not curPlayerIsWhite and from_y == 0 and to_y == 0)) then
 			moves_out = moves_out .. MOVES_LIST_SYMBOL_EMPTY .. ","
-			-- queenside castling / shortside castling
+			-- queenside castling
 			if to_x == 2 then
 				-- write "0-0-0"
 				moves_out = moves_out .. "0-0-0"
-			-- kingside castling / shortside castling
+			-- kingside castling
 			elseif to_x == 6 then
 				-- write "0-0"
 				moves_out = moves_out .. "0-0"
