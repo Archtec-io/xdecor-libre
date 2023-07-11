@@ -1520,6 +1520,8 @@ function realchess.on_move(pos, from_list, from_index)
 	-- Only let it play if it didn't already play.
 	if meta:get_string("mode") == "single" and meta:get_string("lastMove") ~= "black" then
 		ai_move(inv, meta)
+	else
+		update_formspec(meta)
 	end
 	return false
 end
