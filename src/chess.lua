@@ -54,7 +54,9 @@ local piece_values = {
 
 local function get_possible_moves(board, from_idx)
 	local piece, color = board[from_idx]:match(":(%w+)_(%w+)")
-	if not piece then return end
+	if not piece then
+		return {}
+	end
 	local moves = {}
 	local from_x, from_y = index_to_xy(from_idx)
 
@@ -415,7 +417,9 @@ local function get_possible_moves(board, from_idx)
 		end
 	end
 
-	if not next(moves) then return end
+	if not next(moves) then
+		return {}
+	end
 
 	for i in pairs(moves) do
 		local stack_name = board[tonumber(i)]
