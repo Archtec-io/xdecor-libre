@@ -623,7 +623,7 @@ local function update_formspec(meta)
 	local playerBlack = meta:get_string("playerBlack")
 
 	local moves     = meta:get_string("moves")
-	local m_sel_idx = meta:get_int("move_no") or 1
+	local moves_raw = meta:get_string("moves_raw")
 	local eaten_img = meta:get_string("eaten_img")
 	local lastMove  = meta:get_string("lastMove")
 	-- arrow to show whose turn it is
@@ -633,6 +633,9 @@ local function update_formspec(meta)
 	local turnWhite = minetest.colorize("#000001", playerWhite)
 	-- display the word "check" if the player is in check
 	local check_s   = minetest.colorize("#FF0000", "\\["..FS("check").."\\]")
+
+	local mrsplit = string.split(moves_raw, ";")
+	local m_sel_idx = math.ceil(#mrsplit / 2)
 
 	local formspec = fs ..
 		"label[1.9,0.3;"  .. turnBlack .. (black_king_attacked and " " .. check_s or "") .. "]" ..
@@ -698,8 +701,14 @@ local function update_moves_table(meta)
 			moves_out = moves_out .. string.format("% d.", move_no) .. ","
 		end
 		local eatenSymbol = ""
+		local enPassantSymbol = ""
 		if pieceTo ~= "" then
+			-- normal capture
 			eatenSymbol = "x"
+		elseif pieceTo == "" and pieceFrom:sub(11,14) == "pawn" and from_x ~= to_x then
+			-- 'en passant' capture
+			eatenSymbol = "x"
+			enPassantSymbol = " e. p."
 		end
 
 		---- Add halfmove of current player
@@ -719,7 +728,8 @@ local function update_moves_table(meta)
 		else
 			moves_out = moves_out ..
 				pieceFrom_si_id .. "," .. -- piece image ID
-				coordFrom .. eatenSymbol .. coordTo -- coords in long algebraic notation, e.g. "e2e3"
+				coordFrom .. eatenSymbol .. coordTo .. -- coords in long algebraic notation, e.g. "e2e3"
+				enPassantSymbol -- written in case of an 'en passant' capture
 		end
 
 		-- If White moved, fill up the rest of the row with empty space.
@@ -733,7 +743,6 @@ local function update_moves_table(meta)
 		end
 	end
 	meta:set_string("moves", moves_out)
-	meta:set_int("move_no", move_no)
 end
 
 local function get_eaten_list(meta, pieceTo, pieceTo_s)
@@ -785,7 +794,6 @@ function realchess.init(pos)
 	meta:set_int("castlingWhiteL", 1)
 	meta:set_int("castlingWhiteR", 1)
 
-	meta:set_int("move_no", 0)
 	meta:set_string("moves_raw", "")
 	meta:set_string("moves", ","..MOVES_LIST_SYMBOL_EMPTY..",,"..MOVES_LIST_SYMBOL_EMPTY..",")
 	meta:set_string("eaten", "")
@@ -869,25 +877,33 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 			local pawnWhiteMove = inv:get_stack(from_list, xy_to_index(from_x, from_y - 1)):get_name()
 			-- white pawns can go up only
 			if from_y - 1 == to_y then
+				-- single step
 				if from_x == to_x then
 					if pieceTo ~= "" then
 						return 0
 					elseif to_index >= 1 and to_index <= 8 then
+						-- promote
 						inv:set_stack(from_list, from_index, "realchess:queen_white")
 					end
 				elseif from_x - 1 == to_x or from_x + 1 == to_x then
-					if not pieceTo:find("black") then
-						return 0
-					elseif to_index >= 1 and to_index <= 8 then
+					if to_index >= 1 and to_index <= 8 and pieceTo:find("black") then
+						-- promote
 						inv:set_stack(from_list, from_index, "realchess:queen_white")
 					end
 				else
 					return 0
 				end
 			elseif from_y - 2 == to_y then
+				-- double step
 				if pieceTo ~= "" or from_y < 6 or pawnWhiteMove ~= "" then
 					return 0
 				end
+				-- store this double step in meta (needed for en passant check)
+				local pawn_no = pieceFrom:sub(-1)
+				local moves_raw = meta:get_string("moves_raw")
+				local mrsplit = string.split(moves_raw, ";")
+				local halfmove_no = #mrsplit + 1
+				meta:set_int("doublePawnStepW"..pawn_no, halfmove_no)
 			else
 				return 0
 			end
@@ -906,7 +922,29 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 					return 0
 				end
 			elseif from_x - 1 == to_x or from_x + 1 == to_x then
-				if not pieceTo:find("black") then
+				-- capture
+				local can_capture = false
+				if pieceTo:find("black") then
+					-- normal capture
+					can_capture = true
+				else
+					-- en passant
+					local enPassantPiece = inv:get_stack(to_list, xy_to_index(to_x, from_y))
+					local epp_meta = enPassantPiece:get_meta()
+					local epp_name = enPassantPiece:get_name()
+					if epp_name:find("black") and epp_name:sub(11,14) == "pawn" then
+						local pawn_no = epp_name:sub(-1)
+						local double_step_halfmove = meta:get_int("doublePawnStepB"..pawn_no)
+						local moves_raw = meta:get_string("moves_raw")
+						local mrsplit = string.split(moves_raw, ";")
+						local current_halfmove = #mrsplit + 1
+						if double_step_halfmove ~= 0 and double_step_halfmove == current_halfmove - 1 then
+							can_capture = true
+							inv:set_stack(to_list, xy_to_index(to_x, from_y), "")
+						end
+					end
+				end
+				if not can_capture then
 					return 0
 				end
 			else
@@ -917,25 +955,33 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 			local pawnBlackMove = inv:get_stack(from_list, xy_to_index(from_x, from_y + 1)):get_name()
 			-- black pawns can go down only
 			if from_y + 1 == to_y then
+				-- single step
 				if from_x == to_x then
 					if pieceTo ~= "" then
 						return 0
 					elseif to_index >= 57 and to_index <= 64 then
+						-- promote
 						inv:set_stack(from_list, from_index, "realchess:queen_black")
 					end
 				elseif from_x - 1 == to_x or from_x + 1 == to_x then
-					if not pieceTo:find("white") then
-						return 0
-					elseif to_index >= 57 and to_index <= 64 then
+					if to_index >= 57 and to_index <= 64 and pieceTo:find("white") then
+						-- promote
 						inv:set_stack(from_list, from_index, "realchess:queen_black")
 					end
 				else
 					return 0
 				end
 			elseif from_y + 2 == to_y then
+				-- double step
 				if pieceTo ~= "" or from_y > 1 or pawnBlackMove ~= "" then
 					return 0
 				end
+				-- store this double step in meta (needed for en passant check)
+				local pawn_no = pieceFrom:sub(-1)
+				local moves_raw = meta:get_string("moves_raw")
+				local mrsplit = string.split(moves_raw, ";")
+				local halfmove_no = #mrsplit + 1
+				meta:set_int("doublePawnStepB"..pawn_no, halfmove_no)
 			else
 				return 0
 			end
@@ -954,7 +1000,29 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 					return 0
 				end
 			elseif from_x - 1 == to_x or from_x + 1 == to_x then
-				if not pieceTo:find("white") then
+				-- capture
+				local can_capture = false
+				if pieceTo:find("white") then
+					-- normal capture
+					can_capture = true
+				else
+					-- en passant
+					local enPassantPiece = inv:get_stack(to_list, xy_to_index(to_x, from_y))
+					local epp_meta = enPassantPiece:get_meta()
+					local epp_name = enPassantPiece:get_name()
+					if epp_name:find("white") and epp_name:sub(11,14) == "pawn" then
+						local pawn_no = epp_name:sub(-1)
+						local double_step_halfmove = meta:get_int("doublePawnStepW"..pawn_no)
+						local moves_raw = meta:get_string("moves_raw")
+						local mrsplit = string.split(moves_raw, ";")
+						local current_halfmove = #mrsplit + 1
+						if double_step_halfmove ~= 0 and double_step_halfmove == current_halfmove - 1 then
+							can_capture = true
+							inv:set_stack(to_list, xy_to_index(to_x, from_y), "")
+						end
+					end
+				end
+				if not can_capture then
 					return 0
 				end
 			else
