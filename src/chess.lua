@@ -1389,7 +1389,6 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 
 	if blackAttacked then
 		if thisMove == "black" then
-			--[(*)[ and meta:get_string("blackAttacked") == "true" ]] then
 			return 0
 		else
 			meta:set_string("blackAttacked", "true")
@@ -1400,7 +1399,6 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 
 	if whiteAttacked then
 		if thisMove == "white" then
-			--[(*)[ and meta:get_string("whiteAttacked") == "true" ]] then
 			return 0
 		else
 			meta:set_string("whiteAttacked", "true")
@@ -1408,8 +1406,6 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 	else
 		meta:set_string("whiteAttacked", "")
 	end
-
-	--(*) Allow a piece to move and put its king in check. Maybe not in the chess rules though?
 
 	lastMove = thisMove
 	meta:set_string("lastMove", lastMove)
