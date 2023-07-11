@@ -615,39 +615,6 @@ local fs = [[
 	-- move; white piece; white halfmove; black piece; black halfmove
 	.."tablecolumns[text;image," .. pieces_str .. ";text;image," .. pieces_str .. ";text]"
 
-local function update_formspec(meta)
-	local black_king_attacked = meta:get_string("blackAttacked") == "true"
-	local white_king_attacked = meta:get_string("whiteAttacked") == "true"
-
-	local playerWhite = meta:get_string("playerWhite")
-	local playerBlack = meta:get_string("playerBlack")
-
-	local moves     = meta:get_string("moves")
-	local moves_raw = meta:get_string("moves_raw")
-	local eaten_img = meta:get_string("eaten_img")
-	local lastMove  = meta:get_string("lastMove")
-	-- arrow to show whose turn it is
-	local blackArr  = (lastMove == "white" and "image[1,0.2;0.7,0.7;chess_turn_black.png]") or ""
-	local whiteArr  = ((lastMove == "" or lastMove == "black") and "image[1,9.05;0.7,0.7;chess_turn_white.png]") or ""
-	local turnBlack = minetest.colorize("#000001", playerBlack)
-	local turnWhite = minetest.colorize("#000001", playerWhite)
-	-- display the word "check" if the player is in check
-	local check_s   = minetest.colorize("#FF0000", "\\["..FS("check").."\\]")
-
-	local mrsplit = string.split(moves_raw, ";")
-	local m_sel_idx = math.ceil(#mrsplit / 2)
-
-	local formspec = fs ..
-		"label[1.9,0.3;"  .. turnBlack .. (black_king_attacked and " " .. check_s or "") .. "]" ..
-		blackArr ..
-		"label[1.9,9.15;" .. turnWhite .. (white_king_attacked and " " .. check_s or "") .. "]" ..
-		whiteArr ..
-		"table[8.9,1.05;5.07,3.75;moves;" .. moves .. ";"..m_sel_idx.."]" ..
-		eaten_img
-
-	meta:set_string("formspec", formspec)
-end
-
 local function add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_idx, to_idx)
 	local moves_raw = meta:get_string("moves_raw")
 	if moves_raw ~= "" then
@@ -659,11 +626,10 @@ end
 
 -- Create the full formspec string for the sequence of moves.
 -- Uses Figurine Algebraic Notation.
-local function update_moves_table(meta)
+local function get_moves_formstring(meta)
 	local moves_raw = meta:get_string("moves_raw")
 	if moves_raw == "" then
-		meta:set_string("moves", ","..MOVES_LIST_SYMBOL_EMPTY..",,"..MOVES_LIST_SYMBOL_EMPTY..",")
-		return
+		return ","..MOVES_LIST_SYMBOL_EMPTY..",,"..MOVES_LIST_SYMBOL_EMPTY..","
 	end
 
 	local moves_split = string.split(moves_raw, ";")
@@ -742,17 +708,19 @@ local function update_moves_table(meta)
 			moves_out = moves_out .. ","
 		end
 	end
-	meta:set_string("moves", moves_out)
+	return moves_out
 end
 
-local function get_eaten_list(meta, pieceTo, pieceTo_s)
+local function add_to_eaten_list(meta, pieceTo, pieceTo_s)
 	local eaten = meta:get_string("eaten")
 	if pieceTo ~= "" then
 		eaten = eaten .. pieceTo_s .. ","
 	end
-
 	meta:set_string("eaten", eaten)
+end
 
+local function get_eaten_formstring(meta)
+	local eaten = meta:get_string("eaten")
 	local eaten_t   = string.split(eaten, ",")
 	local eaten_img = ""
 
@@ -772,8 +740,40 @@ local function get_eaten_list(meta, pieceTo, pieceTo_s)
 			"image[" .. ((X + (is_white and 11.67 or 8.8)) - (X * 0.45)) .. "," ..
 				    ((Y + 5.56) - (Y * 0.2)) .. ";1,1;" .. eaten_t[i] .. ".png]"
 	end
+	return eaten_img
+end
 
-	meta:set_string("eaten_img", eaten_img)
+local function update_formspec(meta)
+	local black_king_attacked = meta:get_string("blackAttacked") == "true"
+	local white_king_attacked = meta:get_string("whiteAttacked") == "true"
+
+	local playerWhite = meta:get_string("playerWhite")
+	local playerBlack = meta:get_string("playerBlack")
+
+	local moves_raw = meta:get_string("moves_raw")
+	local moves     = get_moves_formstring(meta)
+	local eaten_img = get_eaten_formstring(meta)
+	local lastMove  = meta:get_string("lastMove")
+	-- arrow to show whose turn it is
+	local blackArr  = (lastMove == "white" and "image[1,0.2;0.7,0.7;chess_turn_black.png]") or ""
+	local whiteArr  = ((lastMove == "" or lastMove == "black") and "image[1,9.05;0.7,0.7;chess_turn_white.png]") or ""
+	local turnBlack = minetest.colorize("#000001", playerBlack)
+	local turnWhite = minetest.colorize("#000001", playerWhite)
+	-- display the word "check" if the player is in check
+	local check_s   = minetest.colorize("#FF0000", "\\["..FS("check").."\\]")
+
+	local mrsplit = string.split(moves_raw, ";")
+	local m_sel_idx = math.ceil(#mrsplit / 2)
+
+	local formspec = fs ..
+		"label[1.9,0.3;"  .. turnBlack .. (black_king_attacked and " " .. check_s or "") .. "]" ..
+		blackArr ..
+		"label[1.9,9.15;" .. turnWhite .. (white_king_attacked and " " .. check_s or "") .. "]" ..
+		whiteArr ..
+		"table[8.9,1.05;5.07,3.75;moves;" .. moves .. ";"..m_sel_idx.."]" ..
+		eaten_img
+
+	meta:set_string("formspec", formspec)
 end
 
 function realchess.init(pos)
@@ -795,13 +795,15 @@ function realchess.init(pos)
 	meta:set_int("castlingWhiteR", 1)
 
 	meta:set_string("moves_raw", "")
-	meta:set_string("moves", ","..MOVES_LIST_SYMBOL_EMPTY..",,"..MOVES_LIST_SYMBOL_EMPTY..",")
 	meta:set_string("eaten", "")
-	meta:set_string("eaten_img", "")
 	meta:set_string("mode", "")
 
 	inv:set_list("board", pieces)
 	inv:set_size("board", 64)
+
+	-- Clear legacy metadata
+	meta:set_string("moves", "")
+	meta:set_string("eaten_img", "")
 end
 
 do local ignore_next_invocation = false -- HACK to ignore the next invocation in case of a swap
@@ -1397,8 +1399,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, _, player
 
 	local pieceTo_s = pieceTo ~= "" and pieceTo:match(":(%w+_%w+)") or ""
 	add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_index, to_index)
-	update_moves_table(meta)
-	get_eaten_list(meta, pieceTo, pieceTo_s)
+	add_to_eaten_list(meta, pieceTo, pieceTo_s)
 
 	return 1
 end end
@@ -1499,8 +1500,7 @@ local function ai_move(inv, meta)
 				meta:set_int("lastMoveTime", minetest.get_gametime())
 
 				add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, choice_from, choice_to)
-				update_moves_table(meta)
-				get_eaten_list(meta, pieceTo, pieceTo_s)
+				add_to_eaten_list(meta, pieceTo, pieceTo_s)
 
 				update_formspec(meta)
 			end
