@@ -759,27 +759,116 @@ local function update_formspec(meta)
 	local moves     = get_moves_formstring(meta)
 	local eaten_img = get_eaten_formstring(meta)
 	local lastMove  = meta:get_string("lastMove")
+	local gameResult = meta:get_string("gameResult")
+
 	-- arrow to show whose turn it is
-	local blackArr  = (lastMove == "white" and "image[1,0.2;0.7,0.7;chess_turn_black.png]") or ""
-	local whiteArr  = ((lastMove == "" or lastMove == "black") and "image[1,9.05;0.7,0.7;chess_turn_white.png]") or ""
+	local blackArr  = (gameResult == "" and lastMove == "white" and "image[1,0.2;0.7,0.7;chess_turn_black.png]") or ""
+	local whiteArr  = (gameResult == "" and (lastMove == "" or lastMove == "black") and "image[1,9.05;0.7,0.7;chess_turn_white.png]") or ""
 	local turnBlack = minetest.colorize("#000001", playerBlack)
 	local turnWhite = minetest.colorize("#000001", playerWhite)
-	-- display the word "check" if the player is in check
-	local check_s   = minetest.colorize("#FF0000", "\\["..FS("check").."\\]")
+
+	-- several status words for the player
+	-- player is in check
+	local check_s   = minetest.colorize("#FF8000", "["..S("check").."]")
+	-- player has been checkmated
+	local mate_s    = minetest.colorize("#FF0000", "["..S("checkmate").."]")
+	-- player has won
+	local win_s     = minetest.colorize("#00FF00", "["..S("winner").."]")
+	-- player has a draw
+	local draw_s    = minetest.colorize("#FF00FF", "["..S("draw").."]")
 
 	local mrsplit = string.split(moves_raw, ";")
 	local m_sel_idx = math.ceil(#mrsplit / 2)
 
+	local status_black = ""
+	local status_white = ""
+	if gameResult == "blackWon" then
+		status_black = " " .. win_s
+		status_white = " " .. mate_s
+	elseif gameResult == "draw" then
+		status_black = " " .. draw_s
+		status_white = " " .. draw_s
+	elseif gameResult == "whiteWon" then
+		status_black = " " .. mate_s
+		status_white = " " .. win_s
+	else
+		if black_king_attacked then
+			status_black = " " .. check_s
+		end
+		if white_king_attacked then
+			status_white = " " .. check_s
+		end
+	end
+
 	local formspec = fs ..
-		"label[1.9,0.3;"  .. turnBlack .. (black_king_attacked and " " .. check_s or "") .. "]" ..
+		"label[1.9,0.3;"  .. turnBlack .. minetest.formspec_escape(status_black) .. "]" ..
 		blackArr ..
-		"label[1.9,9.15;" .. turnWhite .. (white_king_attacked and " " .. check_s or "") .. "]" ..
+		"label[1.9,9.15;" .. turnWhite .. minetest.formspec_escape(status_white) .. "]" ..
 		whiteArr ..
 		"table[8.9,1.05;5.07,3.75;moves;" .. moves .. ";"..m_sel_idx.."]" ..
 		eaten_img
 
 	meta:set_string("formspec", formspec)
 end
+
+local function update_game_result(meta)
+	local inv = meta:get_inventory()
+	local board_t = board_to_table(inv)
+
+	update_formspec(meta)
+	local blackCanMove = false
+	local whiteCanMove = false
+
+	for i = 1, 64 do
+		local possibleMovesHere = get_possible_moves(board_t, i)
+		local stack_name = inv:get_stack("board", i):get_name()
+		if stack_name:find("black") then
+			for k, v in pairs(possibleMovesHere) do
+				blackCanMove = true
+				break
+			end
+		elseif stack_name:find("white") then
+			for k, v in pairs(possibleMovesHere) do
+				whiteCanMove = true
+				break
+			end
+		end
+		if blackCanMove and whiteCanMove then
+			return
+		end
+	end
+	local currentTurn
+	local lastTurn = meta:get_string("lastTurn")
+	if lastTurn == "black" or lastTurn == "" then
+		currentTurn = "white"
+	else
+		currentTurn = "black"
+	end
+	if currentTurn == "black" and not blackCanMove then
+		if meta:get_string("blackAttacked") == "true" then
+			-- black was checkmated
+			meta:set_string("gameResult", "whiteWon")
+			return
+		else
+			-- stalemate
+			meta:set_string("gameResult", "draw")
+			return
+		end
+	end
+	if currentTurn == "white" and not whiteCanMove then
+		if meta:get_string("whiteAttacked") == "true" then
+			-- white was checkmated
+			meta:set_string("gameResult", "blackWon")
+			return
+		else
+			-- stalemate
+			meta:set_string("gameResult", "draw")
+			return
+		end
+	end
+end
+
+
 
 function realchess.init(pos)
 	local meta = minetest.get_meta(pos)
@@ -790,6 +879,7 @@ function realchess.init(pos)
 	meta:set_string("playerBlack", "")
 	meta:set_string("playerWhite", "")
 	meta:set_string("lastMove",    "")
+	meta:set_string("gameResult",  "")
 	meta:set_string("blackAttacked", "")
 	meta:set_string("whiteAttacked", "")
 
@@ -1538,6 +1628,7 @@ local function ai_move(inv, meta)
 
 				add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, choice_from, choice_to)
 				add_to_eaten_list(meta, pieceTo, pieceTo_s)
+				update_game_result(meta)
 
 				update_formspec(meta)
 			end
@@ -1621,10 +1712,13 @@ function realchess.move_piece(meta, pieceFrom, from_list, from_index, to_list, t
 	local inv = meta:get_inventory()
 	inv:set_stack(from_list, from_index, "")
 	inv:set_stack(to_list, to_index, pieceFrom)
+
+	update_game_result(meta)
 	update_formspec(meta)
+
 	-- The AI always plays black; make sure it doesn't move twice in the case of a swap:
 	-- Only let it play if it didn't already play.
-	if meta:get_string("mode") == "single" and meta:get_string("lastMove") ~= "black" then
+	if meta:get_string("mode") == "single" and meta:get_string("lastMove") ~= "black" and meta:get_string("gameResult") == "" then
 		ai_move(inv, meta)
 	end
 end
