@@ -804,12 +804,38 @@ local function update_formspec(meta)
 		end
 	end
 
+	local promotion = meta:get_string("promotionActive")
+	local promotion_formstring = ""
+	if promotion == "black" then
+		eaten_img = ""
+		promotion_formstring =
+			"label[9.1,5.6;"..FS("PROMOTION\nFOR BLACK!").."]" ..
+			"animated_image[9.2,6.5;2,2;p_img_white;pawn_black_promo_anim.png;5;100]" ..
+			"label[12,5.6;"..FS("Promote pawn to:").."]" ..
+			"item_image_button[12,6.5;1,1;realchess:queen_black;p_queen_black;]" ..
+			"item_image_button[13,6.5;1,1;realchess:rook_black_1;p_rook_black;]" ..
+			"item_image_button[12,7.5;1,1;realchess:bishop_black_1;p_bishop_black;]" ..
+			"item_image_button[13,7.5;1,1;realchess:knight_black_1;p_knight_black;]"
+
+	elseif promotion == "white" then
+		eaten_img = ""
+		promotion_formstring =
+			"label[9.1,5.6;"..FS("PROMOTION\nFOR WHITE!").."]" ..
+			"animated_image[9.2,6.5;2,2;p_img_white;pawn_white_promo_anim.png;5;100]" ..
+			"label[12,5.6;"..FS("Promote pawn to:").."]" ..
+			"item_image_button[12,6.5;1,1;realchess:queen_white;p_queen_white;]" ..
+			"item_image_button[13,6.5;1,1;realchess:rook_white_1;p_rook_white;]" ..
+			"item_image_button[12,7.5;1,1;realchess:bishop_white_1;p_bishop_white;]" ..
+			"item_image_button[13,7.5;1,1;realchess:knight_white_1;p_knight_white;]"
+	end
+
 	local formspec = fs ..
 		"label[1.9,0.3;"  .. turnBlack .. minetest.formspec_escape(status_black) .. "]" ..
 		blackArr ..
 		"label[1.9,9.15;" .. turnWhite .. minetest.formspec_escape(status_white) .. "]" ..
 		whiteArr ..
 		"table[8.9,1.05;5.07,3.75;moves;" .. moves .. ";"..m_sel_idx.."]" ..
+		promotion_formstring ..
 		eaten_img
 
 	meta:set_string("formspec", formspec)
@@ -886,12 +912,15 @@ function realchess.init(pos)
 	meta:set_string("gameResult",  "")
 	meta:set_string("blackAttacked", "")
 	meta:set_string("whiteAttacked", "")
+	meta:set_string("promotionActive", "")
 
 	meta:set_int("lastMoveTime",   0)
 	meta:set_int("castlingBlackL", 1)
 	meta:set_int("castlingBlackR", 1)
 	meta:set_int("castlingWhiteL", 1)
 	meta:set_int("castlingWhiteR", 1)
+	meta:set_int("promotionPawnFromIdx", 0)
+	meta:set_int("promotionPawnToIdx", 0)
 
 	meta:set_string("moves_raw", "")
 	meta:set_string("eaten", "")
@@ -922,6 +951,12 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 	end
 
 	local meta        = minetest.get_meta(pos)
+	local promo       = meta:get_string("promotionActive")
+	if promo ~= "" then
+		-- Can't move when waiting for selecting a pawn promotion
+		return
+	end
+
 	local playerName  = player:get_player_name()
 	local inv         = meta:get_inventory()
 	local pieceFrom   = inv:get_stack(from_list, from_index):get_name()
@@ -980,7 +1015,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 	local from_x, from_y = index_to_xy(from_index)
 	local to_x, to_y     = index_to_xy(to_index)
 
-	local promoteTo = nil
+	local promotion = false
 
 	-- PAWN
 	if pieceFrom:sub(11,14) == "pawn" then
@@ -993,13 +1028,19 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 					if pieceTo ~= "" then
 						return
 					elseif to_index >= 1 and to_index <= 8 then
-						-- promote
-						promoteTo = "realchess:queen_white"
+						-- activate promotion
+						promotion = true
+						meta:set_string("promotionActive", "white")
+						meta:set_int("promotionPawnFromIdx", from_index)
+						meta:set_int("promotionPawnToIdx", to_index)
 					end
 				elseif from_x - 1 == to_x or from_x + 1 == to_x then
 					if to_index >= 1 and to_index <= 8 and pieceTo:find("black") then
-						-- promote
-						promoteTo = "realchess:queen_white"
+						-- activate promotion
+						promotion = true
+						meta:set_string("promotionActive", "white")
+						meta:set_int("promotionPawnFromIdx", from_index)
+						meta:set_int("promotionPawnToIdx", to_index)
 					end
 				else
 					return
@@ -1071,13 +1112,19 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 					if pieceTo ~= "" then
 						return
 					elseif to_index >= 57 and to_index <= 64 then
-						-- promote
-						promoteTo = "realchess:queen_black"
+						-- activate promotion
+						promotion = true
+						meta:set_string("promotionActive", "black")
+						meta:set_int("promotionPawnFromIdx", from_index)
+						meta:set_int("promotionPawnToIdx", to_index)
 					end
 				elseif from_x - 1 == to_x or from_x + 1 == to_x then
 					if to_index >= 57 and to_index <= 64 and pieceTo:find("white") then
-						-- promote
-						promoteTo = "realchess:queen_black"
+						-- activate promotion
+						promotion = true
+						meta:set_string("promotionActive", "black")
+						meta:set_int("promotionPawnFromIdx", from_index)
+						meta:set_int("promotionPawnToIdx", to_index)
 					end
 				else
 					return
@@ -1479,40 +1526,9 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 		end
 	end
 
-	local board       = board_to_table(inv)
-	board[to_index]   = board[from_index]
-	board[from_index] = ""
-
-	local black_king_idx, white_king_idx = locate_kings(board)
-	if not black_king_idx or not white_king_idx then
-		return
+	if not promotion then
+		realchess.update_state(meta, from_index, to_index, thisMove)
 	end
-	local blackAttacked = attacked("black", black_king_idx, board)
-	local whiteAttacked = attacked("white", white_king_idx, board)
-
-	if blackAttacked then
-		if thisMove == "black" then
-			return
-		else
-			meta:set_string("blackAttacked", "true")
-		end
-	else
-		meta:set_string("blackAttacked", "")
-	end
-
-	if whiteAttacked then
-		if thisMove == "white" then
-			return
-		else
-			meta:set_string("whiteAttacked", "true")
-		end
-	else
-		meta:set_string("whiteAttacked", "")
-	end
-
-	lastMove = thisMove
-	meta:set_string("lastMove", lastMove)
-	meta:set_int("lastMoveTime", minetest.get_gametime())
 
 	if meta:get_string("playerWhite") == "" then
 		meta:set_string("playerWhite", playerWhite)
@@ -1520,17 +1536,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 		meta:set_string("playerBlack", playerBlack)
 	end
 
-	local pieceTo_s = pieceTo ~= "" and pieceTo:match(":(%w+_%w+)") or ""
-	add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_index, to_index)
-	add_to_eaten_list(meta, pieceTo, pieceTo_s)
-
-	local movePiece
-	if promoteTo then
-		movePiece = promoteTo
-	else
-		movePiece = pieceFrom
-	end
-	realchess.move_piece(meta, movePiece, from_list, from_index, to_list, to_index)
+	realchess.move_piece(meta, pieceFrom, from_list, from_index, to_list, to_index)
 
 	return
 end
@@ -1688,6 +1694,41 @@ function realchess.fields(pos, _, fields, sender)
 					timeout_format(timeout_limit)))
 			end
 		end
+		return
+	end
+
+	local promotions = {
+		"queen_white", "rook_white", "bishop_white", "knight_white",
+		"queen_black", "rook_black", "bishop_black", "knight_black",
+	}
+	for p=1, #promotions do
+		local promo = promotions[p]
+		if fields["p_"..promo] then
+			if not (playerName == playerWhite or playerName == playerBlack) then
+				minetest.chat_send_player(playerName, chat_prefix ..
+					S("You're only a spectator in this game of Chess."))
+				return
+			end
+			local pcolor = promo:sub(-5)
+			local activePromo = meta:get_string("promotionActive")
+			if activePromo == "" then
+				minetest.chat_send_player(playerName, chat_prefix ..
+					S("This isn't the time for promotion."))
+				return
+			elseif activePromo ~= pcolor then
+				minetest.chat_send_player(playerName, chat_prefix ..
+					S("It's not your turn! This promotion is meant for the other player."))
+				return
+			end
+			if pcolor == "white" and playerName == playerWhite or pcolor == "black" and playerName == playerBlack then
+				realchess.promote_pawn(meta, pcolor, promo:sub(1, -7))
+				return
+			else
+				minetest.chat_send_player(playerName, chat_prefix ..
+					S("It's not your turn! This promotion is meant for the other player."))
+				return
+			end
+		end
 	end
 end
 
@@ -1717,13 +1758,104 @@ function realchess.move_piece(meta, pieceFrom, from_list, from_index, to_list, t
 	inv:set_stack(from_list, from_index, "")
 	inv:set_stack(to_list, to_index, pieceFrom)
 
-	update_game_result(meta)
+	local promo = meta:get_string("promotionActive") ~= ""
+	if not promo then
+		update_game_result(meta)
+	end
 	update_formspec(meta)
 
 	-- The AI always plays black; make sure it doesn't move twice in the case of a swap:
 	-- Only let it play if it didn't already play.
-	if meta:get_string("mode") == "single" and meta:get_string("lastMove") ~= "black" and meta:get_string("gameResult") == "" then
+	if meta:get_string("mode") == "single" and meta:get_string("lastMove") ~= "black" and meta:get_string("gameResult") == "" and not promo then
 		ai_move(inv, meta)
+	end
+end
+
+function realchess.update_state(meta, from_index, to_index, thisMove, pieceFromOverride)
+	local inv         = meta:get_inventory()
+	local board       = board_to_table(inv)
+	local pieceTo     = board[to_index]
+	local pieceFrom   = pieceFromOverride or board[from_index]
+	local pieceTo_s   = pieceTo ~= "" and pieceTo:match(":(%w+_%w+)") or ""
+
+
+	board[to_index]   = board[from_index]
+	board[from_index] = ""
+
+	local black_king_idx, white_king_idx = locate_kings(board)
+	if not black_king_idx or not white_king_idx then
+		return
+	end
+	local blackAttacked = attacked("black", black_king_idx, board)
+	local whiteAttacked = attacked("white", white_king_idx, board)
+
+	if blackAttacked then
+		if thisMove == "black" then
+			return
+		else
+			meta:set_string("blackAttacked", "true")
+		end
+	else
+		meta:set_string("blackAttacked", "")
+	end
+
+	if whiteAttacked then
+		if thisMove == "white" then
+			return
+		else
+			meta:set_string("whiteAttacked", "true")
+		end
+	else
+		meta:set_string("whiteAttacked", "")
+	end
+
+	local lastMove = thisMove
+	meta:set_string("lastMove", lastMove)
+	meta:set_int("lastMoveTime", minetest.get_gametime())
+
+	local pieceTo_s = pieceTo ~= "" and pieceTo:match(":(%w+_%w+)") or ""
+	add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_index, to_index)
+	add_to_eaten_list(meta, pieceTo, pieceTo_s)
+end
+
+function realchess.promote_pawn(meta, color, promoteTo)
+	local inv = meta:get_inventory()
+	local pstr = promoteTo .. "_" .. color
+	local promoted = false
+	local to_idx = meta:get_int("promotionPawnToIdx")
+	local from_idx = meta:get_int("promotionPawnFromIdx")
+	if to_idx < 1 or from_idx < 1 then
+		return
+	end
+	if promoteTo ~= "queen" then
+		pstr = pstr .. "_1"
+	end
+	local stack
+	if color == "white" then
+		stack = inv:get_stack("board", to_idx)
+		if stack:get_name():sub(11,14) == "pawn" then
+			inv:set_stack("board", to_idx, "realchess:"..pstr)
+			promoted = true
+		end
+	elseif color == "black" then
+		stack = inv:get_stack("board", to_idx)
+		if stack:get_name():sub(11,14) == "pawn" then
+			inv:set_stack("board", to_idx, "realchess:"..pstr)
+			promoted = true
+		end
+	end
+	if promoted then
+		meta:set_string("promotionActive", "")
+		meta:set_int("promotionPawnFromIdx", 0)
+		meta:set_int("promotionPawnToIdx", 0)
+		realchess.update_state(meta, from_idx, to_idx, color, stack:get_name())
+		update_formspec(meta)
+
+		if meta:get_string("mode") == "single" and meta:get_string("lastMove") ~= "black" and meta:get_string("gameResult") == "" then
+			ai_move(inv, meta)
+		end
+	else
+		minetest.log("error", "[xdecor] Chess: Could not find pawn to promote!")
 	end
 end
 
