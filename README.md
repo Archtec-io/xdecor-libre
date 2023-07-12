@@ -32,6 +32,7 @@ blocks with special features:
       in some food items. Collect the soup with a bowl
 * Lever: Pull the lever to activate doors next to it
 * Pressure Plate: Step on it to activate doors next to it
+* Chessboard: Play Chess against a player or the computer
 
 The chessboard, radio and speaker are purely decorative
 and have no special functionality.
@@ -68,9 +69,14 @@ The following bugs of X-Decor (as of 01/07/2023) are fixed:
 * Show short item description in itemframe instead of itemstring
 * Minor typo fixes
 * Fix bad rope placement prediction
+* Fixed the broken Chess game
 
 Maintenance updates:
-* Chess games were disabled because they were too broken
+* Chess reworked to comply with FIDE rules (more or less):
+    * En passant added
+    * Can now choose pawn promotion
+    * Fixed incomplete enforcement of castling rule
+    * Technical UI improvements
 * Renamed blocks:
     * "Empty Shelf" to "Plain Shelf"
     * "Slide Door" to "Paper Door"

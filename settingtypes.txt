@@ -2,9 +2,8 @@
 
 
 
-# This adds a decorative chessboard.
-# Note: You can't play chess on it.
-enable_xdecor_chess 		(Enable Chessboard)	bool true
+# This adds a chessboard on which you can play Chess against other players or the computer.
+enable_xdecor_chess 		(Enable Chess)	        bool true
 
 # This enables the cauldron which you can use to store water and cook soup.
 enable_xdecor_cooking		(Enable Cooking) 	bool true
