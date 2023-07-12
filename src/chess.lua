@@ -631,16 +631,18 @@ local fs = [[
 	list[context;board;0.47,1.155;8,8;]
 	tableoptions[background=#00000000;highlight=#00000000;border=false]
 	]]
-	.."button[13.36,0.26;2,0.8;new;"..FS("New game").."]"
 	-- move; white piece; white halfmove; black piece; black halfmove
 	.."tablecolumns[text;image," .. pieces_str .. ";text;image," .. pieces_str .. ";text]"
 
-local function add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_idx, to_idx)
+local function add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_idx, to_idx, special)
 	local moves_raw = meta:get_string("moves_raw")
 	if moves_raw ~= "" then
 		moves_raw = moves_raw .. ";"
 	end
-	moves_raw = moves_raw .. pieceFrom .. "," .. pieceTo .. "," .. pieceTo_s .. "," .. from_idx .. "," .. to_idx
+	if not special then
+		special = ""
+	end
+	moves_raw = moves_raw .. pieceFrom .. "," .. pieceTo .. "," .. pieceTo_s .. "," .. from_idx .. "," .. to_idx .. "," .. special
 	meta:set_string("moves_raw", moves_raw)
 end
 
@@ -662,7 +664,23 @@ local function get_moves_formstring(meta)
 		local pieceTo_s = move_split[3]
 		local from_idx = tonumber(move_split[4])
 		local to_idx = tonumber(move_split[5])
+		local special = move_split[6]
 
+		-- true if White plays, false if Black plays
+		local curPlayerIsWhite = m % 2 == 1
+
+		if special == "whiteWon" or special == "blackWon" or special == "draw" then
+			if not curPlayerIsWhite then
+				moves_out = moves_out .. ""..MOVES_LIST_SYMBOL_EMPTY..",,"
+			end
+		end
+		if special == "whiteWon" then
+			moves_out = moves_out .. ","..MOVES_LIST_SYMBOL_EMPTY..",1–0,"..MOVES_LIST_SYMBOL_EMPTY
+		elseif special == "blackWon" then
+			moves_out = moves_out .. ","..MOVES_LIST_SYMBOL_EMPTY..",0–1,"..MOVES_LIST_SYMBOL_EMPTY
+		elseif special == "draw" then
+			moves_out = moves_out .. ","..MOVES_LIST_SYMBOL_EMPTY..",½–½,"..MOVES_LIST_SYMBOL_EMPTY
+		else
 		local from_x, from_y  = index_to_xy(from_idx)
 		local to_x, to_y      = index_to_xy(to_idx)
 		local pieceFrom_s     = pieceFrom:match(":(%w+_%w+)")
@@ -677,9 +695,6 @@ local function get_moves_formstring(meta)
 
 		local coordFrom = letters[from_x + 1] .. math.abs(from_y - 8)
 		local coordTo   = letters[to_x   + 1] .. math.abs(to_y   - 8)
-
-		-- true if White plays, false if Black plays
-		local curPlayerIsWhite = m % 2 == 1
 
 		if curPlayerIsWhite then
 			move_no = move_no + 1
@@ -726,6 +741,7 @@ local function get_moves_formstring(meta)
 		-- Required for validity of the table
 		if curPlayerIsWhite and m == #moves_split then
 			moves_out = moves_out .. "," .. MOVES_LIST_SYMBOL_EMPTY
+		end
 		end
 
 		if m ~= #moves_split then
@@ -778,6 +794,7 @@ local function update_formspec(meta)
 	local eaten_img = get_eaten_formstring(meta)
 	local lastMove  = meta:get_string("lastMove")
 	local gameResult = meta:get_string("gameResult")
+	local grReason  = meta:get_string("gameResultReason")
 
 	-- arrow to show whose turn it is
 	local blackArr  = (gameResult == "" and lastMove == "white" and "image[1.2,0.252;0.7,0.7;chess_turn_black.png]") or ""
@@ -790,8 +807,12 @@ local function update_formspec(meta)
 	local check_s   = minetest.colorize("#FF8000", "["..S("check").."]")
 	-- player has been checkmated
 	local mate_s    = minetest.colorize("#FF0000", "["..S("checkmate").."]")
+	-- player has resigned
+	local resign_s    = minetest.colorize("#FF0000", "["..S("resigned").."]")
 	-- player has won
 	local win_s     = minetest.colorize("#00FF00", "["..S("winner").."]")
+	-- player has lost
+	local lose_s     = minetest.colorize("#00FF00", "["..S("loser").."]")
 	-- player has a draw
 	local draw_s    = minetest.colorize("#FF00FF", "["..S("draw").."]")
 
@@ -801,13 +822,25 @@ local function update_formspec(meta)
 	local status_black = ""
 	local status_white = ""
 	if gameResult == "blackWon" then
+		if grReason == "resign" then
+			status_white = " " .. resign_s
+		elseif grReason == "checkmate" then
+			status_white = " " .. mate_s
+		else
+			status_white = " " .. lose_s
+		end
 		status_black = " " .. win_s
-		status_white = " " .. mate_s
 	elseif gameResult == "draw" then
 		status_black = " " .. draw_s
 		status_white = " " .. draw_s
 	elseif gameResult == "whiteWon" then
-		status_black = " " .. mate_s
+		if grReason == "resign" then
+			status_black = " " .. resign_s
+		elseif grReason == "checkmate" then
+			status_black = " " .. mate_s
+		else
+			status_black = " " .. lose_s
+		end
 		status_white = " " .. win_s
 	else
 		if black_king_attacked then
@@ -843,6 +876,13 @@ local function update_formspec(meta)
 			"item_image_button[14.15,8.2;1,1;realchess:knight_white_1;p_knight_white;]"
 	end
 
+	local game_buttons
+	if gameResult == "" and (playerWhite ~= "" and playerBlack ~= "") then
+		game_buttons = "button[13.36,0.26;2,0.8;resign;"..FS("Resign").."]"
+	else
+		game_buttons = "button[13.36,0.26;2,0.8;new;"..FS("New game").."]"
+	end
+
 	local formspec = fs ..
 		"label[2.2,0.652;"  .. turnBlack .. minetest.formspec_escape(status_black) .. "]" ..
 		blackArr ..
@@ -850,7 +890,8 @@ local function update_formspec(meta)
 		whiteArr ..
 		"table[9.9,1.25;5.45,4;moves;" .. moves .. ";"..m_sel_idx.."]" ..
 		promotion_formstring ..
-		eaten_img
+		eaten_img ..
+		game_buttons
 
 	meta:set_string("formspec", formspec)
 end
@@ -924,6 +965,7 @@ function realchess.init(pos)
 	meta:set_string("playerWhite", "")
 	meta:set_string("lastMove",    "")
 	meta:set_string("gameResult",  "")
+	meta:set_string("gameResultReason", "")
 	meta:set_string("blackAttacked", "")
 	meta:set_string("whiteAttacked", "")
 	meta:set_string("promotionActive", "")
@@ -968,6 +1010,11 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 	local promo       = meta:get_string("promotionActive")
 	if promo ~= "" then
 		-- Can't move when waiting for selecting a pawn promotion
+		return
+	end
+	local gameResult  = meta:get_string("gameResult")
+	if gameResult ~= "" then
+		-- No moves if game is over
 		return
 	end
 
@@ -1576,8 +1623,9 @@ end
 local function ai_move(inv, meta)
 	local board_t = board_to_table(inv)
 	local lastMove = meta:get_string("lastMove")
+	local gameResult = meta:get_string("gameResult")
 
-	if lastMove == "white" then
+	if lastMove == "white" and gameResult == "" then
 		update_formspec(meta)
 		local moves = {}
 
@@ -1637,6 +1685,10 @@ local function ai_move(inv, meta)
 		end
 
 		minetest.after(1.0, function()
+			local gameResult = meta:get_string("gameResult")
+			if gameResult ~= "" then
+				return
+			end
 			local lastMoveTime = meta:get_int("lastMoveTime")
 			if lastMoveTime > 0 then
 				if not kingSafe then
@@ -1730,6 +1782,54 @@ function realchess.fields(pos, _, fields, sender)
 					S("You can't reset the chessboard, a game has been started. Try again in @1.",
 					timeout_format(timeout_limit)))
 			end
+		end
+		return
+	end
+
+	if fields.resign then
+		local lastMove = meta:get_string("lastMove")
+		if playerWhite == "" and playerBlack == "" or lastMove == "" then
+			minetest.chat_send_player(playerName, chat_prefix .. S("Resigning is not possible yet."))
+			return
+		end
+		local winner, loser, whiteWon
+		if playerWhite == playerBlack and playerWhite == playerName and playerWhite ~= "" then
+			if lastMove == "black" then
+				winner = playerBlack
+				loser = playerWhite
+				whiteWon = false
+			else
+				winner = playerWhite
+				loser = playerBlack
+				whiteWon = true
+			end
+		elseif playerName == playerWhite and playerWhite ~= "" then
+			winner = playerBlack
+			loser = playerWhite
+			whiteWon = false
+		elseif playerName == playerBlack and playerBlack ~= "" then
+			winner = playerWhite
+			loser = playerBlack
+			whiteWon = true
+		end
+		if winner and loser then
+			meta:set_string("gameResultReason", "resign")
+			if whiteWon then
+				meta:set_string("gameResult", "whiteWon")
+				add_move_to_moves_list(meta, "", "", "", "", "", "whiteWon")
+			else
+				meta:set_string("gameResult", "blackWon")
+				add_move_to_moves_list(meta, "", "", "", "", "", "blackWon")
+			end
+
+			minetest.chat_send_player(loser, chat_prefix .. S("You have resigned."))
+			if playerWhite ~= playerBlack then
+				minetest.chat_send_player(winner, chat_prefix .. S("@1 has resigned. You win!", loser))
+			end
+			minetest.log("action", "[xdecor] Chess: "..loser.." has resigned from the game against "..winner)
+			update_formspec(meta)
+		else
+			minetest.chat_send_player(playerName, chat_prefix .. S("You can't resign, you're not playing in this game."))
 		end
 		return
 	end
