@@ -1943,7 +1943,6 @@ if ENABLE_CHESS_GAMES then
 	-- into the allow function above. The reason for this is of Minetest's
 	-- awkward behavior when swapping items.
 
-	-- TODO switch to `minetest.show_formspec` to avoid LBMs
 	minetest.register_lbm({
 		label = "Re-initialize chessboard (enable Chess games)",
 		name = "xdecor:chessboard_reinit",
