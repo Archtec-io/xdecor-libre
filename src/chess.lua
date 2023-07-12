@@ -688,19 +688,22 @@ local function get_moves_formstring(meta)
 
 		---- Add halfmove of current player
 		-- Castling
+		local castling = false
 		if pieceFrom:sub(11,14) == "king" and ((curPlayerIsWhite and from_y == 7 and to_y == 7) or (not curPlayerIsWhite and from_y == 0 and to_y == 0)) then
-			moves_out = moves_out .. MOVES_LIST_SYMBOL_EMPTY .. ","
 			-- queenside castling
-			if to_x == 2 then
+			if from_x == 4 and to_x == 2 then
 				-- write "0–0–0"
-				moves_out = moves_out .. "0–0–0"
+				moves_out = moves_out .. MOVES_LIST_SYMBOL_EMPTY .. ",0–0–0"
+				castling = true
 			-- kingside castling
-			elseif to_x == 6 then
+			elseif from_x == 4 and to_x == 6 then
 				-- write "0–0"
-				moves_out = moves_out .. "0–0"
+				moves_out = moves_out .. MOVES_LIST_SYMBOL_EMPTY .. ",0–0"
+				castling = true
 			end
+		end
 		-- Normal halfmove
-		else
+		if not castling then
 			moves_out = moves_out ..
 				pieceFrom_si_id .. "," .. -- piece image ID
 				coordFrom .. betweenCoordsSymbol .. coordTo .. -- coords in long algebraic notation, e.g. "e2e3"
