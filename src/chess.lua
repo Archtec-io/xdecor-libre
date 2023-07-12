@@ -612,6 +612,7 @@ local fs_init = [[
 	]]
 	.."bgcolor[#080808BB;true]"
 	.."background[0,0;16,10.7563;chess_bg.png;true]"
+	.."style_type[button,item_image_button;bgcolor=#8f3000]"
 	.."label[11.5,1.8;"..FS("Select a mode:").."]"
 	.."button[11.5,2.1;2.2,0.8;single;"..FS("Singleplayer").."]"
 	.."button[11.5,3.1;2.2,0.8;multi;"..FS("Multiplayer").."]"
@@ -624,6 +625,7 @@ local fs = [[
 	no_prepend[]
 	bgcolor[#080808BB;true]
 	background[0,0;16,10.7563;chess_bg.png;true]
+	style_type[button,item_image_button;bgcolor=#8f3000]
 	style_type[list;spacing=0.1;size=0.975]
 	listcolors[#00000000;#00000000;#00000000;#30434C;#FFF]
 	list[context;board;0.47,1.155;8,8;]
