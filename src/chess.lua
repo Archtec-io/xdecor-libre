@@ -963,6 +963,7 @@ function realchess.init(pos)
 	meta:set_string("infotext", S("Chess Board"))
 	meta:set_string("playerBlack", "")
 	meta:set_string("playerWhite", "")
+	meta:set_string("aiColor",     "")
 	meta:set_string("lastMove",    "")
 	meta:set_string("gameResult",  "")
 	meta:set_string("gameResultReason", "")
@@ -1624,8 +1625,17 @@ local function ai_move(inv, meta)
 	local board_t = board_to_table(inv)
 	local lastMove = meta:get_string("lastMove")
 	local gameResult = meta:get_string("gameResult")
-
-	if lastMove == "white" and gameResult == "" then
+	local aiColor = meta:get_string("aiColor")
+	if aiColor == "" then
+		aiColor = "black"
+	end
+	local opponentColor
+	if aiColor == "black" then
+		opponentColor = "white"
+	else
+		opponentColor = "black"
+	end
+	if (lastMove == opponentColor or (aiColor == "white" and lastMove == "")) and gameResult == "" then
 		update_formspec(meta)
 		local moves = {}
 
@@ -1633,7 +1643,7 @@ local function ai_move(inv, meta)
 			local possibleMoves = get_possible_moves(board_t, i)
 			local stack_name    = inv:get_stack("board", i):get_name()
 
-			if stack_name:find("black") then
+			if stack_name:find(aiColor) then
 				moves[tostring(i)] = possibleMoves
 			end
 		end
@@ -1649,14 +1659,20 @@ local function ai_move(inv, meta)
 		local pieceTo_s = pieceTo ~= "" and pieceTo:match(":(%w+_%w+)") or ""
 
 		local board          = board_to_table(inv)
-		local black_king_idx = locate_kings(board)
-		local blackAttacked  = attacked("black", black_king_idx, board)
+		local black_king_idx, white_king_idx = locate_kings(board)
+		local ai_king_idx
+		if aiColor == "black" then
+			ai_king_idx = black_king_idx
+		else
+			ai_king_idx = white_king_idx
+		end
+		local aiAttacked  = attacked(aiColor, ai_king_idx, board)
 		local kingSafe       = true
 		local bestMoveSaveFrom, bestMoveSaveTo
 
-		if blackAttacked then
+		if aiAttacked then
 			kingSafe = false
-			meta:set_string("blackAttacked", "true")
+			meta:set_string(aiColor.."Attacked", "true")
 			local save_moves = {}
 
 			for from_idx, _ in pairs(moves) do
@@ -1665,11 +1681,15 @@ local function ai_move(inv, meta)
 				local from_idx_bak, to_idx_bak = board[from_idx], board[to_idx]
 				board[to_idx]   = board[from_idx]
 				board[from_idx] = ""
-				black_king_idx  = locate_kings(board)
-
-				if black_king_idx then
-					blackAttacked = attacked("black", black_king_idx, board)
-					if not blackAttacked then
+				black_king_idx, white_king_idx = locate_kings(board)
+				if aiColor == "black" then
+					ai_king_idx = black_king_idx
+				else
+					ai_king_idx = white_king_idx
+				end
+				if ai_king_idx then
+					aiAttacked = attacked(aiColor, ai_king_idx, board)
+					if not aiAttacked then
 						save_moves[from_idx] = save_moves[from_idx] or {}
 						save_moves[from_idx][to_idx] = value
 					end
@@ -1689,19 +1709,22 @@ local function ai_move(inv, meta)
 			if gameResult ~= "" then
 				return
 			end
+			local lastMove = meta:get_string("lastMove")
 			local lastMoveTime = meta:get_int("lastMoveTime")
-			if lastMoveTime > 0 then
+			if lastMoveTime > 0 or lastMove == "" then
 				if not kingSafe then
 					if bestMoveSaveTo ~= nil then
 						inv:set_stack("board", bestMoveSaveTo, board[bestMoveSaveFrom])
 						inv:set_stack("board", bestMoveSaveFrom, "")
-						meta:set_string("blackAttacked", "")
+						meta:set_string(aiColor.."Attacked", "")
 					else
 						return
 					end
 				else
-					if pieceFrom:find("pawn") and choice_to >= 57 and choice_to <= 64 then
+					if aiColor == "black" and pieceFrom:find("pawn") and choice_to >= 57 and choice_to <= 64 then
 						inv:set_stack("board", choice_to, "realchess:queen_black")
+					elseif aiColor == "white" and pieceFrom:find("pawn") and choice_to >= 1 and choice_to <= 8 then
+						inv:set_stack("board", choice_to, "realchess:queen_white")
 					else
 						inv:set_stack("board", choice_to, pieceFrom)
 					end
@@ -1710,18 +1733,26 @@ local function ai_move(inv, meta)
 				end
 
 				board = board_to_table(inv)
-				local _, white_king_idx = locate_kings(board)
-				local whiteAttacked = attacked("white", white_king_idx, board)
+				black_king_idx, white_king_idx = locate_kings(board)
+				local opponent_king_idx
+				if opponentColor == "white" then
+					opponent_king_idx = white_king_idx
+				else
+					opponent_king_idx = black_king_idx
+				end
+				local opponentAttacked = attacked(opponentColor, opponent_king_idx, board)
 
-				if whiteAttacked then
-					meta:set_string("whiteAttacked", "true")
+				if opponentAttacked then
+					meta:set_string(opponentColor.."Attacked", "true")
 				end
 
-				if meta:get_string("playerBlack") == "" then
+				if aiColor == "black" and meta:get_string("playerBlack") == "" then
 					meta:set_string("playerBlack", AI_NAME)
+				elseif aiColor == "white" and meta:get_string("playerWhite") == "" then
+					meta:set_string("playerWhite", AI_NAME)
 				end
 
-				meta:set_string("lastMove", "black")
+				meta:set_string("lastMove", aiColor)
 				meta:set_int("lastMoveTime", minetest.get_gametime())
 
 				add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, choice_from, choice_to)
@@ -1729,6 +1760,7 @@ local function ai_move(inv, meta)
 				update_game_result(meta)
 
 				update_formspec(meta)
+			else
 			end
 		end)
 	else
@@ -1762,15 +1794,26 @@ function realchess.fields(pos, _, fields, sender)
 	if fields.single or fields.multi then
 		meta:set_string("mode", (fields.single and "single" or "multi"))
 		if fields.single then
-			meta:set_string("playerBlack", AI_NAME)
+			-- AI plays a random color at random
+			local r = math.random(1,2)
+			if r == 1 then
+				meta:set_string("aiColor", "black")
+				meta:set_string("playerBlack", AI_NAME)
+			else
+				meta:set_string("aiColor", "white")
+				meta:set_string("playerWhite", AI_NAME)
+				local inv = meta:get_inventory()
+				ai_move(inv, meta)
+			end
 		end
 		update_formspec(meta)
 		return
 	end
 
 	-- Timeout is 5 min. by default for resetting the game (non-players only)
+	-- Also allow instant reset before White and Black moved
 	if fields.new then
-		if (playerWhite == playerName or playerBlack == playerName or playerWhite == "") then
+		if (playerWhite == playerName or playerBlack == playerName or playerWhite == "" or playerBlack == "") then
 			realchess.init(pos)
 
 		elseif lastMoveTime > 0 then
@@ -1914,9 +1957,13 @@ function realchess.move_piece(meta, pieceFrom, from_list, from_index, to_list, t
 	end
 	update_formspec(meta)
 
+	local aiColor = meta:get_string("aiColor")
+	if aiColor == "" then aiColor = "black" end
+	local lastMove = meta:get_string("lastMove")
+	if lastMove == "" then lastMove = "black" end
 	-- The AI always plays black; make sure it doesn't move twice in the case of a swap:
 	-- Only let it play if it didn't already play.
-	if meta:get_string("mode") == "single" and meta:get_string("lastMove") ~= "black" and meta:get_string("gameResult") == "" and not promo then
+	if meta:get_string("mode") == "single" and lastMove ~= aiColor and meta:get_string("gameResult") == "" and not promo then
 		ai_move(inv, meta)
 	end
 end
@@ -1994,7 +2041,11 @@ function realchess.promote_pawn(meta, color, promoteTo)
 		realchess.update_state(meta, from_idx, to_idx, color, stack:get_name())
 		update_formspec(meta)
 
-		if meta:get_string("mode") == "single" and meta:get_string("lastMove") ~= "black" and meta:get_string("gameResult") == "" then
+		local aiColor = meta:get_string("aiColor")
+		if aiColor == "" then aiColor = "black" end
+		local lastMove = meta:get_string("lastMove")
+		if lastMove == "" then lastMove = "black" end
+		if meta:get_string("mode") == "single" and lastMove ~= aiColor and meta:get_string("gameResult") == "" then
 			ai_move(inv, meta)
 		end
 	else
