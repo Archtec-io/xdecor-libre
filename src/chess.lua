@@ -1723,8 +1723,7 @@ function realchess.fields(pos, _, fields, sender)
 				realchess.init(pos)
 			else
 				minetest.chat_send_player(playerName, chat_prefix ..
-					S("You can't reset the chessboard, a game has been started. " ..
-					"If you aren't a current player, try again in @1",
+					S("You can't reset the chessboard, a game has been started. Try again in @1.",
 					timeout_format(timeout_limit)))
 			end
 		end
@@ -1775,13 +1774,26 @@ function realchess.dig(pos, player)
 	local playerName    = player:get_player_name()
 	local timeout_limit = meta:get_int("lastMoveTime") + 300
 	local lastMoveTime  = meta:get_int("lastMoveTime")
+	local playerWhite   = meta:get_string("playerWhite")
+	local playerBlack   = meta:get_string("playerBlack")
 
 	-- Timeout is 5 min. by default for digging the chessboard (non-players only)
-	return (lastMoveTime == 0 and minetest.get_gametime() > timeout_limit) or
-		minetest.chat_send_player(playerName, chat_prefix ..
-				S("You can't dig the chessboard, a game has been started. " ..
-				"Reset it first if you're a current player, or dig it again in @1",
-				timeout_format(timeout_limit)))
+	if (lastMoveTime == 0 and minetest.get_gametime() > timeout_limit) then
+		return true
+	else
+		if playerName == playerWhite or playerName == playerBlack then
+			minetest.chat_send_player(playerName, chat_prefix ..
+					S("You can't dig the chessboard, a game has been started. " ..
+					"Reset it first or dig it again in @1.",
+					timeout_format(timeout_limit)))
+		else
+			minetest.chat_send_player(playerName, chat_prefix ..
+					S("You can't dig the chessboard, a game has been started. " ..
+					"Try it again in @1.",
+					timeout_format(timeout_limit)))
+		end
+		return false
+	end
 end
 
 -- Helper function for realchess.move.
