@@ -1770,7 +1770,7 @@ function realchess.fields(pos, _, fields, sender)
 
 	-- Timeout is 5 min. by default for resetting the game (non-players only)
 	if fields.new then
-		if (playerWhite == playerName or playerBlack == playerName) then
+		if (playerWhite == playerName or playerBlack == playerName or playerWhite == "") then
 			realchess.init(pos)
 
 		elseif lastMoveTime > 0 then
