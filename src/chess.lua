@@ -606,12 +606,16 @@ end
 pieces_str = pieces_str .. MOVES_LIST_SYMBOL_EMPTY .. "=mailbox_blank16.png"
 
 local fs_init = [[
-	size[4,1.2;]
+	size[14.7,10;]
 	no_prepend[]
 	]]
-	.."label[0,0;"..FS("Select a mode:").."]"
-	.."button[0,0.5;2,1;single;"..FS("Singleplayer").."]"
-	.."button[2,0.5;2,1;multi;"..FS("Multiplayer").."]"
+	.."bgcolor[#080808BB;true]"
+	.."background[0,0;14.7,10;chess_bg.png]"
+	.."label[10.5,1.5;"..FS("Select a mode:").."]"
+	.."button[10.5,2;2,1;single;"..FS("Singleplayer").."]"
+	.."button[10.5,3;2,1;multi;"..FS("Multiplayer").."]"
+	.."label[1.9,0.3;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
+	.."label[1.9,9.15;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
 
 local fs = [[
 	size[14.7,10;]
@@ -622,7 +626,7 @@ local fs = [[
 	listcolors[#00000000;#00000000;#00000000;#30434C;#FFF]
 	tableoptions[background=#00000000;highlight=#00000000;border=false]
 	]]
-	.."button[10.5,8.5;2,2;new;"..FS("New game").."]"
+	.."button[12.1,-0.3;2,2;new;"..FS("New game").."]"
 	-- move; white piece; white halfmove; black piece; black halfmove
 	.."tablecolumns[text;image," .. pieces_str .. ";text;image," .. pieces_str .. ";text]"
 
