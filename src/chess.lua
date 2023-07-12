@@ -614,8 +614,9 @@ local fs_init = [[
 	.."background[0,0;16,10.7563;chess_bg.png;true]"
 	.."style_type[button,item_image_button;bgcolor=#8f3000]"
 	.."label[11.5,1.8;"..FS("Select a mode:").."]"
-	.."button[11.5,2.1;2.2,0.8;single;"..FS("Singleplayer").."]"
-	.."button[11.5,3.1;2.2,0.8;multi;"..FS("Multiplayer").."]"
+	.."button[11.5,2.1;2.5,0.8;single_w;"..FS("Singleplayer (white)").."]"
+	.."button[11.5,2.95;2.5,0.8;single_b;"..FS("Singleplayer (black)").."]"
+	.."button[11.5,4.1;2.5,0.8;multi;"..FS("Multiplayer").."]"
 	.."label[2.2,0.652;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
 	.."label[2.2,10.21;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
 
@@ -1791,20 +1792,16 @@ function realchess.fields(pos, _, fields, sender)
 	local lastMoveTime  = meta:get_int("lastMoveTime")
 	if fields.quit then return end
 
-	if fields.single or fields.multi then
-		meta:set_string("mode", (fields.single and "single" or "multi"))
-		if fields.single then
-			-- AI plays a random color at random
-			local r = math.random(1,2)
-			if r == 1 then
-				meta:set_string("aiColor", "black")
-				meta:set_string("playerBlack", AI_NAME)
-			else
-				meta:set_string("aiColor", "white")
-				meta:set_string("playerWhite", AI_NAME)
-				local inv = meta:get_inventory()
-				ai_move(inv, meta)
-			end
+	if fields.single_w or fields.single_b or fields.multi then
+		meta:set_string("mode", ((fields.single_w or fields.single_b) and "single" or "multi"))
+		if fields.single_w then
+			meta:set_string("aiColor", "black")
+			meta:set_string("playerBlack", AI_NAME)
+		elseif fields.single_b then
+			meta:set_string("aiColor", "white")
+			meta:set_string("playerWhite", AI_NAME)
+			local inv = meta:get_inventory()
+			ai_move(inv, meta)
 		end
 		update_formspec(meta)
 		return
