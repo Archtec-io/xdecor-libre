@@ -606,27 +606,30 @@ end
 pieces_str = pieces_str .. MOVES_LIST_SYMBOL_EMPTY .. "=mailbox_blank16.png"
 
 local fs_init = [[
-	size[14.7,10;]
+	formspec_version[2]
+	size[16,10.7563;]
 	no_prepend[]
 	]]
 	.."bgcolor[#080808BB;true]"
-	.."background[0,0;14.7,10;chess_bg.png]"
-	.."label[10.5,1.5;"..FS("Select a mode:").."]"
-	.."button[10.5,2;2,1;single;"..FS("Singleplayer").."]"
-	.."button[10.5,3;2,1;multi;"..FS("Multiplayer").."]"
-	.."label[1.9,0.3;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
-	.."label[1.9,9.15;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
+	.."background[0,0;16,10.7563;chess_bg.png;true]"
+	.."label[11.5,1.8;"..FS("Select a mode:").."]"
+	.."button[11.5,2.1;2.2,0.8;single;"..FS("Singleplayer").."]"
+	.."button[11.5,3.1;2.2,0.8;multi;"..FS("Multiplayer").."]"
+	.."label[2.2,0.652;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
+	.."label[2.2,10.21;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
 
 local fs = [[
-	size[14.7,10;]
+	formspec_version[2]
+	size[16,10.7563;]
 	no_prepend[]
 	bgcolor[#080808BB;true]
-	background[0,0;14.7,10;chess_bg.png]
-	list[context;board;0.3,1;8,8;]
+	background[0,0;16,10.7563;chess_bg.png;true]
+	style_type[list;spacing=0.1;size=0.975]
 	listcolors[#00000000;#00000000;#00000000;#30434C;#FFF]
+	list[context;board;0.47,1.155;8,8;]
 	tableoptions[background=#00000000;highlight=#00000000;border=false]
 	]]
-	.."button[12.1,-0.3;2,2;new;"..FS("New game").."]"
+	.."button[13.36,0.26;2,0.8;new;"..FS("New game").."]"
 	-- move; white piece; white halfmove; black piece; black halfmove
 	.."tablecolumns[text;image," .. pieces_str .. ";text;image," .. pieces_str .. ";text]"
 
@@ -742,7 +745,6 @@ local function get_eaten_formstring(meta)
 	local eaten = meta:get_string("eaten")
 	local eaten_t   = string.split(eaten, ",")
 	local eaten_img = ""
-
 	local a, b = 0, 0
 	for i = 1, #eaten_t do
 		local is_white = eaten_t[i]:sub(-5,-1) == "white"
@@ -756,8 +758,8 @@ local function get_eaten_formstring(meta)
 		end
 
 		eaten_img = eaten_img ..
-			"image[" .. ((X + (is_white and 11.67 or 8.8)) - (X * 0.45)) .. "," ..
-				    ((Y + 5.56) - (Y * 0.2)) .. ";1,1;" .. eaten_t[i] .. ".png]"
+			"image[" .. ((X + (is_white and 12.82 or 9.72)) - (X * 0.44)) .. "," ..
+				    ((Y + 6) - (Y * 0.12)) .. ";1,1;" .. eaten_t[i] .. ".png]"
 	end
 	return eaten_img
 end
@@ -776,8 +778,8 @@ local function update_formspec(meta)
 	local gameResult = meta:get_string("gameResult")
 
 	-- arrow to show whose turn it is
-	local blackArr  = (gameResult == "" and lastMove == "white" and "image[1,0.2;0.7,0.7;chess_turn_black.png]") or ""
-	local whiteArr  = (gameResult == "" and (lastMove == "" or lastMove == "black") and "image[1,9.05;0.7,0.7;chess_turn_white.png]") or ""
+	local blackArr  = (gameResult == "" and lastMove == "white" and "image[1.2,0.252;0.7,0.7;chess_turn_black.png]") or ""
+	local whiteArr  = (gameResult == "" and (lastMove == "" or lastMove == "black") and "image[1.2,9.81;0.7,0.7;chess_turn_white.png]") or ""
 	local turnBlack = minetest.colorize("#000001", playerBlack)
 	local turnWhite = minetest.colorize("#000001", playerWhite)
 
@@ -819,32 +821,32 @@ local function update_formspec(meta)
 	if promotion == "black" then
 		eaten_img = ""
 		promotion_formstring =
-			"label[9.1,5.6;"..FS("PROMOTION\nFOR BLACK!").."]" ..
-			"animated_image[9.2,6.5;2,2;p_img_white;pawn_black_promo_anim.png;5;100]" ..
-			"label[12,5.6;"..FS("Promote pawn to:").."]" ..
-			"item_image_button[12,6.5;1,1;realchess:queen_black;p_queen_black;]" ..
-			"item_image_button[13,6.5;1,1;realchess:rook_black_1;p_rook_black;]" ..
-			"item_image_button[12,7.5;1,1;realchess:bishop_black_1;p_bishop_black;]" ..
-			"item_image_button[13,7.5;1,1;realchess:knight_black_1;p_knight_black;]"
+			"label[10.1,6.35;"..FS("PROMOTION\nFOR BLACK!").."]" ..
+			"animated_image[10.05,7.2;2,2;p_img_white;pawn_black_promo_anim.png;5;100]" ..
+			"label[13.15,6.35;"..FS("Promote pawn to:").."]" ..
+			"item_image_button[13.15,7.2;1,1;realchess:queen_black;p_queen_black;]" ..
+			"item_image_button[14.15,7.2;1,1;realchess:rook_black_1;p_rook_black;]" ..
+			"item_image_button[13.15,8.2;1,1;realchess:bishop_black_1;p_bishop_black;]" ..
+			"item_image_button[14.15,8.2;1,1;realchess:knight_black_1;p_knight_black;]"
 
 	elseif promotion == "white" then
 		eaten_img = ""
 		promotion_formstring =
-			"label[9.1,5.6;"..FS("PROMOTION\nFOR WHITE!").."]" ..
-			"animated_image[9.2,6.5;2,2;p_img_white;pawn_white_promo_anim.png;5;100]" ..
-			"label[12,5.6;"..FS("Promote pawn to:").."]" ..
-			"item_image_button[12,6.5;1,1;realchess:queen_white;p_queen_white;]" ..
-			"item_image_button[13,6.5;1,1;realchess:rook_white_1;p_rook_white;]" ..
-			"item_image_button[12,7.5;1,1;realchess:bishop_white_1;p_bishop_white;]" ..
-			"item_image_button[13,7.5;1,1;realchess:knight_white_1;p_knight_white;]"
+			"label[10.1,6.35;"..FS("PROMOTION\nFOR WHITE!").."]" ..
+			"animated_image[10.05,7.2;2,2;p_img_white;pawn_white_promo_anim.png;5;100]" ..
+			"label[13.15,6.35;"..FS("Promote pawn to:").."]" ..
+			"item_image_button[13.15,7.2;1,1;realchess:queen_white;p_queen_white;]" ..
+			"item_image_button[14.15,7.2;1,1;realchess:rook_white_1;p_rook_white;]" ..
+			"item_image_button[13.15,8.2;1,1;realchess:bishop_white_1;p_bishop_white;]" ..
+			"item_image_button[14.15,8.2;1,1;realchess:knight_white_1;p_knight_white;]"
 	end
 
 	local formspec = fs ..
-		"label[1.9,0.3;"  .. turnBlack .. minetest.formspec_escape(status_black) .. "]" ..
+		"label[2.2,0.652;"  .. turnBlack .. minetest.formspec_escape(status_black) .. "]" ..
 		blackArr ..
-		"label[1.9,9.15;" .. turnWhite .. minetest.formspec_escape(status_white) .. "]" ..
+		"label[2.2,10.21;" .. turnWhite .. minetest.formspec_escape(status_white) .. "]" ..
 		whiteArr ..
-		"table[8.9,1.05;5.07,3.75;moves;" .. moves .. ";"..m_sel_idx.."]" ..
+		"table[9.9,1.25;5.45,4;moves;" .. moves .. ";"..m_sel_idx.."]" ..
 		promotion_formstring ..
 		eaten_img
 
