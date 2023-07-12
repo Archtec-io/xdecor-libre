@@ -533,6 +533,9 @@ local function best_move(moves)
 	end
 	end
 
+	if #choices == 0 then
+		return -1, -1
+	end
 	local random = math.random(1, #choices)
 	local choice_from, choice_to = choices[random].from, choices[random].to
 
@@ -1580,6 +1583,10 @@ local function ai_move(inv, meta)
 		end
 
 		local choice_from, choice_to = best_move(moves)
+		if choice_from == -1 then
+			-- No best move: stalemate or checkmate
+			return
+		end
 
 		local pieceFrom = inv:get_stack("board", choice_from):get_name()
 		local pieceTo   = inv:get_stack("board", choice_to):get_name()
@@ -1625,7 +1632,7 @@ local function ai_move(inv, meta)
 			local lastMoveTime = meta:get_int("lastMoveTime")
 			if lastMoveTime > 0 then
 				if not kingSafe then
-					if bestMoveSaveTo then
+					if bestMoveSaveTo ~= -1 then
 						inv:set_stack("board", bestMoveSaveTo, board[bestMoveSaveFrom])
 						inv:set_stack("board", bestMoveSaveFrom, "")
 						meta:set_string("blackAttacked", "")
