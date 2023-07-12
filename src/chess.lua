@@ -1686,10 +1686,12 @@ local function timeout_format(timeout_limit)
 	local seconds        = time_remaining % 60
 
 	if minutes == 0 then
-		return seconds .. " sec."
+		-- number of seconds
+		return S("@1 s", seconds)
 	end
 
-	return minutes .. " min. " .. seconds .. " sec."
+	-- number of minutes and seconds
+	return S("@1 min @2 s", minutes, seconds)
 end
 
 function realchess.fields(pos, _, fields, sender)
