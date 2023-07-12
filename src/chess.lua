@@ -1526,6 +1526,24 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 		end
 	end
 
+	local board       = board_to_table(inv)
+	board[to_index]   = board[from_index]
+	board[from_index] = ""
+
+	local black_king_idx, white_king_idx = locate_kings(board)
+	if not black_king_idx or not white_king_idx then
+		return
+	end
+	local blackAttacked = attacked("black", black_king_idx, board)
+	local whiteAttacked = attacked("white", white_king_idx, board)
+
+	if blackAttacked and thisMove == "black" then
+		return
+	end
+	if whiteAttacked and thisMove == "white" then
+		return
+	end
+
 	if not promotion then
 		realchess.update_state(meta, from_index, to_index, thisMove)
 	end
@@ -1771,16 +1789,17 @@ function realchess.move_piece(meta, pieceFrom, from_list, from_index, to_list, t
 	end
 end
 
-function realchess.update_state(meta, from_index, to_index, thisMove, pieceFromOverride)
+function realchess.update_state(meta, from_index, to_index, thisMove, promotionOverride)
 	local inv         = meta:get_inventory()
 	local board       = board_to_table(inv)
 	local pieceTo     = board[to_index]
-	local pieceFrom   = pieceFromOverride or board[from_index]
+	local pieceFrom   = promotionOverride or board[from_index]
 	local pieceTo_s   = pieceTo ~= "" and pieceTo:match(":(%w+_%w+)") or ""
 
-
-	board[to_index]   = board[from_index]
-	board[from_index] = ""
+	if not promotionOverride then
+		board[to_index]   = board[from_index]
+		board[from_index] = ""
+	end
 
 	local black_king_idx, white_king_idx = locate_kings(board)
 	if not black_king_idx or not white_king_idx then
@@ -1790,21 +1809,13 @@ function realchess.update_state(meta, from_index, to_index, thisMove, pieceFromO
 	local whiteAttacked = attacked("white", white_king_idx, board)
 
 	if blackAttacked then
-		if thisMove == "black" then
-			return
-		else
-			meta:set_string("blackAttacked", "true")
-		end
+		meta:set_string("blackAttacked", "true")
 	else
 		meta:set_string("blackAttacked", "")
 	end
 
 	if whiteAttacked then
-		if thisMove == "white" then
-			return
-		else
-			meta:set_string("whiteAttacked", "true")
-		end
+		meta:set_string("whiteAttacked", "true")
 	else
 		meta:set_string("whiteAttacked", "")
 	end
