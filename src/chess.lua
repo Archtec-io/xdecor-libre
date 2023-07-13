@@ -126,7 +126,17 @@ local function attacked(color, idx, board)
 	return threatDetected
 end
 
-local function get_possible_moves(board, from_idx)
+-- Returns all theoretically possible moves from a given
+-- square, according to the piece it occupies. Ignores restrictions like check, etc.
+-- If the square is empty, no moves are returned.
+-- Parameters:
+-- * board: chessboard table
+-- * from_idx:
+-- returns: table with the keys used as destination indices
+--    Any key with a numeric value is a possible destination.
+--    The numeric value is a move rating for AI and is 0 by default.
+-- Example: { [4] = 0, [9] = 0 } -- can move to squares 4 and 9
+local function get_theoretical_moves_from(board, from_idx)
 	local piece, color = board[from_idx]:match(":(%w+)_(%w+)")
 	if not piece then
 		return {}
@@ -513,6 +523,33 @@ local function get_possible_moves(board, from_idx)
 	return moves
 end
 
+-- returns all theoretically possible moves on the board for a player
+-- Parameters:
+-- * board: chessboard table
+-- * player: "black" or "white"
+-- returns: table of this format:
+-- {
+--	[origin_index_1] = { [destination_index_1] = r1, [destination_index_2] = r2 },
+--	[origin_index_2] = { [destination_index_3] = r3 },
+--      ...
+-- }
+--   origin_index is the board index for the square to start the piece from (as string)
+--   and this is the key for a list of destination indixes.
+--   r1, r2, r3 ... are numeric values (normally 0) to "rate" this square for AI.
+local function get_theoretical_moves_for(board, player)
+	local moves = {}
+	for i = 1, 64 do
+		local possibleMoves = get_theoretical_moves_from(board, i)
+		if next(possibleMoves) then
+			local stack_name = board[i]
+			if stack_name:find(player) then
+				moves[tostring(i)] = possibleMoves
+			end
+		end
+	end
+	return moves
+end
+
 local function best_move(moves)
 	local value, choices = 0, {}
 
@@ -645,6 +682,10 @@ local function add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_
 	end
 	moves_raw = moves_raw .. pieceFrom .. "," .. pieceTo .. "," .. pieceTo_s .. "," .. from_idx .. "," .. to_idx .. "," .. special
 	meta:set_string("moves_raw", moves_raw)
+end
+
+local function add_special_to_moves_list(meta, special)
+	add_move_to_moves_list(meta, "", "", "", "", "", special)
 end
 
 -- Create the full formspec string for the sequence of moves.
@@ -811,9 +852,9 @@ local function update_formspec(meta)
 	-- player has resigned
 	local resign_s    = minetest.colorize("#FF0000", "["..S("resigned").."]")
 	-- player has won
-	local win_s     = minetest.colorize("#00FF00", "["..S("winner").."]")
+	local win_s     = minetest.colorize("#26AB2B", "["..S("winner").."]")
 	-- player has lost
-	local lose_s     = minetest.colorize("#00FF00", "["..S("loser").."]")
+	local lose_s     = minetest.colorize("#FF0000", "["..S("loser").."]")
 	-- player has a draw
 	local draw_s    = minetest.colorize("#FF00FF", "["..S("draw").."]")
 
@@ -901,59 +942,75 @@ local function update_game_result(meta)
 	local inv = meta:get_inventory()
 	local board_t = board_to_table(inv)
 
+	local playerWhite = meta:get_string("playerWhite")
+	local playerBlack = meta:get_string("playerBlack")
+
 	update_formspec(meta)
 	local blackCanMove = false
 	local whiteCanMove = false
 
-	for i = 1, 64 do
-		local possibleMovesHere = get_possible_moves(board_t, i)
-		local stack_name = inv:get_stack("board", i):get_name()
-		if stack_name:find("black") then
-			for k, v in pairs(possibleMovesHere) do
-				blackCanMove = true
-				break
-			end
-		elseif stack_name:find("white") then
-			for k, v in pairs(possibleMovesHere) do
-				whiteCanMove = true
-				break
-			end
-		end
-		if blackCanMove and whiteCanMove then
-			return
-		end
+	local blackMoves = get_theoretical_moves_for(board_t, "black")
+	local whiteMoves = get_theoretical_moves_for(board_t, "white")
+	local b = 0
+	for k,v in pairs(blackMoves) do
+		b = b + 1
+		blackCanMove = true
 	end
-	local currentTurn
-	local lastTurn = meta:get_string("lastTurn")
-	if lastTurn == "black" or lastTurn == "" then
-		currentTurn = "white"
-	else
-		currentTurn = "black"
+	b = 0
+	for k,v in pairs(whiteMoves) do
+		b = b + 1
+		whiteCanMove = true
 	end
-	if currentTurn == "black" and not blackCanMove then
+
+	-- assume lastMove was updated *after* the player moved
+	local lastMove = meta:get_string("lastMove")
+	if lastMove == "white" and not blackCanMove then
 		if meta:get_string("blackAttacked") == "true" then
 			-- black was checkmated
 			meta:set_string("gameResult", "whiteWon")
+			meta:set_string("gameResultReason", "checkmate")
+			add_special_to_moves_list(meta, "whiteWon")
+			minetest.chat_send_player(playerWhite, chat_prefix .. S("You have checkmated @1. You win!", playerBlack))
+			minetest.chat_send_player(playerBlack, chat_prefix .. S("You were checkmated by @1. You lose!", playerWhite))
+			minetest.log("action", "[xdecor] Chess: "..playerWhite.." won against "..playerBlack.." by checkmate")
 			return
 		else
 			-- stalemate
 			meta:set_string("gameResult", "draw")
+			meta:set_string("gameResultReason", "stalemate")
+			add_special_to_moves_list(meta, "draw")
+			minetest.chat_send_player(playerWhite, chat_prefix .. S("The game ended up in a stalemate! It's a draw!"))
+			if playerWhite ~= playerBlack then
+				minetest.chat_send_player(playerBlack, chat_prefix .. S("The game ended up in a stalemate! It's a draw!"))
+			end
+			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a stalemate")
 			return
 		end
 	end
-	if currentTurn == "white" and not whiteCanMove then
+	if lastMove == "black" and not whiteCanMove then
 		if meta:get_string("whiteAttacked") == "true" then
 			-- white was checkmated
 			meta:set_string("gameResult", "blackWon")
+			meta:set_string("gameResultReason", "checkmate")
+			add_special_to_moves_list(meta, "blackWon")
+			minetest.chat_send_player(playerBlack, chat_prefix .. S("You have checkmated @1. You win!", playerWhite))
+			minetest.chat_send_player(playerWhite, chat_prefix .. S("You were checkmated by @1. You lose!", playerBlack))
+			minetest.log("action", "[xdecor] Chess: "..playerBlack .." won against "..playerWhite.." by checkmate")
 			return
 		else
 			-- stalemate
 			meta:set_string("gameResult", "draw")
+			meta:set_string("gameResultReason", "stalemate")
+			add_special_to_moves_list(meta, "draw")
+			minetest.chat_send_player(playerWhite, chat_prefix .. S("The game ended up in a stalemate! It's a draw!"))
+			if playerWhite ~= playerBlack then
+				minetest.chat_send_player(playerBlack, chat_prefix .. S("The game ended up in a stalemate! It's a draw!"))
+			end
+			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a stalemate")
 			return
 		end
 	end
 end
-
 
 
 function realchess.init(pos)
@@ -1638,16 +1695,8 @@ local function ai_move(inv, meta)
 	end
 	if (lastMove == opponentColor or (aiColor == "white" and lastMove == "")) and gameResult == "" then
 		update_formspec(meta)
-		local moves = {}
 
-		for i = 1, 64 do
-			local possibleMoves = get_possible_moves(board_t, i)
-			local stack_name    = inv:get_stack("board", i):get_name()
-
-			if stack_name:find(aiColor) then
-				moves[tostring(i)] = possibleMoves
-			end
-		end
+		local moves = get_theoretical_moves_for(board_t, aiColor)
 
 		local choice_from, choice_to = best_move(moves)
 		if choice_from == nil then
@@ -1758,6 +1807,7 @@ local function ai_move(inv, meta)
 
 				add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, choice_from, choice_to)
 				add_to_eaten_list(meta, pieceTo, pieceTo_s)
+
 				update_game_result(meta)
 
 				update_formspec(meta)
@@ -1856,10 +1906,10 @@ function realchess.fields(pos, _, fields, sender)
 			meta:set_string("gameResultReason", "resign")
 			if whiteWon then
 				meta:set_string("gameResult", "whiteWon")
-				add_move_to_moves_list(meta, "", "", "", "", "", "whiteWon")
+				add_special_to_moves_list(meta, "whiteWon")
 			else
 				meta:set_string("gameResult", "blackWon")
-				add_move_to_moves_list(meta, "", "", "", "", "", "blackWon")
+				add_special_to_moves_list(meta, "blackWon")
 			end
 
 			minetest.chat_send_player(loser, chat_prefix .. S("You have resigned."))
