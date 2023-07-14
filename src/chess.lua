@@ -720,6 +720,46 @@ local function locate_kings(board)
 	return Bidx, Widx
 end
 
+-- Given a table of theoretical moves and the king of the player is attacked,
+-- returns true if the player still has at least one move left,
+-- return false otherwise.
+-- * theoretical_moves: moves table returned by get_theoretical_moves_for()
+-- * board: board table
+-- * player: player color ("white" or "black")
+local function has_king_safe_move(theoretical_moves, board, player)
+	local save_moves = {}
+	local s_board = table.copy(board)
+	for from_idx, _ in pairs(theoretical_moves) do
+	for to_idx, value in pairs(_) do
+		from_idx = tonumber(from_idx)
+		s_board[to_idx]   = s_board[from_idx]
+		s_board[from_idx] = ""
+		local black_king_idx, white_king_idx = locate_kings(s_board)
+		local king_idx
+		if player == "black" then
+			king_idx = black_king_idx
+		else
+			king_idx = white_king_idx
+		end
+		if king_idx then
+			local playerAttacked = attacked(player, king_idx, s_board)
+			if not playerAttacked then
+				save_moves[from_idx] = save_moves[from_idx] or {}
+				save_moves[from_idx][to_idx] = value
+			end
+		end
+	end
+	end
+
+	if next(save_moves) then
+		return true
+	else
+		return false
+	end
+end
+
+
+
 local pieces = {
 	"realchess:rook_black_1",
 	"realchess:knight_black_1",
@@ -1076,15 +1116,52 @@ local function update_game_result(meta)
 
 	local blackMoves = get_theoretical_moves_for(meta, board_t, "black")
 	local whiteMoves = get_theoretical_moves_for(meta, board_t, "white")
+	local b = 0
 	for k,v in pairs(blackMoves) do
 		blackCanMove = true
+		b = b+1
 	end
+	b = 0
 	for k,v in pairs(whiteMoves) do
 		whiteCanMove = true
+		b = b+1
 	end
 
 	-- assume lastMove was updated *after* the player moved
 	local lastMove = meta:get_string("lastMove")
+
+	local black_king_idx, white_king_idx = locate_kings(board_t)
+	if not black_king_idx or not white_king_idx then
+		return
+	end
+
+	local checkPlayer, king_idx, checkMoves
+	if lastMove == "white" then
+		checkPlayer = "black"
+		checkMoves = blackMoves
+		king_idx = black_king_idx
+	else
+		checkPlayer = "white"
+		checkMoves = whiteMoves
+		king_idx = white_king_idx
+	end
+
+	-- King attacked? This reduces the list of available moves,
+	-- so remove these, too and check if there are still any left.
+	local isKingAttacked = attacked(checkPlayer, king_idx, board_t)
+	if isKingAttacked then
+		meta:set_string(checkPlayer.."Attacked", "true")
+		local is_safe = has_king_safe_move(checkMoves, board_t, checkPlayer)
+		-- If not safe moves left, player can't move
+		if not is_safe then
+			if checkPlayer == "black" then
+				blackCanMove = false
+			else
+				whiteCanMove = false
+			end
+		end
+	end
+
 	if lastMove == "white" and not blackCanMove then
 		if meta:get_string("blackAttacked") == "true" then
 			-- black was checkmated
@@ -1764,33 +1841,8 @@ local function ai_move(inv, meta)
 		if aiAttacked then
 			kingSafe = false
 			meta:set_string(aiColor.."Attacked", "true")
-			local save_moves = {}
-
-			for from_idx, _ in pairs(moves) do
-			for to_idx, value in pairs(_) do
-				from_idx = tonumber(from_idx)
-				local from_idx_bak, to_idx_bak = board[from_idx], board[to_idx]
-				board[to_idx]   = board[from_idx]
-				board[from_idx] = ""
-				black_king_idx, white_king_idx = locate_kings(board)
-				if aiColor == "black" then
-					ai_king_idx = black_king_idx
-				else
-					ai_king_idx = white_king_idx
-				end
-				if ai_king_idx then
-					aiAttacked = attacked(aiColor, ai_king_idx, board)
-					if not aiAttacked then
-						save_moves[from_idx] = save_moves[from_idx] or {}
-						save_moves[from_idx][to_idx] = value
-					end
-				end
-
-				board[from_idx], board[to_idx] = from_idx_bak, to_idx_bak
-			end
-			end
-
-			if next(save_moves) then
+			local is_safe = has_king_safe_move(moves, board, aiColor)
+			if is_safe then
 				bestMoveSaveFrom, bestMoveSaveTo = best_move(save_moves)
 			end
 		end
