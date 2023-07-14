@@ -126,6 +126,12 @@ local function attacked(color, idx, board)
 	return threatDetected
 end
 
+local function get_current_halfmove(meta)
+	local moves_raw = meta:get_string("moves_raw")
+	local mrsplit = string.split(moves_raw, ";")
+	return #mrsplit
+end
+
 -- Returns all theoretically possible moves from a given
 -- square, according to the piece it occupies. Ignores restrictions like check, etc.
 -- If the square is empty, no moves are returned.
@@ -136,7 +142,7 @@ end
 --    Any key with a numeric value is a possible destination.
 --    The numeric value is a move rating for AI and is 0 by default.
 -- Example: { [4] = 0, [9] = 0 } -- can move to squares 4 and 9
-local function get_theoretical_moves_from(board, from_idx)
+local function get_theoretical_moves_from(meta, board, from_idx)
 	local piece, color = board[from_idx]:match(":(%w+)_(%w+)")
 	if not piece then
 		return {}
@@ -160,6 +166,7 @@ local function get_theoretical_moves_from(board, from_idx)
 		if piece == "pawn" then
 			if color == "white" then
 				local pawnWhiteMove = board[xy_to_index(from_x, from_y - 1)]
+				local en_passant = false
 				-- white pawns can go up only
 				if from_y - 1 == to_y then
 					if from_x == to_x then
@@ -167,7 +174,26 @@ local function get_theoretical_moves_from(board, from_idx)
 							moves[to_idx] = nil
 						end
 					elseif from_x - 1 == to_x or from_x + 1 == to_x then
-						if not pieceTo:find("black") then
+						local can_capture = false
+						if pieceTo:find("black") then
+							can_capture = true
+						else
+							-- en passant
+							local inv = meta:get_inventory()
+							local enPassantPiece = inv:get_stack("board", xy_to_index(to_x, from_y))
+							local epp_meta = enPassantPiece:get_meta()
+							local epp_name = enPassantPiece:get_name()
+							if epp_name:find("black") and epp_name:sub(11,14) == "pawn" then
+								local pawn_no = epp_name:sub(-1)
+								local double_step_halfmove = meta:get_int("doublePawnStepB"..pawn_no)
+								local current_halfmove = get_current_halfmove(meta)
+								if double_step_halfmove ~= 0 and double_step_halfmove == current_halfmove then
+									can_capture = true
+									en_passant = true
+								end
+							end
+						end
+						if not can_capture then
 							moves[to_idx] = nil
 						end
 					else
@@ -195,7 +221,7 @@ local function get_theoretical_moves_from(board, from_idx)
 						moves[to_idx] = nil
 					end
 				elseif from_x - 1 == to_x or from_x + 1 == to_x then
-					if not pieceTo:find("black") then
+					if not pieceTo:find("black") and not en_passant then
 						moves[to_idx] = nil
 					end
 				else
@@ -204,6 +230,7 @@ local function get_theoretical_moves_from(board, from_idx)
 
 			elseif color == "black" then
 				local pawnBlackMove = board[xy_to_index(from_x, from_y + 1)]
+				local en_passant = false
 				-- black pawns can go down only
 				if from_y + 1 == to_y then
 					if from_x == to_x then
@@ -211,7 +238,26 @@ local function get_theoretical_moves_from(board, from_idx)
 							moves[to_idx] = nil
 						end
 					elseif from_x - 1 == to_x or from_x + 1 == to_x then
-						if not pieceTo:find("white") then
+						local can_capture = false
+						if pieceTo:find("white") then
+							can_capture = true
+						else
+							-- en passant
+							local inv = meta:get_inventory()
+							local enPassantPiece = inv:get_stack("board", xy_to_index(to_x, from_y))
+							local epp_meta = enPassantPiece:get_meta()
+							local epp_name = enPassantPiece:get_name()
+							if epp_name:find("white") and epp_name:sub(11,14) == "pawn" then
+								local pawn_no = epp_name:sub(-1)
+								local double_step_halfmove = meta:get_int("doublePawnStepW"..pawn_no)
+								local current_halfmove = get_current_halfmove(meta)
+								if double_step_halfmove ~= 0 and double_step_halfmove == current_halfmove then
+									can_capture = true
+									en_passant = true
+								end
+							end
+						end
+						if not can_capture then
 							moves[to_idx] = nil
 						end
 					else
@@ -239,7 +285,7 @@ local function get_theoretical_moves_from(board, from_idx)
 						moves[to_idx] = nil
 					end
 				elseif from_x - 1 == to_x or from_x + 1 == to_x then
-					if not pieceTo:find("white") then
+					if not pieceTo:find("white") and not en_passant then
 						moves[to_idx] = nil
 					end
 				else
@@ -536,10 +582,10 @@ end
 --   origin_index is the board index for the square to start the piece from (as string)
 --   and this is the key for a list of destination indixes.
 --   r1, r2, r3 ... are numeric values (normally 0) to "rate" this square for AI.
-local function get_theoretical_moves_for(board, player)
+local function get_theoretical_moves_for(meta, board, player)
 	local moves = {}
 	for i = 1, 64 do
-		local possibleMoves = get_theoretical_moves_from(board, i)
+		local possibleMoves = get_theoretical_moves_from(meta, board, i)
 		if next(possibleMoves) then
 			local stack_name = board[i]
 			if stack_name:find(player) then
@@ -949,8 +995,8 @@ local function update_game_result(meta)
 	local blackCanMove = false
 	local whiteCanMove = false
 
-	local blackMoves = get_theoretical_moves_for(board_t, "black")
-	local whiteMoves = get_theoretical_moves_for(board_t, "white")
+	local blackMoves = get_theoretical_moves_for(meta, board_t, "black")
+	local whiteMoves = get_theoretical_moves_for(meta, board_t, "white")
 	local b = 0
 	for k,v in pairs(blackMoves) do
 		b = b + 1
@@ -1207,10 +1253,8 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 					if epp_name:find("black") and epp_name:sub(11,14) == "pawn" then
 						local pawn_no = epp_name:sub(-1)
 						local double_step_halfmove = meta:get_int("doublePawnStepB"..pawn_no)
-						local moves_raw = meta:get_string("moves_raw")
-						local mrsplit = string.split(moves_raw, ";")
-						local current_halfmove = #mrsplit + 1
-						if double_step_halfmove ~= 0 and double_step_halfmove == current_halfmove - 1 then
+						local current_halfmove = get_current_halfmove(meta)
+						if double_step_halfmove ~= 0 and double_step_halfmove == current_halfmove then
 							can_capture = true
 							inv:set_stack(to_list, xy_to_index(to_x, from_y), "")
 						end
@@ -1291,10 +1335,8 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 					if epp_name:find("white") and epp_name:sub(11,14) == "pawn" then
 						local pawn_no = epp_name:sub(-1)
 						local double_step_halfmove = meta:get_int("doublePawnStepW"..pawn_no)
-						local moves_raw = meta:get_string("moves_raw")
-						local mrsplit = string.split(moves_raw, ";")
-						local current_halfmove = #mrsplit + 1
-						if double_step_halfmove ~= 0 and double_step_halfmove == current_halfmove - 1 then
+						local current_halfmove = get_current_halfmove(meta)
+						if double_step_halfmove ~= 0 and double_step_halfmove == current_halfmove then
 							can_capture = true
 							inv:set_stack(to_list, xy_to_index(to_x, from_y), "")
 						end
@@ -1696,7 +1738,7 @@ local function ai_move(inv, meta)
 	if (lastMove == opponentColor or (aiColor == "white" and lastMove == "")) and gameResult == "" then
 		update_formspec(meta)
 
-		local moves = get_theoretical_moves_for(board_t, aiColor)
+		local moves = get_theoretical_moves_for(meta, board_t, aiColor)
 
 		local choice_from, choice_to = best_move(moves)
 		if choice_from == nil then
