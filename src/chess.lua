@@ -40,7 +40,7 @@ local function index_to_notation(idx)
 		return "??"
 	end
 	local xstr = letters[x+1] or "?"
-	local ystr = tostring(y+1) or "?"
+	local ystr = tostring(9 - (y+1)) or "?"
 	return xstr .. ystr
 end
 
