@@ -723,6 +723,7 @@ end
 -- Given a table of theoretical moves and the king of the player is attacked,
 -- returns true if the player still has at least one move left,
 -- return false otherwise.
+-- 2nd return value ist table of save moves
 -- * theoretical_moves: moves table returned by get_theoretical_moves_for()
 -- * board: board table
 -- * player: player color ("white" or "black")
@@ -752,7 +753,7 @@ local function has_king_safe_move(theoretical_moves, board, player)
 	end
 
 	if next(save_moves) then
-		return true
+		return true, save_moves
 	else
 		return false
 	end
@@ -1841,9 +1842,9 @@ local function ai_move(inv, meta)
 		if aiAttacked then
 			kingSafe = false
 			meta:set_string(aiColor.."Attacked", "true")
-			local is_safe = has_king_safe_move(moves, board, aiColor)
+			local is_safe, safe_moves = has_king_safe_move(moves, board, aiColor)
 			if is_safe then
-				bestMoveSaveFrom, bestMoveSaveTo = best_move(save_moves)
+				bestMoveSaveFrom, bestMoveSaveTo = best_move(safe_moves)
 			end
 		end
 
