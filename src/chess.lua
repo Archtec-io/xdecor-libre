@@ -132,6 +132,65 @@ local function get_current_halfmove(meta)
 	return #mrsplit
 end
 
+local function can_castle(meta, board, from_list, from_idx, to_idx)
+	local from_x, from_y = index_to_xy(from_idx)
+	local to_x, to_y = index_to_xy(to_idx)
+	local inv = meta:get_inventory()
+	local kingPiece = inv:get_stack(from_list, from_idx):get_name()
+	local kingColor
+	if kingPiece:find("black") then
+		kingColor = "black"
+	else
+		kingColor = "white"
+	end
+	local possible_castles = {
+		-- white queenside
+		{ y = 7, to_x = 2, rook_idx = 57, rook_goal = 60, acheck_dir = -1, color = "white", meta = "castlingWhiteL", rook_id = 1 },
+		-- white kingside
+		{ y = 7, to_x = 6, rook_idx = 64, rook_goal = 62, acheck_dir = 1, color = "white", meta = "castlingWhiteR", rook_id = 2 },
+		-- black queenside
+		{ y = 0, to_x = 2, rook_idx = 1, rook_goal = 4, acheck_dir = -1, color = "black", meta = "castlingBlackL", rook_id = 1 },
+		-- black kingside
+		{ y = 0, to_x = 6, rook_idx = 8, rook_goal = 6, acheck_dir = 1, color = "black", meta = "castlingBlackR", rook_id = 2 },
+	}
+
+	for p=1, #possible_castles do
+		local pc = possible_castles[p]
+		if pc.color == kingColor and pc.to_x == to_x and to_y == pc.y and from_y == pc.y then
+			local castlingMeta = meta:get_int(pc.meta)
+			local rookPiece = inv:get_stack(from_list, pc.rook_idx):get_name()
+			if castlingMeta == 1 and rookPiece == "realchess:rook_"..kingColor.."_"..pc.rook_id then
+				-- Check if all squares between king and rook are empty
+				local empty_start, empty_end
+				if pc.acheck_dir == -1 then
+					-- queenside
+					empty_start = pc.rook_idx + 1
+					empty_end = from_idx - 1
+				else
+					-- kingside
+					empty_start = from_idx + 1
+					empty_end = pc.rook_idx - 1
+				end
+				for i = empty_start, empty_end do
+					if inv:get_stack(from_list, i):get_name() ~= "" then
+						return false
+					end
+				end
+				-- Check if square of king as well the squares that king must cross and reach
+				-- are NOT attacked
+				for i = from_idx, from_idx + 2 * pc.acheck_dir, pc.acheck_dir do
+					if attacked(kingColor, i, board) then
+						return false
+					end
+				end
+				return true, pc.rook_idx, pc.rook_goal, "realchess:rook_"..kingColor.."_"..pc.rook_id
+			end
+		end
+	end
+	return false
+
+end
+
 -- Returns all theoretically possible moves from a given
 -- square, according to the piece it occupies. Ignores restrictions like check, etc.
 -- If the square is empty, no moves are returned.
@@ -1130,6 +1189,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 	local lastMove    = meta:get_string("lastMove")
 	local playerWhite = meta:get_string("playerWhite")
 	local playerBlack = meta:get_string("playerBlack")
+	local castled     = false
 	local thisMove    -- Will replace lastMove when move is legal
 
 	if pieceFrom:find("white") then
@@ -1578,90 +1638,13 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 		local inv = meta:get_inventory()
 		local board = board_to_table(inv)
 
-		if thisMove == "white" then
-			if from_y == 7 and to_y == 7 then
-				if to_x == 2 then
-					local castlingWhiteL = meta:get_int("castlingWhiteL")
-					local idx57 = inv:get_stack(from_list, 57):get_name()
-
-					if castlingWhiteL == 1 and idx57 == "realchess:rook_white_1" then
-						for i = 58, from_index - 1 do
-							if inv:get_stack(from_list, i):get_name() ~= "" then
-								return
-							end
-						end
-						for i = from_index, from_index - 2, -1 do
-							if attacked("white", i, board) then
-								return
-							end
-						end
-						inv:set_stack(from_list, 57, "")
-						inv:set_stack(from_list, 60, "realchess:rook_white_1")
-						check = false
-					end
-				elseif to_x == 6 then
-					local castlingWhiteR = meta:get_int("castlingWhiteR")
-					local idx64 = inv:get_stack(from_list, 64):get_name()
-
-					if castlingWhiteR == 1 and idx64 == "realchess:rook_white_2" then
-						for i = from_index + 1, 63 do
-							if inv:get_stack(from_list, i):get_name() ~= "" then
-								return
-							end
-						end
-						for i = from_index, from_index + 2, 1 do
-							if attacked("white", i, board) then
-								return
-							end
-						end
-						inv:set_stack(from_list, 62, "realchess:rook_white_2")
-						inv:set_stack(from_list, 64, "")
-						check = false
-					end
-				end
-			end
-		elseif thisMove == "black" then
-			if from_y == 0 and to_y == 0 then
-				if to_x == 2 then
-					local castlingBlackL = meta:get_int("castlingBlackL")
-					local idx1 = inv:get_stack(from_list, 1):get_name()
-
-					if castlingBlackL == 1 and idx1 == "realchess:rook_black_1" then
-						for i = 2, from_index - 1 do
-							if inv:get_stack(from_list, i):get_name() ~= "" then
-								return
-							end
-						end
-						for i = from_index, from_index - 2, -1 do
-							if attacked("black", i, board) then
-								return
-							end
-						end
-						inv:set_stack(from_list, 1, "")
-						inv:set_stack(from_list, 4, "realchess:rook_black_1")
-						check = false
-					end
-				elseif to_x == 6 then
-					local castlingBlackR = meta:get_int("castlingBlackR")
-					local idx8 = inv:get_stack(from_list, 8):get_name()
-
-					if castlingBlackR == 1 and idx8 == "realchess:rook_black_2" then
-						for i = from_index + 1, 7 do
-							if inv:get_stack(from_list, i):get_name() ~= "" then
-								return
-							end
-						end
-						for i = from_index, from_index + 2, 1 do
-							if attacked("black", i, board) then
-								return
-							end
-						end
-						inv:set_stack(from_list, 6, "realchess:rook_black_2")
-						inv:set_stack(from_list, 8, "")
-						check = false
-					end
-				end
-			end
+		-- Castling
+		local cc, rook_start, rook_goal, rook_name = can_castle(meta, board, from_list, from_index, to_index)
+		if cc then
+			inv:set_stack(from_list, rook_goal, rook_name)
+			inv:set_stack(from_list, rook_start, "")
+			check = false
+			castled = true
 		end
 
 		if check then
@@ -1678,14 +1661,6 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 			end
 		end
 
-		if thisMove == "white" then
-			meta:set_int("castlingWhiteL", 0)
-			meta:set_int("castlingWhiteR", 0)
-
-		elseif thisMove == "black" then
-			meta:set_int("castlingBlackL", 0)
-			meta:set_int("castlingBlackR", 0)
-		end
 	end
 
 	local board       = board_to_table(inv)
@@ -1704,6 +1679,14 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 	end
 	if whiteAttacked and thisMove == "white" then
 		return
+	end
+
+	if castled and thisMove == "white" then
+		meta:set_int("castlingWhiteL", 0)
+		meta:set_int("castlingWhiteR", 0)
+	elseif castled and thisMove == "black" then
+		meta:set_int("castlingBlackL", 0)
+		meta:set_int("castlingBlackR", 0)
 	end
 
 	if not promotion then
