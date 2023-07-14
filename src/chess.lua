@@ -858,7 +858,7 @@ end
 local function get_moves_formstring(meta)
 	local moves_raw = meta:get_string("moves_raw")
 	if moves_raw == "" then
-		return ","..MOVES_LIST_SYMBOL_EMPTY..",,"..MOVES_LIST_SYMBOL_EMPTY..","
+		return ","..MOVES_LIST_SYMBOL_EMPTY..",,"..MOVES_LIST_SYMBOL_EMPTY..",", 1
 	end
 
 	local moves_split = string.split(moves_raw, ";")
@@ -883,10 +883,13 @@ local function get_moves_formstring(meta)
 		end
 		if special == "whiteWon" then
 			moves_out = moves_out .. ","..MOVES_LIST_SYMBOL_EMPTY..",1–0,"..MOVES_LIST_SYMBOL_EMPTY
+			move_no = move_no + 1
 		elseif special == "blackWon" then
 			moves_out = moves_out .. ","..MOVES_LIST_SYMBOL_EMPTY..",0–1,"..MOVES_LIST_SYMBOL_EMPTY
+			move_no = move_no + 1
 		elseif special == "draw" then
 			moves_out = moves_out .. ","..MOVES_LIST_SYMBOL_EMPTY..",½–½,"..MOVES_LIST_SYMBOL_EMPTY
+			move_no = move_no + 1
 		else
 		local from_x, from_y  = index_to_xy(from_idx)
 		local to_x, to_y      = index_to_xy(to_idx)
@@ -955,7 +958,7 @@ local function get_moves_formstring(meta)
 			moves_out = moves_out .. ","
 		end
 	end
-	return moves_out
+	return moves_out, move_no
 end
 
 local function add_to_eaten_list(meta, pieceTo, pieceTo_s)
@@ -997,7 +1000,7 @@ local function update_formspec(meta)
 	local playerBlack = meta:get_string("playerBlack")
 
 	local moves_raw = meta:get_string("moves_raw")
-	local moves     = get_moves_formstring(meta)
+	local moves, mlistlen = get_moves_formstring(meta)
 	local eaten_img = get_eaten_formstring(meta)
 	local lastMove  = meta:get_string("lastMove")
 	local gameResult = meta:get_string("gameResult")
@@ -1022,9 +1025,6 @@ local function update_formspec(meta)
 	local lose_s     = minetest.colorize("#FF0000", "["..S("loser").."]")
 	-- player has a draw
 	local draw_s    = minetest.colorize("#FF00FF", "["..S("draw").."]")
-
-	local mrsplit = string.split(moves_raw, ";")
-	local m_sel_idx = math.ceil(#mrsplit / 2)
 
 	local status_black = ""
 	local status_white = ""
@@ -1095,7 +1095,7 @@ local function update_formspec(meta)
 		blackArr ..
 		"label[2.2,10.21;" .. turnWhite .. minetest.formspec_escape(status_white) .. "]" ..
 		whiteArr ..
-		"table[9.9,1.25;5.45,4;moves;" .. moves .. ";"..m_sel_idx.."]" ..
+		"table[9.9,1.25;5.45,4;moves;" .. moves .. ";"..mlistlen.."]" ..
 		promotion_formstring ..
 		eaten_img ..
 		game_buttons
