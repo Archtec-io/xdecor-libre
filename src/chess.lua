@@ -589,23 +589,26 @@ local function get_theoretical_moves_from(meta, board, from_idx)
 
 		-- KING
 		elseif piece == "king" then
-			local dx = from_x - to_x
-			local dy = from_y - to_y
-
-			if dx < 0 then
-				dx = -dx
-			end
-
-			if dy < 0 then
-				dy = -dy
-			end
-
-			if dx > 1 or dy > 1 then
-				moves[to_idx] = nil
-			end
-
 			if attacked(color, xy_to_index(to_x, to_y), board) then
 				moves[to_idx] = nil
+			else
+				local dx = from_x - to_x
+				local dy = from_y - to_y
+
+				if dx < 0 then
+					dx = -dx
+				end
+
+				if dy < 0 then
+					dy = -dy
+				end
+
+				if dx > 1 or dy > 1 then
+					local cc = can_castle(meta, board, "board", from_idx, to_idx)
+					if not cc then
+						moves[to_idx] = nil
+					end
+				end
 			end
 		end
 	end
