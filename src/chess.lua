@@ -599,7 +599,14 @@ local function get_theoretical_moves_from(meta, board, from_idx)
 
 		-- KING
 		elseif piece == "king" then
-			if attacked(color, xy_to_index(to_x, to_y), board) then
+			local inv = meta:get_inventory()
+			-- King can't move to any attacked square
+			-- king_board simulates the board with the king moved already.
+			-- Required for the attacked() check to work
+			local king_board = board_to_table(inv)
+			king_board[to_idx] = king_board[from_idx]
+			king_board[from_idx] = ""
+			if attacked(color, to_idx, king_board) then
 				moves[to_idx] = nil
 			else
 				local dx = from_x - to_x
@@ -1069,14 +1076,10 @@ local function update_game_result(meta)
 
 	local blackMoves = get_theoretical_moves_for(meta, board_t, "black")
 	local whiteMoves = get_theoretical_moves_for(meta, board_t, "white")
-	local b = 0
 	for k,v in pairs(blackMoves) do
-		b = b + 1
 		blackCanMove = true
 	end
-	b = 0
 	for k,v in pairs(whiteMoves) do
-		b = b + 1
 		whiteCanMove = true
 	end
 
