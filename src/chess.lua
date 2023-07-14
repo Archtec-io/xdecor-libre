@@ -34,6 +34,16 @@ end
 local chat_prefix = minetest.colorize("#FFFF00", "["..S("Chess").."] ")
 local letters = {'a','b','c','d','e','f','g','h'}
 
+local function index_to_notation(idx)
+	local x, y = index_to_xy(idx)
+	if not x then
+		return "??"
+	end
+	local xstr = letters[x+1] or "?"
+	local ystr = tostring(y+1) or "?"
+	return xstr .. ystr
+end
+
 local function board_to_table(inv)
 	local t = {}
 	for i = 1, 64 do
@@ -843,8 +853,8 @@ local function get_moves_formstring(meta)
 		end
 		local pieceTo_si_id   = pieceTo_s ~= "" and pieces_str:match("(%d+)=" .. pieceTo_s) or ""
 
-		local coordFrom = letters[from_x + 1] .. math.abs(from_y - 8)
-		local coordTo   = letters[to_x   + 1] .. math.abs(to_y   - 8)
+		local coordFrom = index_to_notation(from_idx)
+		local coordTo   = index_to_notation(to_idx)
 
 		if curPlayerIsWhite then
 			move_no = move_no + 1
