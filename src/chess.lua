@@ -1433,7 +1433,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 	local lastMove    = meta:get_string("lastMove")
 	local playerWhite = meta:get_string("playerWhite")
 	local playerBlack = meta:get_string("playerBlack")
-	local castled     = false
+	local kingMoved   = false
 	local thisMove    -- Will replace lastMove when move is legal
 
 	if pieceFrom:find("white") then
@@ -1701,11 +1701,22 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 			return
 		end
 
-		if thisMove == "white" or thisMove == "black" then
-			if pieceFrom:sub(-1) == "1" then
+		-- Lose castling right when moving rook
+		if thisMove == "white" then
+			if from_index == 57 then
+				-- queenside white rook
 				meta:set_int("castlingWhiteL", 0)
-			elseif pieceFrom:sub(-1) == "2" then
+			elseif from_index == 64 then
+				-- kingside white rook
 				meta:set_int("castlingWhiteR", 0)
+			end
+		elseif thisMove == "black" then
+			if from_index == 1 then
+				-- queenside black rook
+				meta:set_int("castlingBlackL", 0)
+			elseif from_index == 8 then
+				-- kingside black rook
+				meta:set_int("castlingBlackR", 0)
 			end
 		end
 
@@ -1888,7 +1899,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 			inv:set_stack(from_list, rook_goal, rook_name)
 			inv:set_stack(from_list, rook_start, "")
 			check = false
-			castled = true
+			kingMoved = true
 		end
 
 		if check then
@@ -1904,6 +1915,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 				return
 			end
 		end
+		kingMoved = true
 
 	end
 
@@ -1925,10 +1937,10 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 		return
 	end
 
-	if castled and thisMove == "white" then
+	if kingMoved and thisMove == "white" then
 		meta:set_int("castlingWhiteL", 0)
 		meta:set_int("castlingWhiteR", 0)
-	elseif castled and thisMove == "black" then
+	elseif kingMoved and thisMove == "black" then
 		meta:set_int("castlingBlackL", 0)
 		meta:set_int("castlingBlackR", 0)
 	end
