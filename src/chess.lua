@@ -1043,8 +1043,8 @@ local function get_moves_formstring(meta)
 
 		if curPlayerIsWhite then
 			move_no = move_no + 1
-			-- Add move number (e.g. " 3.")
-			moves_out = moves_out .. string.format("% d.", move_no) .. ","
+			-- Add move number (e.g. "3.")
+			moves_out = moves_out .. string.format("%d.", move_no) .. ","
 		end
 		local betweenCoordsSymbol = "–" -- to be inserted between source and destination coords
 						-- dash for normal moves, × for capturing moves
@@ -1055,7 +1055,7 @@ local function get_moves_formstring(meta)
 		elseif pieceTo == "" and pieceFrom:sub(11,14) == "pawn" and from_x ~= to_x then
 			-- 'en passant' capture
 			betweenCoordsSymbol = "×"
-			enPassantSymbol = " e. p."
+			enPassantSymbol = " e.p."
 		end
 
 		---- Add halfmove of current player
