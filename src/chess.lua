@@ -17,7 +17,7 @@ local function index_to_xy(idx)
 	idx = idx - 1
 
 	local x = idx % 8
-	local y = (idx - x) / 8
+	local y = math.floor((idx - x) / 8)
 
 	return x, y
 end
@@ -28,6 +28,29 @@ end
 
 local function get_square(a, b)
 	return (a * 8) - (8 - b)
+end
+
+-- Given a board index (1..64), returns the color of the square at
+-- this position: "light" or "dark".
+-- Undefined behavior if given an invalid board index
+function get_square_index_color(idx)
+	local x, y = index_to_xy(idx)
+	if not x then
+		return nil
+	end
+	if x % 2 == 0 then
+		if y % 2 == 0 then
+			return "light"
+		else
+			return "dark"
+		end
+	else
+		if y % 2 == 0 then
+			return "dark"
+		else
+			return "light"
+		end
+	end
 end
 
 local chat_prefix = minetest.colorize("#FFFF00", "["..S("Chess").."] ")
@@ -51,6 +74,7 @@ local function board_to_table(inv)
 
 	return t
 end
+
 
 local piece_values = {
 	pawn   = 10,
@@ -758,6 +782,89 @@ local function has_king_safe_move(theoretical_moves, board, player)
 	end
 end
 
+-- Given a chessboard, checks whether it is in a "dead position",
+-- i.e. a position in which neither player would be able to checkmate.
+-- This function does not cover all dead positions, but only
+-- the most common ones.
+-- NOT checked are dead posisions in which both sides can still move,
+-- but cannot capture pieces or checkmate the king
+-- Parameters
+-- * board: Chessboard table
+-- Returns true if the board is in a dead position, false otherwise.
+local function is_dead_position(board)
+	-- Dead position by lack of material
+	local mat = {} -- material table to count pieces
+	-- white material
+	mat.w = {
+		-- piece counters
+		pawn = 0,
+		bishop = 0,
+		knight = 0,
+		rook = 0,
+		queen = 0,
+		-- for bishops, also record their square color
+		bishop_square_light = 0,
+		bishop_square_dark = 0,
+	}
+	-- black material
+	mat.b = table.copy(mat.w)
+	-- Count material for both players
+	for b=1, #board do
+		local piece = board[b]
+		if piece ~= "" then
+			local color
+			if piece:find("white") then
+				color = "w"
+			else
+				color = "b"
+			end
+			-- Count all pieces except kings because we can assume
+			-- the board always has 1 white and 1 black king
+			if piece:find("pawn") then
+				mat[color].pawn = mat[color].pawn + 1
+			elseif piece:find("bishop") then
+				mat[color].bishop = mat[color].bishop + 1
+				local sqcolor = get_square_index_color(b)
+				mat[color]["bishop_square_"..sqcolor] = mat[color]["bishop_square_"..sqcolor] + 1
+			elseif piece:find("knight") then
+				mat[color].knight = mat[color].knight + 1
+			elseif piece:find("rook") then
+				mat[color].rook = mat[color].rook + 1
+			elseif piece:find("queen") then
+				mat[color].queen = mat[color].queen + 1
+			end
+		end
+	end
+	-- Check well-known dead positions based on insufficient material.
+	-- If there is any rook, queen or pawn on the board, the material is sufficient.
+	if mat.w.rook == 0 and mat.w.queen == 0 and mat.w.pawn == 0 and
+			mat.b.rook == 0 and mat.b.queen == 0 and mat.b.pawn == 0 then
+		-- King against king
+		if mat.w.knight == 0 and mat.w.bishop == 0 and mat.b.knight == 0 and mat.b.bishop == 0 then
+			return true
+		-- King against king and bishop
+		elseif mat.w.knight == 0 and mat.b.knight == 0 and
+				((mat.w.bishop == 1 and mat.b.bishop == 0) or
+				(mat.w.bishop == 0 and mat.b.bishop == 1)) then
+			return true
+		-- King against king and knight
+		elseif mat.w.bishop == 0 and mat.b.bishop == 0 and
+				((mat.w.knight == 1 and mat.b.knight == 0) or
+				(mat.w.knight == 0 and mat.b.knight == 1)) then
+			return true
+		-- King and bishop against king and bishop,
+		-- and both bishops are on squares of the same color
+		elseif mat.w.knight == 0 and mat.b.knight == 0 and
+				(mat.w.bishop == 1 and mat.b.bishop == 1) and
+				(mat.w.bishop_square_color_light == mat.b.bishop_square_color_light) and
+				(mat.w.bishop_square_color_dark == mat.b.bishop_square_color_dark) then
+			return true
+		end
+	end
+
+	return false
+end
+
 -- Base names of all Chess pieces (with color)
 local pieces_basenames = {
 	"pawn_white",
@@ -1213,7 +1320,7 @@ local function update_game_result(meta)
 			if playerWhite ~= playerBlack then
 				minetest.chat_send_player(playerBlack, chat_prefix .. S("The game ended up in a stalemate! It's a draw!"))
 			end
-			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a stalemate")
+			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by stalemate")
 			return
 		end
 	end
@@ -1236,9 +1343,21 @@ local function update_game_result(meta)
 			if playerWhite ~= playerBlack then
 				minetest.chat_send_player(playerBlack, chat_prefix .. S("The game ended up in a stalemate! It's a draw!"))
 			end
-			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a stalemate")
+			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by stalemate")
 			return
 		end
+	end
+
+	-- Is this a dead position
+	if is_dead_position(board_t) then
+		meta:set_string("gameResult", "draw")
+		meta:set_string("gameResultReason", "dead_position")
+		add_special_to_moves_list(meta, "draw")
+		minetest.chat_send_player(playerWhite, chat_prefix .. S("The game ended up in a dead position! It's a draw!"))
+		if playerWhite ~= playerBlack then
+			minetest.chat_send_player(playerBlack, chat_prefix .. S("The game ended up in dead position! It's a draw!"))
+		end
+		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by dead position")
 	end
 end
 
