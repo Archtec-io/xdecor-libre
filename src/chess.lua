@@ -802,7 +802,7 @@ local pieces_str, x = "", 0
 for i = 1, #pieces do
 	local p = pieces[i]:match(":(%w+_%w+)")
 	if pieces[i]:find(":(%w+)_(%w+)") and not pieces_str:find(p) then
-		pieces_str = pieces_str .. x .. "=" .. p .. ".png,"
+		pieces_str = pieces_str .. x .. "=chess_figurine_" .. p .. ".png,"
 		x = x + 1
 	end
 end
@@ -900,9 +900,9 @@ local function get_moves_formstring(meta)
 		if pieceFrom:sub(11,14) == "pawn" then
 			pieceFrom_si_id = MOVES_LIST_SYMBOL_EMPTY
 		else
-			pieceFrom_si_id = pieces_str:match("(%d+)=" .. pieceFrom_s)
+			pieceFrom_si_id = pieces_str:match("(%d+)=chess_figurine_" .. pieceFrom_s)
 		end
-		local pieceTo_si_id   = pieceTo_s ~= "" and pieces_str:match("(%d+)=" .. pieceTo_s) or ""
+		local pieceTo_si_id   = pieceTo_s ~= "" and pieces_str:match("(%d+)=chess_figurine_" .. pieceTo_s) or ""
 
 		local coordFrom = index_to_notation(from_idx)
 		local coordTo   = index_to_notation(to_idx)
