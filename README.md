@@ -34,8 +34,7 @@ blocks with special features:
 * Pressure Plate: Step on it to activate doors next to it
 * Chessboard: Play Chess against a player or the computer
 
-The chessboard, radio and speaker are purely decorative
-and have no special functionality.
+The radio and speaker are purely decorative and have no special functionality.
 
 ### X-Decor-libre vs X-Decor
 
@@ -123,7 +122,7 @@ that X-Decor-libre replaces:
 
 (see `LICENSE` file for licensing).
 
-### Technical information
+## Technical information
 X-Decor-libre is a fork of X-Decor, from <https://github.com/minetest-mods/xdecor>,
 forked at Git commit ID 8b614b3513f2719d5975c883180c011cb7428c8d.
 
