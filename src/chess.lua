@@ -2,7 +2,6 @@ local realchess = {}
 local S = minetest.get_translator("xdecor")
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaque" or false
-local MOVES_LIST_SYMBOL_EMPTY = 69
 local AI_NAME = S("Dumb AI")
 screwdriver = screwdriver or {}
 
@@ -759,17 +758,36 @@ local function has_king_safe_move(theoretical_moves, board, player)
 	end
 end
 
+-- Base names of all Chess pieces (with color)
+local pieces_basenames = {
+	"pawn_white",
+	"rook_white",
+	"knight_white",
+	"bishop_white",
+	"queen_white",
+	"king_white",
+	"pawn_black",
+	"rook_black",
+	"knight_black",
+	"bishop_black",
+	"queen_black",
+	"king_black",
+}
 
-
-local pieces = {
-	"realchess:rook_black_1",
-	"realchess:knight_black_1",
-	"realchess:bishop_black_1",
-	"realchess:queen_black",
+-- Initial positions of the pieces on the chessboard.
+-- The pieces are specified as item names.
+-- It starts a8, continues with b8, c8, etc. then continues with a7, b7, etc. etc.
+local starting_grid = {
+	-- file '8'
+	"realchess:rook_black_1", -- a8
+	"realchess:knight_black_1", -- b8
+	"realchess:bishop_black_1", -- c8
+	"realchess:queen_black", -- ...
 	"realchess:king_black",
 	"realchess:bishop_black_2",
 	"realchess:knight_black_2",
 	"realchess:rook_black_2",
+	-- file '7'
 	"realchess:pawn_black_1",
 	"realchess:pawn_black_2",
 	"realchess:pawn_black_3",
@@ -778,8 +796,10 @@ local pieces = {
 	"realchess:pawn_black_6",
 	"realchess:pawn_black_7",
 	"realchess:pawn_black_8",
+	-- files '6' thru '3'
 	'','','','','','','','','','','','','','','','',
 	'','','','','','','','','','','','','','','','',
+        -- file '2'
 	"realchess:pawn_white_1",
 	"realchess:pawn_white_2",
 	"realchess:pawn_white_3",
@@ -788,6 +808,7 @@ local pieces = {
 	"realchess:pawn_white_6",
 	"realchess:pawn_white_7",
 	"realchess:pawn_white_8",
+        -- file '1'
 	"realchess:rook_white_1",
 	"realchess:knight_white_1",
 	"realchess:bishop_white_1",
@@ -798,15 +819,23 @@ local pieces = {
 	"realchess:rook_white_2"
 }
 
-local pieces_str, x = "", 0
-for i = 1, #pieces do
-	local p = pieces[i]:match(":(%w+_%w+)")
-	if pieces[i]:find(":(%w+)_(%w+)") and not pieces_str:find(p) then
-		pieces_str = pieces_str .. x .. "=chess_figurine_" .. p .. ".png,"
-		x = x + 1
-	end
+-- Figurine image IDs and file names for the chess notation table.
+-- Note: "figurine" refers to the chess notation icon, NOT the chess piece for playing.
+local figurines_str = "", 0
+local figurines_str_cnt = 0
+local MOVES_LIST_SYMBOL_EMPTY = figurines_str_cnt
+figurines_str = figurines_str .. MOVES_LIST_SYMBOL_EMPTY .. "=mailbox_blank16.png"
+for i = 1, #pieces_basenames do
+	figurines_str_cnt = figurines_str_cnt + 1
+	local p = pieces_basenames[i]
+	figurines_str = figurines_str .. "," .. figurines_str_cnt .. "=chess_figurine_" .. p .. ".png"
 end
-pieces_str = pieces_str .. MOVES_LIST_SYMBOL_EMPTY .. "=mailbox_blank16.png"
+
+local function get_figurine_id(piece_itemname)
+	local piece_s = piece_itemname:match(":(%w+_%w+)")
+	return figurines_str:match("(%d+)=chess_figurine_" .. piece_s)
+end
+
 
 local fs_init = [[
 	formspec_version[2]
@@ -836,9 +865,9 @@ local fs = [[
 	tableoptions[background=#00000000;highlight=#00000000;border=false]
 	]]
 	-- move; white piece; white halfmove; black piece; black halfmove
-	.."tablecolumns[text;image," .. pieces_str .. ";text;image," .. pieces_str .. ";text]"
+	.."tablecolumns[text;image," .. figurines_str .. ";text;image," .. figurines_str .. ";text]"
 
-local function add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_idx, to_idx, special)
+local function add_move_to_moves_list(meta, pieceFrom, pieceTo, from_idx, to_idx, special)
 	local moves_raw = meta:get_string("moves_raw")
 	if moves_raw ~= "" then
 		moves_raw = moves_raw .. ";"
@@ -846,12 +875,12 @@ local function add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_
 	if not special then
 		special = ""
 	end
-	moves_raw = moves_raw .. pieceFrom .. "," .. pieceTo .. "," .. pieceTo_s .. "," .. from_idx .. "," .. to_idx .. "," .. special
+	moves_raw = moves_raw .. pieceFrom .. "," .. pieceTo .. "," .. from_idx .. "," .. to_idx .. "," .. special
 	meta:set_string("moves_raw", moves_raw)
 end
 
 local function add_special_to_moves_list(meta, special)
-	add_move_to_moves_list(meta, "", "", "", "", "", special)
+	add_move_to_moves_list(meta, "", "", "", "", special)
 end
 
 -- Create the full formspec string for the sequence of moves.
@@ -869,10 +898,9 @@ local function get_moves_formstring(meta)
 		local move_split = string.split(moves_split[m], ",", true)
 		local pieceFrom = move_split[1]
 		local pieceTo = move_split[2]
-		local pieceTo_s = move_split[3]
-		local from_idx = tonumber(move_split[4])
-		local to_idx = tonumber(move_split[5])
-		local special = move_split[6]
+		local from_idx = tonumber(move_split[3])
+		local to_idx = tonumber(move_split[4])
+		local special = move_split[5]
 
 		-- true if White plays, false if Black plays
 		local curPlayerIsWhite = m % 2 == 1
@@ -894,15 +922,14 @@ local function get_moves_formstring(meta)
 		else
 		local from_x, from_y  = index_to_xy(from_idx)
 		local to_x, to_y      = index_to_xy(to_idx)
-		local pieceFrom_s     = pieceFrom:match(":(%w+_%w+)")
 		local pieceFrom_si_id
 		-- Show no piece icon for pawn
 		if pieceFrom:sub(11,14) == "pawn" then
 			pieceFrom_si_id = MOVES_LIST_SYMBOL_EMPTY
 		else
-			pieceFrom_si_id = pieces_str:match("(%d+)=chess_figurine_" .. pieceFrom_s)
+			pieceFrom_si_id = get_figurine_id(pieceFrom)
 		end
-		local pieceTo_si_id   = pieceTo_s ~= "" and pieces_str:match("(%d+)=chess_figurine_" .. pieceTo_s) or ""
+		local pieceTo_si_id   = pieceTo ~= "" and get_figurine_id(pieceTo)
 
 		local coordFrom = index_to_notation(from_idx)
 		local coordTo   = index_to_notation(to_idx)
@@ -962,9 +989,10 @@ local function get_moves_formstring(meta)
 	return moves_out, move_no
 end
 
-local function add_to_eaten_list(meta, pieceTo, pieceTo_s)
+local function add_to_eaten_list(meta, pieceTo)
 	local eaten = meta:get_string("eaten")
 	if pieceTo ~= "" then
+		local pieceTo_s = pieceTo:match(":(%w+_%w+)") or ""
 		eaten = eaten .. pieceTo_s .. ","
 	end
 	meta:set_string("eaten", eaten)
@@ -1243,7 +1271,7 @@ function realchess.init(pos)
 	meta:set_string("eaten", "")
 	meta:set_string("mode", "")
 
-	inv:set_list("board", pieces)
+	inv:set_list("board", starting_grid)
 	inv:set_size("board", 64)
 
 	-- Clear legacy metadata
@@ -1828,7 +1856,6 @@ local function ai_move(inv, meta)
 
 		local pieceFrom = inv:get_stack("board", choice_from):get_name()
 		local pieceTo   = inv:get_stack("board", choice_to):get_name()
-		local pieceTo_s = pieceTo ~= "" and pieceTo:match(":(%w+_%w+)") or ""
 
 		local board          = board_to_table(inv)
 		local black_king_idx, white_king_idx = locate_kings(board)
@@ -1902,8 +1929,8 @@ local function ai_move(inv, meta)
 				meta:set_string("lastMove", aiColor)
 				meta:set_int("lastMoveTime", minetest.get_gametime())
 
-				add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, choice_from, choice_to)
-				add_to_eaten_list(meta, pieceTo, pieceTo_s)
+				add_move_to_moves_list(meta, pieceFrom, pieceTo, choice_from, choice_to)
+				add_to_eaten_list(meta, pieceTo)
 
 				update_game_result(meta)
 
@@ -2121,7 +2148,6 @@ function realchess.update_state(meta, from_index, to_index, thisMove, promotionO
 	local board       = board_to_table(inv)
 	local pieceTo     = board[to_index]
 	local pieceFrom   = promotionOverride or board[from_index]
-	local pieceTo_s   = pieceTo ~= "" and pieceTo:match(":(%w+_%w+)") or ""
 
 	if not promotionOverride then
 		board[to_index]   = board[from_index]
@@ -2151,9 +2177,8 @@ function realchess.update_state(meta, from_index, to_index, thisMove, promotionO
 	meta:set_string("lastMove", lastMove)
 	meta:set_int("lastMoveTime", minetest.get_gametime())
 
-	local pieceTo_s = pieceTo ~= "" and pieceTo:match(":(%w+_%w+)") or ""
-	add_move_to_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_index, to_index)
-	add_to_eaten_list(meta, pieceTo, pieceTo_s)
+	add_move_to_moves_list(meta, pieceFrom, pieceTo, from_index, to_index)
+	add_to_eaten_list(meta, pieceTo)
 end
 
 function realchess.promote_pawn(meta, color, promoteTo)
