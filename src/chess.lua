@@ -2054,6 +2054,7 @@ function realchess.fields(pos, _, fields, sender)
 		"queen_black", "rook_black", "bishop_black", "knight_black",
 	}
 	for p=1, #promotions do
+		local gameResult = meta:get_string("gameResult")
 		if gameResult ~= "" then
 			return
 		end
