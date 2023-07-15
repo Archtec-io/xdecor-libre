@@ -971,8 +971,13 @@ local fs = [[
 	list[context;board;0.47,1.155;8,8;]
 	tableoptions[background=#00000000;highlight=#00000000;border=false]
 	]]
-	-- move; white piece; white halfmove; black piece; black halfmove
-	.."tablecolumns[text;image," .. figurines_str .. ";text;image," .. figurines_str .. ";text]"
+	-- table columns for Chess notation.
+	-- Columns: move no.; white piece; white halfmove; white promotion; black piece; black halfmove; black promotion
+	.."tablecolumns[" ..
+		"text;"..
+		"image," .. figurines_str .. ";text;image," .. figurines_str .. ";" ..
+		--"image,0=mailbox_blank16.png;" ..
+		"image," .. figurines_str .. ";text;image," .. figurines_str .. "]"
 
 local function add_move_to_moves_list(meta, pieceFrom, pieceTo, from_idx, to_idx, special)
 	local moves_raw = meta:get_string("moves_raw")
@@ -995,7 +1000,7 @@ end
 local function get_moves_formstring(meta)
 	local moves_raw = meta:get_string("moves_raw")
 	if moves_raw == "" then
-		return ","..MOVES_LIST_SYMBOL_EMPTY..",,"..MOVES_LIST_SYMBOL_EMPTY..",", 1
+		return "", 1
 	end
 
 	local moves_split = string.split(moves_raw, ";")
@@ -1014,7 +1019,7 @@ local function get_moves_formstring(meta)
 
 		if special == "whiteWon" or special == "blackWon" or special == "draw" then
 			if not curPlayerIsWhite then
-				moves_out = moves_out .. ""..MOVES_LIST_SYMBOL_EMPTY..",,"
+				moves_out = moves_out .. ""..MOVES_LIST_SYMBOL_EMPTY..",," .. MOVES_LIST_SYMBOL_EMPTY .. ","
 			end
 		end
 		if special == "whiteWon" then
@@ -1065,12 +1070,12 @@ local function get_moves_formstring(meta)
 			-- queenside castling
 			if from_x == 4 and to_x == 2 then
 				-- write "0–0–0"
-				moves_out = moves_out .. MOVES_LIST_SYMBOL_EMPTY .. ",0–0–0"
+				moves_out = moves_out .. MOVES_LIST_SYMBOL_EMPTY .. ",0–0–0," .. MOVES_LIST_SYMBOL_EMPTY
 				castling = true
 			-- kingside castling
 			elseif from_x == 4 and to_x == 6 then
 				-- write "0–0"
-				moves_out = moves_out .. MOVES_LIST_SYMBOL_EMPTY .. ",0–0"
+				moves_out = moves_out .. MOVES_LIST_SYMBOL_EMPTY .. ",0–0," .. MOVES_LIST_SYMBOL_EMPTY
 				castling = true
 			end
 		end
@@ -1079,13 +1084,21 @@ local function get_moves_formstring(meta)
 			moves_out = moves_out ..
 				pieceFrom_si_id .. "," .. -- piece image ID
 				coordFrom .. betweenCoordsSymbol .. coordTo .. -- coords in long algebraic notation, e.g. "e2e3"
-				enPassantSymbol -- written in case of an 'en passant' capture
+				enPassantSymbol .. "," -- written in case of an 'en passant' capture
+
+			-- Promotion?
+			if special:sub(1, 7) == "promo__" then
+				local promoSym = special:sub(8)
+				moves_out = moves_out .. get_figurine_id(promoSym)
+			else
+				moves_out = moves_out .. MOVES_LIST_SYMBOL_EMPTY
+			end
 		end
 
 		-- If White moved, fill up the rest of the row with empty space.
 		-- Required for validity of the table
 		if curPlayerIsWhite and m == #moves_split then
-			moves_out = moves_out .. "," .. MOVES_LIST_SYMBOL_EMPTY
+			moves_out = moves_out .. "," .. MOVES_LIST_SYMBOL_EMPTY .. ",," .. MOVES_LIST_SYMBOL_EMPTY
 		end
 		end
 
@@ -2275,13 +2288,13 @@ function realchess.move_piece(meta, pieceFrom, from_list, from_index, to_list, t
 	end
 end
 
-function realchess.update_state(meta, from_index, to_index, thisMove, promotionOverride)
+function realchess.update_state(meta, from_index, to_index, thisMove, promoteFrom, promoteTo)
 	local inv         = meta:get_inventory()
 	local board       = board_to_table(inv)
 	local pieceTo     = board[to_index]
-	local pieceFrom   = promotionOverride or board[from_index]
+	local pieceFrom   = promoteFrom or board[from_index]
 
-	if not promotionOverride then
+	if not promoteFrom then
 		board[to_index]   = board[from_index]
 		board[from_index] = ""
 	end
@@ -2309,7 +2322,11 @@ function realchess.update_state(meta, from_index, to_index, thisMove, promotionO
 	meta:set_string("lastMove", lastMove)
 	meta:set_int("lastMoveTime", minetest.get_gametime())
 
-	add_move_to_moves_list(meta, pieceFrom, pieceTo, from_index, to_index)
+	local special
+	if promoteTo then
+		special = "promo__"..promoteTo
+	end
+	add_move_to_moves_list(meta, pieceFrom, pieceTo, from_index, to_index, special)
 	add_to_eaten_list(meta, pieceTo)
 end
 
@@ -2325,17 +2342,19 @@ function realchess.promote_pawn(meta, color, promoteTo)
 	if promoteTo ~= "queen" then
 		pstr = pstr .. "_1"
 	end
-	local stack
+	pstr = "realchess:" .. pstr
+
+	local promoteFrom
 	if color == "white" then
-		stack = inv:get_stack("board", to_idx)
-		if stack:get_name():sub(11,14) == "pawn" then
-			inv:set_stack("board", to_idx, "realchess:"..pstr)
+		promoteFrom = inv:get_stack("board", to_idx)
+		if promoteFrom:get_name():sub(11,14) == "pawn" then
+			inv:set_stack("board", to_idx, pstr)
 			promoted = true
 		end
 	elseif color == "black" then
-		stack = inv:get_stack("board", to_idx)
-		if stack:get_name():sub(11,14) == "pawn" then
-			inv:set_stack("board", to_idx, "realchess:"..pstr)
+		promoteFrom = inv:get_stack("board", to_idx)
+		if promoteFrom:get_name():sub(11,14) == "pawn" then
+			inv:set_stack("board", to_idx, pstr)
 			promoted = true
 		end
 	end
@@ -2343,7 +2362,7 @@ function realchess.promote_pawn(meta, color, promoteTo)
 		meta:set_string("promotionActive", "")
 		meta:set_int("promotionPawnFromIdx", 0)
 		meta:set_int("promotionPawnToIdx", 0)
-		realchess.update_state(meta, from_idx, to_idx, color, stack:get_name())
+		realchess.update_state(meta, from_idx, to_idx, color, promoteFrom:get_name(), pstr)
 		update_formspec(meta)
 
 		local aiColor = meta:get_string("aiColor")
