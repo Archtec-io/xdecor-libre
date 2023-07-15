@@ -1059,7 +1059,10 @@ local function update_formspec(meta)
 		end
 	end
 
-	local promotion = meta:get_string("promotionActive")
+	local promotion = ""
+	if gameResult == "" then
+		promotion = meta:get_string("promotionActive")
+	end
 	local promotion_formstring = ""
 	if promotion == "black" then
 		eaten_img = ""
@@ -1934,6 +1937,7 @@ function realchess.fields(pos, _, fields, sender)
 	local playerWhite   = meta:get_string("playerWhite")
 	local playerBlack   = meta:get_string("playerBlack")
 	local lastMoveTime  = meta:get_int("lastMoveTime")
+	local gameResult    = meta:get_int("gameResult")
 	if fields.quit then return end
 
 	if fields.single_w or fields.single_b or fields.multi then
@@ -2023,6 +2027,9 @@ function realchess.fields(pos, _, fields, sender)
 		"queen_black", "rook_black", "bishop_black", "knight_black",
 	}
 	for p=1, #promotions do
+		if gameResult ~= "" then
+			return
+		end
 		local promo = promotions[p]
 		if fields["p_"..promo] then
 			if not (playerName == playerWhite or playerName == playerBlack) then
