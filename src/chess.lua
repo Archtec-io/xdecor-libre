@@ -988,7 +988,7 @@ local fs = [[
 	-- table columns for Chess notation.
 	-- Columns: move no.; white piece; white halfmove; white promotion; black piece; black halfmove; black promotion
 	.."tablecolumns[" ..
-		"text;"..
+		"text,align=right;"..
 		"image," .. figurines_str .. ";text;image," .. figurines_str .. ";" ..
 		--"image,0=mailbox_blank16.png;" ..
 		"image," .. figurines_str .. ";text;image," .. figurines_str .. "]"
