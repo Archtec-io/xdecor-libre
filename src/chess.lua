@@ -2,7 +2,11 @@ local realchess = {}
 local S = minetest.get_translator("xdecor")
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaque" or false
+
 local AI_NAME = S("Dumb AI")
+local AI_DELAY_MOVE = 1.0
+local AI_DELAY_PROMOTE = 1.0
+
 screwdriver = screwdriver or {}
 
 -- Chess games are disabled because they are currently too broken.
@@ -1214,27 +1218,38 @@ local function update_formspec(meta)
 		promotion = meta:get_string("promotionActive")
 	end
 	local promotion_formstring = ""
+	local aiColor = meta:get_string("aiColor")
+
+	-- Show promotion prompt to ask player to choose to which piece to promote a pawn to
 	if promotion == "black" then
 		eaten_img = ""
 		promotion_formstring =
 			"label[10.1,6.35;"..FS("PROMOTION\nFOR BLACK!").."]" ..
-			"animated_image[10.05,7.2;2,2;p_img_white;pawn_black_promo_anim.png;5;100]" ..
+			"animated_image[10.05,7.2;2,2;p_img_white;pawn_black_promo_anim.png;5;100]"
+		if aiColor ~= "black" then
+			-- Hide buttons if computer player promotes
+			promotion_formstring = promotion_formstring ..
 			"label[13.15,6.35;"..FS("Promote pawn to:").."]" ..
 			"item_image_button[13.15,7.2;1,1;realchess:queen_black;p_queen_black;]" ..
 			"item_image_button[14.15,7.2;1,1;realchess:rook_black_1;p_rook_black;]" ..
 			"item_image_button[13.15,8.2;1,1;realchess:bishop_black_1;p_bishop_black;]" ..
 			"item_image_button[14.15,8.2;1,1;realchess:knight_black_1;p_knight_black;]"
+		end
 
 	elseif promotion == "white" then
 		eaten_img = ""
 		promotion_formstring =
 			"label[10.1,6.35;"..FS("PROMOTION\nFOR WHITE!").."]" ..
-			"animated_image[10.05,7.2;2,2;p_img_white;pawn_white_promo_anim.png;5;100]" ..
+			"animated_image[10.05,7.2;2,2;p_img_white;pawn_white_promo_anim.png;5;100]"
+		if aiColor ~= "white" then
+			-- Hide buttons if computer player promotes
+			promotion_formstring = promotion_formstring ..
 			"label[13.15,6.35;"..FS("Promote pawn to:").."]" ..
 			"item_image_button[13.15,7.2;1,1;realchess:queen_white;p_queen_white;]" ..
 			"item_image_button[14.15,7.2;1,1;realchess:rook_white_1;p_rook_white;]" ..
 			"item_image_button[13.15,8.2;1,1;realchess:bishop_white_1;p_bishop_white;]" ..
 			"item_image_button[14.15,8.2;1,1;realchess:knight_white_1;p_knight_white;]"
+		end
 	end
 
 	local game_buttons
@@ -1520,17 +1535,11 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 					elseif to_index >= 1 and to_index <= 8 then
 						-- activate promotion
 						promotion = true
-						meta:set_string("promotionActive", "white")
-						meta:set_int("promotionPawnFromIdx", from_index)
-						meta:set_int("promotionPawnToIdx", to_index)
 					end
 				elseif from_x - 1 == to_x or from_x + 1 == to_x then
 					if to_index >= 1 and to_index <= 8 and pieceTo:find("black") then
 						-- activate promotion
 						promotion = true
-						meta:set_string("promotionActive", "white")
-						meta:set_int("promotionPawnFromIdx", from_index)
-						meta:set_int("promotionPawnToIdx", to_index)
 					end
 				else
 					return false
@@ -1590,17 +1599,11 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 					elseif to_index >= 57 and to_index <= 64 then
 						-- activate promotion
 						promotion = true
-						meta:set_string("promotionActive", "black")
-						meta:set_int("promotionPawnFromIdx", from_index)
-						meta:set_int("promotionPawnToIdx", to_index)
 					end
 				elseif from_x - 1 == to_x or from_x + 1 == to_x then
 					if to_index >= 57 and to_index <= 64 and pieceTo:find("white") then
 						-- activate promotion
 						promotion = true
-						meta:set_string("promotionActive", "black")
-						meta:set_int("promotionPawnFromIdx", from_index)
-						meta:set_int("promotionPawnToIdx", to_index)
 					end
 				else
 					return false
@@ -1947,9 +1950,14 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 		meta:set_int("castlingBlackR", 0)
 	end
 
-	if not promotion then
+	if promotion then
+		meta:set_string("promotionActive", thisMove)
+		meta:set_int("promotionPawnFromIdx", from_index)
+		meta:set_int("promotionPawnToIdx", to_index)
+	else
 		realchess.update_state(meta, from_index, to_index, thisMove)
 	end
+
 	if doublePawnStep then
 		meta:set_int("prevDoublePawnStepTo", doublePawnStep)
 	else
@@ -2016,7 +2024,7 @@ local function ai_move(inv, meta)
 			end
 		end
 
-		minetest.after(1.0, function()
+		minetest.after(AI_DELAY_MOVE, function()
 			local gameResult = meta:get_string("gameResult")
 			if gameResult ~= "" then
 				return
@@ -2066,6 +2074,14 @@ local function ai_move(inv, meta)
 	else
 		update_formspec(meta)
 	end
+end
+
+local function ai_promote(inv, meta, pawnIndex)
+	minetest.after(AI_DELAY_MOVE, function()
+		local aiColor = meta:get_string("aiColor")
+		-- Always promote to queen
+		realchess.promote_pawn(meta, aiColor, "queen")
+	end)
 end
 
 local function timeout_format(timeout_limit)
@@ -2264,8 +2280,12 @@ function realchess.move_piece(meta, pieceFrom, from_list, from_index, to_list, t
 	if lastMove == "" then lastMove = "black" end
 	-- The AI always plays black; make sure it doesn't move twice in the case of a swap:
 	-- Only let it play if it didn't already play.
-	if meta:get_string("mode") == "single" and lastMove ~= aiColor and meta:get_string("gameResult") == "" and not promo then
-		ai_move(inv, meta)
+	if meta:get_string("mode") == "single" and lastMove ~= aiColor and meta:get_string("gameResult") == "" then
+		if not promo then
+			ai_move(inv, meta)
+		else
+			ai_promote(inv, meta, to_index)
+		end
 	end
 end
 
