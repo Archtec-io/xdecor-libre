@@ -2036,6 +2036,15 @@ local function ai_move(inv, meta)
 						inv:set_stack("board", choice_to, pieceFrom)
 					end
 
+					-- Note the pawn double step
+					local c_from_x, c_from_y = index_to_xy(choice_from)
+					local c_to_x, c_to_y = index_to_xy(choice_to)
+					if pieceFrom:find("pawn") and math.abs(c_from_y - c_to_y) == 2 then
+						meta:set_int("prevDoublePawnStepTo", choice_to)
+					else
+						meta:set_int("prevDoublePawnStepTo", 0)
+					end
+
 					inv:set_stack("board", choice_from, "")
 				end
 
