@@ -885,7 +885,7 @@ local pieces_basenames = {
 -- The pieces are specified as item names.
 -- It starts a8, continues with b8, c8, etc. then continues with a7, b7, etc. etc.
 local starting_grid = {
-	-- file '8'
+	-- rank '8'
 	"realchess:rook_black_1", -- a8
 	"realchess:knight_black_1", -- b8
 	"realchess:bishop_black_1", -- c8
@@ -894,7 +894,7 @@ local starting_grid = {
 	"realchess:bishop_black_2",
 	"realchess:knight_black_2",
 	"realchess:rook_black_2",
-	-- file '7'
+	-- rank '7'
 	"realchess:pawn_black_1",
 	"realchess:pawn_black_2",
 	"realchess:pawn_black_3",
@@ -903,10 +903,10 @@ local starting_grid = {
 	"realchess:pawn_black_6",
 	"realchess:pawn_black_7",
 	"realchess:pawn_black_8",
-	-- files '6' thru '3'
+	-- ranks '6' thru '3'
 	'','','','','','','','','','','','','','','','',
 	'','','','','','','','','','','','','','','','',
-        -- file '2'
+        -- rank '2'
 	"realchess:pawn_white_1",
 	"realchess:pawn_white_2",
 	"realchess:pawn_white_3",
@@ -915,7 +915,7 @@ local starting_grid = {
 	"realchess:pawn_white_6",
 	"realchess:pawn_white_7",
 	"realchess:pawn_white_8",
-        -- file '1'
+        -- rank '1'
 	"realchess:rook_white_1",
 	"realchess:knight_white_1",
 	"realchess:bishop_white_1",
