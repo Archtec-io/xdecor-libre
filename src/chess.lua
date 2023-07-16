@@ -1521,6 +1521,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 	local promotion = false
 	local doublePawnStep = nil
 	local en_passant_target = nil
+	local lostCastlingRightRook = nil
 
 	-- PAWN
 	if pieceFrom:sub(11,14) == "pawn" then
@@ -1704,18 +1705,18 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 		if thisMove == "white" then
 			if from_index == 57 then
 				-- queenside white rook
-				meta:set_int("castlingWhiteL", 0)
+				lostCastlingRightRook = "castlingWhiteL"
 			elseif from_index == 64 then
 				-- kingside white rook
-				meta:set_int("castlingWhiteR", 0)
+				lostCastlingRightRook = "castlingWhiteR"
 			end
 		elseif thisMove == "black" then
 			if from_index == 1 then
 				-- queenside black rook
-				meta:set_int("castlingBlackL", 0)
+				lostCastlingRightRook = "castlingBlackL"
 			elseif from_index == 8 then
 				-- kingside black rook
-				meta:set_int("castlingBlackR", 0)
+				lostCastlingRightRook = "castlingBlackR"
 			end
 		end
 
@@ -1948,6 +1949,8 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 	elseif kingMoved and thisMove == "black" then
 		meta:set_int("castlingBlackL", 0)
 		meta:set_int("castlingBlackR", 0)
+	elseif lostCastlingRightRook then
+		meta:set_int(lostCastlingRightRook, 0)
 	end
 
 	if promotion then
