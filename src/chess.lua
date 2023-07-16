@@ -14,7 +14,7 @@ screwdriver = screwdriver or {}
 local ENABLE_CHESS_GAMES = true
 
 -- If true, will show some hidden state for debugging purposes
-local CHESS_DEBUG = false
+local CHESS_DEBUG = true
 
 local function index_to_xy(idx)
 	if not idx then
@@ -1442,7 +1442,7 @@ local function update_game_result(meta)
 		end
 	end
 
-	-- Is this a dead position
+	-- Is this a dead position?
 	if is_dead_position(board_t) then
 		meta:set_string("gameResult", "draw")
 		meta:set_string("gameResultReason", "dead_position")
@@ -1453,6 +1453,22 @@ local function update_game_result(meta)
 		end
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by dead position")
 	end
+
+	-- 75-moves rule. Automatically draw game if the last 75 moves of EACH player (thus 150 halfmoves)
+	-- neither moved a pawn or captured a piece.
+	-- Important: This rule MUST be checked AFTER checkmate because checkmate takes precedence.
+	if meta:get_int("halfmoveClock") >= 150 then
+		meta:set_string("gameResult", "draw")
+		meta:set_string("gameResultReason", "75_moves_rule")
+		add_special_to_moves_list(meta, "draw")
+		local msg = S("No piece was captured and no pawn was moved for 75 consecutive moves of each player. It's a draw!")
+		minetest.chat_send_player(playerWhite, chat_prefix .. msg)
+		if playerWhite ~= playerBlack then
+			minetest.chat_send_player(playerBlack, chat_prefix .. msg)
+		end
+		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw via the 75-move rule")
+	end
+
 end
 
 
