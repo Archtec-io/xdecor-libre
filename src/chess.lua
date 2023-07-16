@@ -1500,6 +1500,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 
 	local promotion = false
 	local doublePawnStep = nil
+	local en_passant_target = nil
 
 	-- PAWN
 	if pieceFrom:sub(11,14) == "pawn" then
@@ -1563,7 +1564,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 					-- en passant
 					if can_capture_en_passant(meta, "black", xy_to_index(to_x, from_y)) then
 						can_capture = true
-						inv:set_stack(to_list, xy_to_index(to_x, from_y), "")
+						en_passant_target = xy_to_index(to_x, from_y)
 					end
 				end
 				if not can_capture then
@@ -1633,7 +1634,7 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 					-- en passant
 					if can_capture_en_passant(meta, "white", xy_to_index(to_x, from_y)) then
 						can_capture = true
-						inv:set_stack(to_list, xy_to_index(to_x, from_y), "")
+						en_passant_target = xy_to_index(to_x, from_y)
 					end
 				end
 				if not can_capture then
@@ -1920,11 +1921,17 @@ function realchess.move(pos, from_list, from_index, to_list, to_index, player)
 	local blackAttacked = attacked("black", black_king_idx, board)
 	local whiteAttacked = attacked("white", white_king_idx, board)
 
+	-- Refuse to move if it would put or leave the own king
+	-- under attack
 	if blackAttacked and thisMove == "black" then
 		return
 	end
 	if whiteAttacked and thisMove == "white" then
 		return
+	end
+
+	if en_passant_target then
+		inv:set_stack(to_list, en_passant_target, "")
 	end
 
 	if kingMoved and thisMove == "white" then
