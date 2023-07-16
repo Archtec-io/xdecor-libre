@@ -3,9 +3,11 @@ local S = minetest.get_translator("xdecor")
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaque" or false
 
-local AI_NAME = S("Dumb AI")
-local AI_DELAY_MOVE = 1.0
-local AI_DELAY_PROMOTE = 1.0
+-- Note: Asterisks added to avoid confusion with a player name
+-- because asterisks are forbidden in player names.
+local BOT_NAME = "*"..S("Weak Computer").."*"
+local BOT_DELAY_MOVE = 1.0
+local BOT_DELAY_PROMOTE = 1.0
 
 screwdriver = screwdriver or {}
 
@@ -315,7 +317,7 @@ end
 -- * from_idx:
 -- returns: table with the keys used as destination indices
 --    Any key with a numeric value is a possible destination.
---    The numeric value is a move rating for AI and is 0 by default.
+--    The numeric value is a move rating for the bot and is 0 by default.
 -- Example: { [4] = 0, [9] = 0 } -- can move to squares 4 and 9
 local function get_theoretical_moves_from(meta, board, from_idx)
 	local piece, color = board[from_idx]:match(":(%w+)_(%w+)")
@@ -748,7 +750,7 @@ end
 -- }
 --   origin_index is the board index for the square to start the piece from (as string)
 --   and this is the key for a list of destination indixes.
---   r1, r2, r3 ... are numeric values (normally 0) to "rate" this square for AI.
+--   r1, r2, r3 ... are numeric values (normally 0) to "rate" this square for the bot.
 local function get_theoretical_moves_for(meta, board, player)
 	local moves = {}
 	for i = 1, 64 do
@@ -1463,7 +1465,7 @@ local function update_formspec(meta)
 		promotion = meta:get_string("promotionActive")
 	end
 	local promotion_formstring = ""
-	local aiColor = meta:get_string("aiColor")
+	local botColor = meta:get_string("botColor")
 
 	-- Show promotion prompt to ask player to choose to which piece to promote a pawn to
 	if promotion == "black" then
@@ -1471,7 +1473,7 @@ local function update_formspec(meta)
 		promotion_formstring =
 			"label[10.1,6.35;"..FS("PROMOTION\nFOR BLACK!").."]" ..
 			"animated_image[10.05,7.2;2,2;p_img_white;pawn_black_promo_anim.png;5;100]"
-		if aiColor ~= "black" then
+		if botColor ~= "black" then
 			-- Hide buttons if computer player promotes
 			promotion_formstring = promotion_formstring ..
 			"label[13.15,6.35;"..FS("Promote pawn to:").."]" ..
@@ -1486,7 +1488,7 @@ local function update_formspec(meta)
 		promotion_formstring =
 			"label[10.1,6.35;"..FS("PROMOTION\nFOR WHITE!").."]" ..
 			"animated_image[10.05,7.2;2,2;p_img_white;pawn_white_promo_anim.png;5;100]"
-		if aiColor ~= "white" then
+		if botColor ~= "white" then
 			-- Hide buttons if computer player promotes
 			promotion_formstring = promotion_formstring ..
 			"label[13.15,6.35;"..FS("Promote pawn to:").."]" ..
@@ -1735,7 +1737,7 @@ function realchess.init(pos)
 	meta:set_string("infotext", S("Chess Board"))
 	meta:set_string("playerBlack", "")
 	meta:set_string("playerWhite", "")
-	meta:set_string("aiColor",     "")
+	meta:set_string("botColor",    "")
 	meta:set_string("lastMove",    "")
 	meta:set_string("gameResult",  "")
 	meta:set_string("gameResultReason", "")
@@ -2334,24 +2336,24 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 	return true
 end
 
-local function ai_move(inv, meta)
+local function bot_move(inv, meta)
 	local board_t = board_to_table(inv)
 	local lastMove = meta:get_string("lastMove")
 	local gameResult = meta:get_string("gameResult")
-	local aiColor = meta:get_string("aiColor")
-	if aiColor == "" then
-		aiColor = "black"
+	local botColor = meta:get_string("botColor")
+	if botColor == "" then
+		botColor = "black"
 	end
 	local opponentColor
-	if aiColor == "black" then
+	if botColor == "black" then
 		opponentColor = "white"
 	else
 		opponentColor = "black"
 	end
-	if (lastMove == opponentColor or (aiColor == "white" and lastMove == "")) and gameResult == "" then
+	if (lastMove == opponentColor or (botColor == "white" and lastMove == "")) and gameResult == "" then
 		update_formspec(meta)
 
-		local moves = get_theoretical_moves_for(meta, board_t, aiColor)
+		local moves = get_theoretical_moves_for(meta, board_t, botColor)
 
 		local choice_from, choice_to = best_move(moves)
 		if choice_from == nil then
@@ -2364,26 +2366,26 @@ local function ai_move(inv, meta)
 
 		local board          = board_to_table(inv)
 		local black_king_idx, white_king_idx = locate_kings(board)
-		local ai_king_idx
-		if aiColor == "black" then
-			ai_king_idx = black_king_idx
+		local bot_king_idx
+		if botColor == "black" then
+			bot_king_idx = black_king_idx
 		else
-			ai_king_idx = white_king_idx
+			bot_king_idx = white_king_idx
 		end
-		local aiAttacked  = attacked(aiColor, ai_king_idx, board)
+		local botAttacked  = attacked(botColor, bot_king_idx, board)
 		local kingSafe       = true
 		local bestMoveSaveFrom, bestMoveSaveTo
 
-		if aiAttacked then
+		if botAttacked then
 			kingSafe = false
-			meta:set_string(aiColor.."Attacked", "true")
-			local is_safe, safe_moves = has_king_safe_move(moves, board, aiColor)
+			meta:set_string(botColor.."Attacked", "true")
+			local is_safe, safe_moves = has_king_safe_move(moves, board, botColor)
 			if is_safe then
 				bestMoveSaveFrom, bestMoveSaveTo = best_move(safe_moves)
 			end
 		end
 
-		minetest.after(AI_DELAY_MOVE, function()
+		minetest.after(BOT_DELAY_MOVE, function()
 			local gameResult = meta:get_string("gameResult")
 			if gameResult ~= "" then
 				return
@@ -2391,18 +2393,18 @@ local function ai_move(inv, meta)
 			local lastMove = meta:get_string("lastMove")
 			local lastMoveTime = meta:get_int("lastMoveTime")
 			if lastMoveTime > 0 or lastMove == "" then
-				if aiColor == "black" and meta:get_string("playerBlack") == "" then
-					meta:set_string("playerBlack", AI_NAME)
-				elseif aiColor == "white" and meta:get_string("playerWhite") == "" then
-					meta:set_string("playerWhite", AI_NAME)
+				if botColor == "black" and meta:get_string("playerBlack") == "" then
+					meta:set_string("playerBlack", BOT_NAME)
+				elseif botColor == "white" and meta:get_string("playerWhite") == "" then
+					meta:set_string("playerWhite", BOT_NAME)
 				end
 				local moveOK = false
 				if not kingSafe then
 					-- Make a move to put the king out of check
 					if bestMoveSaveTo ~= nil then
-						moveOK = realchess.move(meta, "board", bestMoveSaveFrom, "board", bestMoveSaveTo, AI_NAME)
+						moveOK = realchess.move(meta, "board", bestMoveSaveFrom, "board", bestMoveSaveTo, BOT_NAME)
 						if not moveOK then
-							minetest.log("error", "[xdecor] Chess: AI tried to make an invalid move (to protect the king) from "..
+							minetest.log("error", "[xdecor] Chess: Bot tried to make an invalid move (to protect the king) from "..
 								index_to_notation(bestMoveSaveFrom).." to "..index_to_notation(bestMoveSaveTo))
 						end
 					else
@@ -2410,16 +2412,16 @@ local function ai_move(inv, meta)
 					end
 				else
 					-- Make a regular move
-					moveOK = realchess.move(meta, "board", choice_from, "board", choice_to, AI_NAME)
+					moveOK = realchess.move(meta, "board", choice_from, "board", choice_to, BOT_NAME)
 					if not moveOK then
-						minetest.log("error", "[xdecor] Chess: AI tried to make an invalid move from "..
+						minetest.log("error", "[xdecor] Chess: Bot tried to make an invalid move from "..
 							index_to_notation(choice_from).." to "..index_to_notation(choice_to))
 					end
 				end
-				-- AI resigns if it made an incorrect move
+				-- Bot resigns if it made an incorrect move
 				if not moveOK then
 					meta:set_string("gameResultReason", "resign")
-					if aiColor == "black" then
+					if botColor == "black" then
 						meta:set_string("gameResult", "whiteWon")
 						add_special_to_moves_list(meta, "whiteWon")
 					else
@@ -2435,11 +2437,11 @@ local function ai_move(inv, meta)
 	end
 end
 
-local function ai_promote(inv, meta, pawnIndex)
-	minetest.after(AI_DELAY_MOVE, function()
-		local aiColor = meta:get_string("aiColor")
+local function bot_promote(inv, meta, pawnIndex)
+	minetest.after(BOT_DELAY_MOVE, function()
+		local botColor = meta:get_string("botColor")
 		-- Always promote to queen
-		realchess.promote_pawn(meta, aiColor, "queen")
+		realchess.promote_pawn(meta, botColor, "queen")
 	end)
 end
 
@@ -2470,13 +2472,13 @@ function realchess.fields(pos, _, fields, sender)
 	if fields.single_w or fields.single_b or fields.multi then
 		meta:set_string("mode", ((fields.single_w or fields.single_b) and "single" or "multi"))
 		if fields.single_w then
-			meta:set_string("aiColor", "black")
-			meta:set_string("playerBlack", AI_NAME)
+			meta:set_string("botColor", "black")
+			meta:set_string("playerBlack", BOT_NAME)
 		elseif fields.single_b then
-			meta:set_string("aiColor", "white")
-			meta:set_string("playerWhite", AI_NAME)
+			meta:set_string("botColor", "white")
+			meta:set_string("playerWhite", BOT_NAME)
 			local inv = meta:get_inventory()
-			ai_move(inv, meta)
+			bot_move(inv, meta)
 		end
 		update_formspec(meta)
 		return
@@ -2633,17 +2635,16 @@ function realchess.move_piece(meta, pieceFrom, from_list, from_index, to_list, t
 	end
 	update_formspec(meta)
 
-	local aiColor = meta:get_string("aiColor")
-	if aiColor == "" then aiColor = "black" end
+	local botColor = meta:get_string("botColor")
+	if botColor == "" then botColor = "black" end
 	local lastMove = meta:get_string("lastMove")
 	if lastMove == "" then lastMove = "black" end
-	-- The AI always plays black; make sure it doesn't move twice in the case of a swap:
-	-- Only let it play if it didn't already play.
-	if meta:get_string("mode") == "single" and lastMove ~= aiColor and meta:get_string("gameResult") == "" then
+	-- Let the bot play when it its turn
+	if meta:get_string("mode") == "single" and lastMove ~= botColor and meta:get_string("gameResult") == "" then
 		if not promo then
-			ai_move(inv, meta)
+			bot_move(inv, meta)
 		else
-			ai_promote(inv, meta, to_index)
+			bot_promote(inv, meta, to_index)
 		end
 	end
 end
@@ -2725,12 +2726,12 @@ function realchess.promote_pawn(meta, color, promoteTo)
 		realchess.update_state(meta, from_idx, to_idx, color, promoteFrom:get_name(), pstr)
 		update_formspec(meta)
 
-		local aiColor = meta:get_string("aiColor")
-		if aiColor == "" then aiColor = "black" end
+		local botColor = meta:get_string("botColor")
+		if botColor == "" then botColor = "black" end
 		local lastMove = meta:get_string("lastMove")
 		if lastMove == "" then lastMove = "black" end
-		if meta:get_string("mode") == "single" and lastMove ~= aiColor and meta:get_string("gameResult") == "" then
-			ai_move(inv, meta)
+		if meta:get_string("mode") == "single" and lastMove ~= botColor and meta:get_string("gameResult") == "" then
+			bot_move(inv, meta)
 		end
 	else
 		minetest.log("error", "[xdecor] Chess: Could not find pawn to promote!")
