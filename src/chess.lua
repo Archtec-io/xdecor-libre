@@ -13,6 +13,9 @@ screwdriver = screwdriver or {}
 -- Set this to true to enable this again and try your luck.
 local ENABLE_CHESS_GAMES = true
 
+-- If true, will show some hidden state for debugging purposes
+local CHESS_DEBUG = false
+
 local function index_to_xy(idx)
 	if not idx then
 		return nil
@@ -167,6 +170,11 @@ local function get_current_halfmove(meta)
 	local moves_raw = meta:get_string("moves_raw")
 	local mrsplit = string.split(moves_raw, ";")
 	return #mrsplit
+end
+local function get_current_fullmove(meta)
+	local moves_raw = meta:get_string("moves_raw")
+	local mrsplit = string.split(moves_raw, ";")
+	return math.floor(#mrsplit / 2)
 end
 
 local function can_castle(meta, board, from_list, from_idx, to_idx)
@@ -1259,6 +1267,60 @@ local function update_formspec(meta)
 		game_buttons = "button[13.36,0.26;2,0.8;new;"..FS("New game").."]"
 	end
 
+	local debug_formstring = ""
+	if CHESS_DEBUG then
+		-- Write a debug string in the formspec based on FEN
+		-- to show some hidden state.
+		-- It uses FEN syntax but without the piece positions
+
+		-- current player: b or w
+		local d_turn = "-"
+		if lastMove == "white" then
+			d_turn  = "b"
+		elseif lastMove == "black" or lastMove == "" then
+			d_turn  = "w"
+		end
+		-- castling rights
+		local d_castling = ""
+		if meta:get_int("castlingWhiteR") == 1 then
+			d_castling = d_castling .. "K"
+		end
+		if meta:get_int("castlingWhiteL") == 1 then
+			d_castling = d_castling .. "Q"
+		end
+		if meta:get_int("castlingBlackR") == 1 then
+			d_castling = d_castling .. "k"
+		end
+		if meta:get_int("castlingBlackL") == 1 then
+			d_castling = d_castling .. "q"
+		end
+		if d_castling == "" then
+			d_castling = "-"
+		end
+		-- en passant possible?
+		local double_step = meta:get_int("prevDoublePawnStepTo")
+		local d_en_passant = "-"
+		if double_step ~= 0 then
+			-- write the square crossed by the pawn who made
+			-- the double step
+			local dsx, dsy = index_to_xy(double_step)
+			if dsy == 3 then
+				dsy = dsy - 1
+			else
+				dsy = dsy + 1
+			end
+			d_en_passant = index_to_notation(xy_to_index(dsx, dsy))
+		end
+		-- The halfmove clock is not implemented and is always at 0
+		local d_halfmove_clock = "0"
+
+		-- fullmove starts at 1 and should count up every time black moves
+		local d_fullmove = tostring(get_current_fullmove(meta) + 1)
+
+		local debug_str = d_turn .. " " .. d_castling .. " " .. d_en_passant .. " " .. d_halfmove_clock .. " " .. d_fullmove
+		debug_formstring = "label[9.9,10.2;DEBUG: "..debug_str.."]"
+	end
+
 	local formspec = fs ..
 		"label[2.2,0.652;"  .. turnBlack .. minetest.formspec_escape(status_black) .. "]" ..
 		blackArr ..
@@ -1267,7 +1329,8 @@ local function update_formspec(meta)
 		"table[9.9,1.25;5.45,4;moves;" .. moves .. ";"..mlistlen.."]" ..
 		promotion_formstring ..
 		eaten_img ..
-		game_buttons
+		game_buttons ..
+		debug_formstring
 
 	meta:set_string("formspec", formspec)
 end
