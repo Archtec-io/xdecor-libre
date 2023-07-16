@@ -1311,8 +1311,9 @@ local function update_formspec(meta)
 			end
 			d_en_passant = index_to_notation(xy_to_index(dsx, dsy))
 		end
-		-- The halfmove clock is not implemented and is always at 0
-		local d_halfmove_clock = "0"
+		-- The halfmove clock counts for how many consecutive halfmoves
+		-- have been made with no pawn advancing and no piece being captured
+		local d_halfmove_clock = meta:get_int("halfmoveClock")
 
 		-- fullmove starts at 1 and should count up every time black moves
 		local d_fullmove = tostring(get_current_fullmove(meta) + 1)
@@ -1479,6 +1480,7 @@ function realchess.init(pos)
 	meta:set_int("promotionPawnFromIdx", 0)
 	meta:set_int("promotionPawnToIdx", 0)
 	meta:set_int("prevDoublePawnStepTo", 0)
+	meta:set_int("halfmoveClock", 0)
 
 	meta:set_string("moves_raw", "")
 	meta:set_string("eaten", "")
@@ -1585,6 +1587,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 	local doublePawnStep = nil
 	local en_passant_target = nil
 	local lostCastlingRightRook = nil
+	local resetHalfmoveClock = false
 
 	-- PAWN
 	if pieceFrom:sub(11,14) == "pawn" then
@@ -1600,11 +1603,13 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 						-- activate promotion
 						promotion = true
 					end
+					resetHalfmoveClock = true
 				elseif from_x - 1 == to_x or from_x + 1 == to_x then
 					if to_index >= 1 and to_index <= 8 and pieceTo:find("black") then
 						-- activate promotion
 						promotion = true
 					end
+					resetHalfmoveClock = true
 				else
 					return false
 				end
@@ -1615,6 +1620,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 				end
 				-- store the destination of this double step in meta (needed for en passant check)
 				doublePawnStep = to_index
+				resetHalfmoveClock = true
 			else
 				return false
 			end
@@ -1648,6 +1654,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 				if not can_capture then
 					return false
 				end
+				resetHalfmoveClock = true
 			else
 				return false
 			end
@@ -1664,11 +1671,13 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 						-- activate promotion
 						promotion = true
 					end
+					resetHalfmoveClock = true
 				elseif from_x - 1 == to_x or from_x + 1 == to_x then
 					if to_index >= 57 and to_index <= 64 and pieceTo:find("white") then
 						-- activate promotion
 						promotion = true
 					end
+					resetHalfmoveClock = true
 				else
 					return false
 				end
@@ -1679,6 +1688,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 				end
 				-- store the destination of this double step in meta (needed for en passant check)
 				doublePawnStep = to_index
+				resetHalfmoveClock = true
 			else
 				return false
 			end
@@ -1712,6 +1722,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 				if not can_capture then
 					return false
 				end
+				resetHalfmoveClock = true
 			else
 				return false
 			end
@@ -2000,6 +2011,17 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 	end
 	if whiteAttacked and thisMove == "white" then
 		return false
+	end
+
+	if pieceTo ~= "" then
+		resetHalfmoveClock = true
+	end
+	-- The halfmove clock counts the number of consecutive halfmoves
+	-- in which neither a pawn was moved nor a piece was captured.
+	if resetHalfmoveClock then
+		meta:set_int("halfmoveClock", 0)
+	else
+		meta:set_int("halfmoveClock", meta:get_int("halfmoveClock") + 1)
 	end
 
 	if en_passant_target then
