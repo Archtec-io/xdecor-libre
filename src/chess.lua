@@ -14,7 +14,7 @@ screwdriver = screwdriver or {}
 local ENABLE_CHESS_GAMES = true
 
 -- If true, will show some hidden state for debugging purposes
-local CHESS_DEBUG = true
+local CHESS_DEBUG = false
 
 local function index_to_xy(idx)
 	if not idx then
@@ -61,6 +61,7 @@ function get_square_index_color(idx)
 end
 
 local chat_prefix = minetest.colorize("#FFFF00", "["..S("Chess").."] ")
+local chat_prefix_debug = minetest.colorize("#FFFF00", "["..S("Chess Debug").."] ")
 local letters = {'a','b','c','d','e','f','g','h'}
 
 local function index_to_notation(idx)
@@ -175,6 +176,59 @@ local function get_current_fullmove(meta)
 	local moves_raw = meta:get_string("moves_raw")
 	local mrsplit = string.split(moves_raw, ";")
 	return math.floor(#mrsplit / 2)
+end
+
+-- Returns a FEN-style string to represent castling rights
+-- Will return a sequence of K, Q, k and q, with each letter
+-- representing castling rights:
+-- * K: white kingside
+-- * Q: white queenside
+-- * k: black kingside
+-- * q: black queenside
+-- If all castling rights are gone, will return "-" instead.
+-- The 4 arguments are booleans for each possible castling,
+-- true means the castling is possible.
+local function castling_to_string(white_kingside, white_queenside, black_kingside, black_queenside)
+	local s_castling = ""
+	if white_kingside then
+		s_castling = s_castling .. "K"
+	end
+	if white_queenside then
+		s_castling = s_castling .. "Q"
+	end
+	if black_kingside then
+		s_castling = s_castling .. "k"
+	end
+	if black_queenside then
+		s_castling = s_castling .. "q"
+	end
+	if s_castling == "" then
+		s_castling = "-"
+	end
+	return s_castling
+end
+
+-- Returns a FEN-style string to represent the state of a theoretically
+-- possible en passant capture on the board (even if no pawn can actually
+-- capture). If an en passant capture is possible, returns the square
+-- coordinates in algebraic notation of the square the vulnerable pawn
+-- has just crossed. If no en passant capture is possible, returns "-".
+-- double_step is the board index of the square the vulnerable
+-- pawn has just double-stepped to or 0 if there is no such pawn.
+local function en_passant_to_string(double_step)
+	local s_en_passant = "-"
+	if double_step ~= 0 and double_step ~= nil then
+		-- write the square crossed by the pawn who made
+		-- the double step
+		local dsx, dsy = index_to_xy(double_step)
+		if dsy == 3 then
+			dsy = dsy - 1
+		else
+			dsy = dsy + 1
+		end
+		s_en_passant = index_to_notation(xy_to_index(dsx, dsy))
+	end
+	return s_en_passant
 end
 
 local function can_castle(meta, board, from_list, from_idx, to_idx)
@@ -1009,6 +1063,189 @@ local function add_special_to_moves_list(meta, special)
 	add_move_to_moves_list(meta, "", "", "", "", special)
 end
 
+-- Returns a list of all positions so far, for the purposes
+-- of determining position equality under the "same position
+-- repeated X times" draw rule.
+-- Each possible position is uniquely identified by a string
+-- so equal positions have the same string and unequal positons
+-- have a different string.
+-- A position string containts the following data:
+-- * position of pieces on the board
+-- * current player
+-- * castling rights
+-- * target coords of the square crossed by the pawn who
+--   made a double step in the prvious turn (if any)
+--
+-- Patemeter: meta is the node metadata of the chessboard
+--
+-- NOTE: The FIDE Laws of Chess (Jan 2023, article 9.2.3.1)
+-- are somewhat unclear about en passant here ... Is it important
+-- the pawn was only theoretically vulnerable to being
+-- captured en passant without being actually threatened
+-- that way, or does it only count if the pawn was actually
+-- threatened by another pawn to be captured that way?
+-- This mod currently interprets the rule in the former way,
+-- i.e. a double step by a pawn
+local function get_positions_history(meta)
+	-- Turns a board table to a string.
+	-- The syntax is inspired by FEN but not identical.
+	-- It iterates through the table from start
+	-- to finish and turns every square to a character,
+	-- representing a piece or an empty square.
+	local function board_to_string(board)
+		local str = ""
+		for b=1, #board do
+			local piece = board[b]
+			local append
+			if piece == "" then
+				str = str .. "."
+			elseif piece:find("white") then
+				if piece:find("pawn") then
+					str = str .. "P"
+				elseif piece:find("bishop") then
+					str = str .. "B"
+				elseif piece:find("knight") then
+					str = str .. "N"
+				elseif piece:find("rook") then
+					str = str .. "R"
+				elseif piece:find("queen") then
+					str = str .. "Q"
+				elseif piece:find("king") then
+					str = str .. "K"
+				end
+			elseif piece:find("black") then
+				if piece:find("pawn") then
+					str = str .. "p"
+				elseif piece:find("bishop") then
+					str = str .. "b"
+				elseif piece:find("knight") then
+					str = str .. "n"
+				elseif piece:find("rook") then
+					str = str .. "r"
+				elseif piece:find("queen") then
+					str = str .. "q"
+				elseif piece:find("king") then
+					str = str .. "k"
+				end
+			end
+		end
+		return str
+	end
+
+	local moves_raw = meta:get_string("moves_raw")
+	local moves_split = string.split(moves_raw, ";")
+	local positions_list = ""
+	local board = table.copy(starting_grid)
+	local castling_state = { true, true, true, true }
+	local castling_str = castling_to_string(unpack(castling_state))
+	positions_list = {}
+
+	local current_player = "w"
+	local position_string = board_to_string(board) .. " " ..
+		current_player .. " " ..
+		castling_str .. " " ..
+		en_passant_to_string(nil)
+	table.insert(positions_list, position_string)
+	for m=1, #moves_split do
+		local move_split = string.split(moves_split[m], ",", true)
+		local pieceFrom = move_split[1]
+		local pieceTo = move_split[2]
+		local from_idx = tonumber(move_split[3])
+		local to_idx = tonumber(move_split[4])
+		local special = move_split[5]
+		if special == "" or special:sub(1,7) == "promo__" then
+
+		if current_player == "w" then
+			current_player = "b"
+		else
+			current_player = "w"
+		end
+		-- Piece movement
+		board[to_idx] = board[from_idx]
+		board[from_idx] = ""
+
+		-- Pawn promotion
+		if special:sub(1, 7) == "promo__" then
+			local promoSym = special:sub(8)
+			board[to_idx] = promoSym
+		end
+
+		local from_x, from_y  = index_to_xy(from_idx)
+		local to_x, to_y      = index_to_xy(to_idx)
+		if pieceFrom:sub(11,14) == "king" then
+			-- Castling (move rook)
+			if (from_y == 7 and to_y == 7) then
+				if (from_x == 4 and to_x == 2) then
+					board[60] = board[57]
+					board[57] = ""
+				elseif (from_x == 4 and to_x == 6) then
+					board[62] = board[64]
+					board[64] = ""
+				end
+			elseif (from_y == 0 and to_y == 0) then
+				if (from_x == 4 and to_x == 2) then
+					board[4] = board[1]
+					board[1] = ""
+				elseif (from_x == 4 and to_x == 6) then
+					board[6] = board[8]
+					board[8] = ""
+				end
+			end
+			-- Lose castling rights on any king move
+			if pieceFrom:find("white") then
+				castling_state[1] = false
+				castling_state[2] = false
+			else
+				castling_state[3] = false
+				castling_state[4] = false
+			end
+
+		-- Lose castling rights on lone rook move
+		elseif pieceFrom:sub(11,14) == "rook" then
+			if from_idx == 57 then
+				-- white queenside
+				castling_state[2] = false
+			elseif from_idx == 64 then
+				-- white kingside
+				castling_state[1] = false
+			elseif from_idx == 1 then
+				-- black queenside
+				castling_state[4] = false
+			elseif from_idx == 8 then
+				-- black kingside
+				castling_state[3] = false
+			end
+		end
+
+		local pawn_double_step_index
+		if pieceTo == "" and pieceFrom:sub(11,14) == "pawn" then
+			-- En passant (remove captured pawn)
+			if from_x ~= to_x then
+				local epp_y
+				if pieceFrom:find("white") then
+					epp_y = to_y + 1
+				else
+					epp_y = to_y - 1
+				end
+				board[xy_to_index(to_x, epp_y)] = ""
+			-- Double pawn step (record positoin)
+			elseif math.abs(from_y-to_y) == 2 then
+				pawn_double_step_index = to_idx
+			end
+		end
+
+		castling_str = castling_to_string(unpack(castling_state))
+		local position_string = board_to_string(board) .. " " ..
+			current_player .. " " ..
+			castling_str .. " " ..
+			en_passant_to_string(pawn_double_step_index)
+		table.insert(positions_list, position_string)
+	end
+	end
+	local p=#positions_list
+	return positions_list
+end
+
 -- Create the full formspec string for the sequence of moves.
 -- Uses Figurine Algebraic Notation.
 local function get_moves_formstring(meta)
@@ -1281,36 +1518,15 @@ local function update_formspec(meta)
 			d_turn  = "w"
 		end
 		-- castling rights
-		local d_castling = ""
-		if meta:get_int("castlingWhiteR") == 1 then
-			d_castling = d_castling .. "K"
-		end
-		if meta:get_int("castlingWhiteL") == 1 then
-			d_castling = d_castling .. "Q"
-		end
-		if meta:get_int("castlingBlackR") == 1 then
-			d_castling = d_castling .. "k"
-		end
-		if meta:get_int("castlingBlackL") == 1 then
-			d_castling = d_castling .. "q"
-		end
-		if d_castling == "" then
-			d_castling = "-"
-		end
+		local d_castling = castling_to_string(
+			meta:get_int("castlingWhiteR") == 1,
+			meta:get_int("castlingWhiteL") == 1,
+			meta:get_int("castlingBlackR") == 1,
+			meta:get_int("castlingBlackL") == 1)
 		-- en passant possible?
 		local double_step = meta:get_int("prevDoublePawnStepTo")
-		local d_en_passant = "-"
-		if double_step ~= 0 then
-			-- write the square crossed by the pawn who made
-			-- the double step
-			local dsx, dsy = index_to_xy(double_step)
-			if dsy == 3 then
-				dsy = dsy - 1
-			else
-				dsy = dsy + 1
-			end
-			d_en_passant = index_to_notation(xy_to_index(dsx, dsy))
-		end
+		local d_en_passant = en_passant_to_string(double_step)
+
 		-- The halfmove clock counts for how many consecutive halfmoves
 		-- have been made with no pawn advancing and no piece being captured
 		local d_halfmove_clock = meta:get_int("halfmoveClock")
@@ -1469,6 +1685,45 @@ local function update_game_result(meta)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw via the 75-move rule")
 	end
 
+	local repetitionDraw = false
+	local positions = get_positions_history(meta)
+	local positions_counter = {}
+	for p = 1, #positions do
+		local position = positions[p]
+		if positions_counter[position] == nil then
+			positions_counter[position] = 1
+		else
+			positions_counter[position] = positions_counter[position] + 1
+		end
+
+		if CHESS_DEBUG and p == #positions then
+			local msg = chat_prefix_debug .. "Current position: \"" .. position .. "\""
+			if positions_counter[position] > 1 then
+				msg = msg .. " (occurred "..positions_counter[position].." times)"
+			end
+			minetest.chat_send_player(playerWhite, msg)
+			if playerWhite ~= playerBlack then
+				minetest.chat_send_player(playerBlack, msg)
+			end
+		end
+
+		if positions_counter[position] == 5 then
+			repetitionDraw = true
+			break
+		end
+	end
+
+	if repetitionDraw then
+		meta:set_string("gameResult", "draw")
+		meta:set_string("gameResultReason", "same_position_5")
+		add_special_to_moves_list(meta, "draw")
+		local msg = S("The exact same position has occured 5 times. It's a draw!")
+		minetest.chat_send_player(playerWhite, chat_prefix .. msg)
+		if playerWhite ~= playerBlack then
+			minetest.chat_send_player(playerBlack, chat_prefix .. msg)
+		end
+		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because the same position has appeared 5 times")
+	end
 end
 
 
