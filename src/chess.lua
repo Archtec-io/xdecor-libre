@@ -4,8 +4,16 @@ if minetest.get_modpath("realchess") ~= nil then
 	minetest.log("action", "[xdecor] 'realchess' mod detected. Disabling X-Decor-libre's Chess module in favor of realchess")
 	return
 end
-realchess = {}
+
+-- For making some functions available for the chessbot.
+-- It is NOT recommended to use the public chess function outside of this mod!
+xdecor.chess = {}
+
+local realchess = xdecor.chess -- just an alias
+
+-- Load chess bot code
 local chessbot = dofile(minetest.get_modpath(minetest.get_current_modname()).."/src/chessbot.lua")
+
 screwdriver = screwdriver or {}
 
 -- Translation init
@@ -804,6 +812,7 @@ local function get_theoretical_moves_from(meta, board, from_idx)
 	end
 
 	-- Rate the possible moves depending on its piece value
+	-- TODO: Move this to chessbot.lua
 	for i in pairs(moves) do
 		local stack_name = board[tonumber(i)]
 		if stack_name ~= "" then
