@@ -1,16 +1,14 @@
 local realchess = {}
 local S = minetest.get_translator("xdecor")
+local NS = function(s) return s end
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaque" or false
 
 -- Bot names
--- Note: Asterisks added to avoid confusion with a player name
--- because asterisks are forbidden in player names.
--- Bot name if playing against a player
-local BOT_NAME = "*"..S("Weak Computer").."*"
+local BOT_NAME = NS("Weak Computer")
 -- Bot names in Bot vs Bot mode
-local BOT_NAME_1 = "*"..S("Weak Computer 1").."*"
-local BOT_NAME_2 = "*"..S("Weak Computer 2").."*"
+local BOT_NAME_1 = NS("Weak Computer 1")
+local BOT_NAME_2 = NS("Weak Computer 2")
 -- Delay in seconds for a bot moving a piece (excluding choosing a promotion)
 local BOT_DELAY_MOVE = 1.0
 -- Delay in seconds for a bot promoting a piece
@@ -25,6 +23,29 @@ local ENABLE_CHESS_GAMES = true
 -- If true, will show some hidden state for debugging purposes
 -- and enables a "Bot vs Bot" gamemode for testing the bot
 local CHESS_DEBUG = false
+
+-- Returns the player name for the given player color.
+-- In case of a bot player, will return a translated
+-- bot name.
+local function get_display_player_name(meta, playerColor)
+	local botColor = meta:get_string("botColor")
+	local displayName
+	if playerColor == botColor and (botColor == "white" or botColor == "black") then
+		return "*"..S(BOT_NAME).."*"
+	elseif botColor == "both" then
+		if playerColor == "white" then
+			return "*"..S(BOT_NAME_1).."*"
+		else
+			return "*"..S(BOT_NAME_2).."*"
+		end
+	elseif playerColor == "white" then
+		return meta:get_string("playerWhite")
+	elseif playerColor == "black" then
+		return meta:get_string("playerBlack")
+	else
+		return ""
+	end
+end
 
 local function index_to_xy(idx)
 	if not idx then
@@ -50,7 +71,7 @@ end
 -- Given a board index (1..64), returns the color of the square at
 -- this position: "light" or "dark".
 -- Undefined behavior if given an invalid board index
-function get_square_index_color(idx)
+local function get_square_index_color(idx)
 	local x, y = index_to_xy(idx)
 	if not x then
 		return nil
@@ -72,6 +93,48 @@ end
 
 local chat_prefix = minetest.colorize("#FFFF00", "["..S("Chess").."] ")
 local chat_prefix_debug = minetest.colorize("#FFFF00", "["..S("Chess Debug").."] ")
+
+-- Send a chat message to a player with a prefix.
+-- If you pass playerColor and botColor, this function will also
+-- check if the player is a bot, in which case the message
+-- is not sent.
+-- If you only pass playerName and message, the message will always
+-- be sent (if the player exists).
+--
+-- Parameters:
+-- * playerName: Name of player to send message to (can be a bot name)
+-- * message: The message text
+-- * playerColor: "white", "black" or nil (if color is irrelevant)
+-- * botColor: optional color of the bot(s):
+--     * "white", "black": white or black
+--     * "both": Both players are bots
+--     * "": No player is a bot (default)
+-- * isDebug: if true, message will only be shown in Chess Debug Mode (default: false)
+local function send_message(playerName, message, playerColor, botColor, isDebug)
+	local prefix
+	if isDebug then
+		if not CHESS_DEBUG then
+			return
+		end
+		prefix = chat_prefix_debug
+	else
+		prefix = chat_prefix
+	end
+	minetest.chat_send_player(playerName, prefix .. message)
+end
+-- Send a message to both players of the chess game (except bots, if botColor is provided)
+-- * playerName1: White player name
+-- * playerName2: Black player name
+-- * message: Message text
+-- * botColor: See `send_message`
+-- * isDebug: See `send_message`
+local function send_message_2(playerName1, playerName2, message, botColor, isDebug)
+	send_message(playerName1, message, "white", botColor, isDebug)
+	if playerName2 ~= playerName1 then
+		send_message(playerName2, message, "black", botColor, isDebug)
+	end
+end
+
 local letters = {'a','b','c','d','e','f','g','h'}
 
 local function index_to_notation(idx)
@@ -1472,9 +1535,15 @@ end
 local function update_formspec(meta)
 	local black_king_attacked = meta:get_string("blackAttacked") == "true"
 	local white_king_attacked = meta:get_string("whiteAttacked") == "true"
+	local botColor = meta:get_string("botColor")
 
 	local playerWhite = meta:get_string("playerWhite")
 	local playerBlack = meta:get_string("playerBlack")
+
+	-- Translate the bot names for the display
+	-- (internally, the bot names are still English-only)
+	local playerWhiteDisplay = get_display_player_name(meta, "white")
+	local playerBlackDisplay = get_display_player_name(meta, "black")
 
 	local moves_raw = meta:get_string("moves_raw")
 	local moves, mlistlen = get_moves_formstring(meta)
@@ -1487,8 +1556,8 @@ local function update_formspec(meta)
 	-- arrow to show whose turn it is
 	local blackArr  = (gameResult == "" and lastMove == "white" and "image[1.2,0.252;0.7,0.7;chess_turn_black.png]") or ""
 	local whiteArr  = (gameResult == "" and (lastMove == "" or lastMove == "black") and "image[1.2,9.81;0.7,0.7;chess_turn_white.png]") or ""
-	local turnBlack = minetest.colorize("#000001", playerBlack)
-	local turnWhite = minetest.colorize("#000001", playerWhite)
+	local turnBlack = minetest.colorize("#000001", playerBlackDisplay)
+	local turnWhite = minetest.colorize("#000001", playerWhiteDisplay)
 
 	-- several status words for the player
 	-- player is in check
@@ -1541,7 +1610,6 @@ local function update_formspec(meta)
 		promotion = meta:get_string("promotionActive")
 	end
 	local promotion_formstring = ""
-	local botColor = meta:get_string("botColor")
 
 	-- Show promotion prompt to ask player to choose to which piece to promote a pawn to
 	if promotion == "black" then
@@ -1689,14 +1757,18 @@ local function update_game_result(meta)
 		end
 	end
 
+	local playerWhiteDisplay = get_display_player_name(meta, "white")
+	local playerBlackDisplay = get_display_player_name(meta, "black")
+	local botColor = meta:get_string("botColor")
+
 	if lastMove == "white" and not blackCanMove then
 		if meta:get_string("blackAttacked") == "true" then
 			-- black was checkmated
 			meta:set_string("gameResult", "whiteWon")
 			meta:set_string("gameResultReason", "checkmate")
 			add_special_to_moves_list(meta, "whiteWon")
-			minetest.chat_send_player(playerWhite, chat_prefix .. S("You have checkmated @1. You win!", playerBlack))
-			minetest.chat_send_player(playerBlack, chat_prefix .. S("You were checkmated by @1. You lose!", playerWhite))
+			send_message(playerWhite, S("You have checkmated @1. You win!", playerBlackDisplay), "white", botColor)
+			send_message(playerBlack, S("You were checkmated by @1. You lose!", playerWhiteDisplay), "black", botColor)
 			minetest.log("action", "[xdecor] Chess: "..playerWhite.." won against "..playerBlack.." by checkmate")
 			return
 		else
@@ -1704,10 +1776,7 @@ local function update_game_result(meta)
 			meta:set_string("gameResult", "draw")
 			meta:set_string("gameResultReason", "stalemate")
 			add_special_to_moves_list(meta, "draw")
-			minetest.chat_send_player(playerWhite, chat_prefix .. S("The game ended up in a stalemate! It's a draw!"))
-			if playerWhite ~= playerBlack then
-				minetest.chat_send_player(playerBlack, chat_prefix .. S("The game ended up in a stalemate! It's a draw!"))
-			end
+			send_message_2(playerWhite, playerBlack, S("The game ended up in a stalemate! It's a draw!"), botColor)
 			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by stalemate")
 			return
 		end
@@ -1718,8 +1787,8 @@ local function update_game_result(meta)
 			meta:set_string("gameResult", "blackWon")
 			meta:set_string("gameResultReason", "checkmate")
 			add_special_to_moves_list(meta, "blackWon")
-			minetest.chat_send_player(playerBlack, chat_prefix .. S("You have checkmated @1. You win!", playerWhite))
-			minetest.chat_send_player(playerWhite, chat_prefix .. S("You were checkmated by @1. You lose!", playerBlack))
+			send_message(playerBlack, S("You have checkmated @1. You win!", playerWhiteDisplay), "white", botColor)
+			send_message(playerWhite, S("You were checkmated by @1. You lose!", playerBlackDisplay), "white", botColor)
 			minetest.log("action", "[xdecor] Chess: "..playerBlack .." won against "..playerWhite.." by checkmate")
 			return
 		else
@@ -1727,10 +1796,7 @@ local function update_game_result(meta)
 			meta:set_string("gameResult", "draw")
 			meta:set_string("gameResultReason", "stalemate")
 			add_special_to_moves_list(meta, "draw")
-			minetest.chat_send_player(playerWhite, chat_prefix .. S("The game ended up in a stalemate! It's a draw!"))
-			if playerWhite ~= playerBlack then
-				minetest.chat_send_player(playerBlack, chat_prefix .. S("The game ended up in a stalemate! It's a draw!"))
-			end
+			send_message_2(playerWhite, playerBlack, S("The game ended up in a stalemate! It's a draw!"), botColor)
 			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by stalemate")
 			return
 		end
@@ -1741,10 +1807,7 @@ local function update_game_result(meta)
 		meta:set_string("gameResult", "draw")
 		meta:set_string("gameResultReason", "dead_position")
 		add_special_to_moves_list(meta, "draw")
-		minetest.chat_send_player(playerWhite, chat_prefix .. S("The game ended up in a dead position! It's a draw!"))
-		if playerWhite ~= playerBlack then
-			minetest.chat_send_player(playerBlack, chat_prefix .. S("The game ended up in dead position! It's a draw!"))
-		end
+		send_message_2(playerWhite, playerBlack, S("The game ended up in a dead position! It's a draw!"), botColor)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by dead position")
 	end
 
@@ -1756,10 +1819,7 @@ local function update_game_result(meta)
 		meta:set_string("gameResultReason", "75_moves_rule")
 		add_special_to_moves_list(meta, "draw")
 		local msg = S("No piece was captured and no pawn was moved for 75 consecutive moves of each player. It's a draw!")
-		minetest.chat_send_player(playerWhite, chat_prefix .. msg)
-		if playerWhite ~= playerBlack then
-			minetest.chat_send_player(playerBlack, chat_prefix .. msg)
-		end
+		send_message_2(playerWhite, playerBlack, msg, botColor)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw via the 75-move rule")
 	end
 
@@ -1775,14 +1835,11 @@ local function update_game_result(meta)
 		end
 
 		if CHESS_DEBUG and p == #positions then
-			local msg = chat_prefix_debug .. "Current position: \"" .. position .. "\""
+			local msg = "Current position: \"" .. position .. "\""
 			if positions_counter[position] > 1 then
 				msg = msg .. " (occurred "..positions_counter[position].." times)"
 			end
-			minetest.chat_send_player(playerWhite, msg)
-			if playerWhite ~= playerBlack then
-				minetest.chat_send_player(playerBlack, msg)
-			end
+			--send_message_2(playerWhite, playerBlack, msg, botColor)
 		end
 
 		if positions_counter[position] == 5 then
@@ -1796,10 +1853,7 @@ local function update_game_result(meta)
 		meta:set_string("gameResultReason", "same_position_5")
 		add_special_to_moves_list(meta, "draw")
 		local msg = S("The exact same position has occured 5 times. It's a draw!")
-		minetest.chat_send_player(playerWhite, chat_prefix .. msg)
-		if playerWhite ~= playerBlack then
-			minetest.chat_send_player(playerBlack, chat_prefix .. msg)
-		end
+		send_message_2(playerWhite, playerBlack, msg, botColor)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because the same position has appeared 5 times")
 	end
 end
@@ -1895,7 +1949,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 		end
 
 		if playerWhite ~= "" and playerWhite ~= playerName then
-			minetest.chat_send_player(playerName, chat_prefix .. S("Someone else plays white pieces!"))
+			send_message(playerName, S("Someone else plays white pieces!"))
 			return false
 		end
 
@@ -1914,7 +1968,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 		end
 
 		if playerBlack ~= "" and playerBlack ~= playerName then
-			minetest.chat_send_player(playerName, chat_prefix .. S("Someone else plays black pieces!"))
+			send_message(playerName, S("Someone else plays black pieces!"))
 			return false
 		end
 
@@ -2429,20 +2483,21 @@ local function bot_move(inv, meta)
 	if botColor == "black" then
 		currentBotColor = "black"
 		opponentColor = "white"
-		botName = BOT_NAME
 	elseif botColor == "white" then
 		currentBotColor = "white"
 		opponentColor = "black"
-		botName = BOT_NAME
 	elseif botColor == "both" then
 		opponentColor = lastMove
 		if lastMove == "black" or lastMove == "" then
 			currentBotColor = "white"
-			botName = BOT_NAME_1
 		else
 			currentBotColor = "black"
-			botName = BOT_NAME_2
 		end
+	end
+	if currentBotColor == "white" then
+		botName = meta:get_string("playerWhite")
+	else
+		botName = meta:get_string("playerBlack")
 	end
 	if (lastMove == opponentColor or ((botColor == "white" or botColor == "both") and lastMove == "")) and gameResult == "" then
 		update_formspec(meta)
@@ -2581,18 +2636,20 @@ function realchess.fields(pos, _, fields, sender)
 			end
 			meta:set_string("mode", "bot_vs_bot")
 			meta:set_string("botColor", "both")
-			meta:set_string("playerWhite", BOT_NAME_1)
-			meta:set_string("playerBlack", BOT_NAME_2)
+			-- Add asterisk to bot names so it can't collide with a player name
+			-- (asterisk is forbidden in player names)
+			meta:set_string("playerWhite", "*"..BOT_NAME_1.."*")
+			meta:set_string("playerBlack", "*"..BOT_NAME_2.."*")
 			local inv = meta:get_inventory()
 			bot_move(inv, meta)
 		elseif fields.single_w then
 			meta:set_string("mode", "single")
 			meta:set_string("botColor", "black")
-			meta:set_string("playerBlack", BOT_NAME)
+			meta:set_string("playerBlack", "*"..BOT_NAME.."*")
 		elseif fields.single_b then
 			meta:set_string("mode", "single")
 			meta:set_string("botColor", "white")
-			meta:set_string("playerWhite", BOT_NAME)
+			meta:set_string("playerWhite", "*"..BOT_NAME.."*")
 			local inv = meta:get_inventory()
 			bot_move(inv, meta)
 		elseif fields.multi then
@@ -2615,7 +2672,7 @@ function realchess.fields(pos, _, fields, sender)
 					(playerWhite ~= playerName or playerBlack ~= playerName) then
 				realchess.init(pos)
 			else
-				minetest.chat_send_player(playerName, chat_prefix ..
+				send_message(playerName,
 					S("You can't reset the chessboard, a game has been started. Try again in @1.",
 					timeout_format(timeout_limit)))
 			end
@@ -2626,7 +2683,7 @@ function realchess.fields(pos, _, fields, sender)
 	if fields.resign and mode ~= "bot_vs_bot" then
 		local lastMove = meta:get_string("lastMove")
 		if playerWhite == "" and playerBlack == "" or lastMove == "" then
-			minetest.chat_send_player(playerName, chat_prefix .. S("Resigning is not possible yet."))
+			send_message(playerName, S("Resigning is not possible yet."))
 			return
 		end
 		local winner, loser, whiteWon
@@ -2659,14 +2716,14 @@ function realchess.fields(pos, _, fields, sender)
 				add_special_to_moves_list(meta, "blackWon")
 			end
 
-			minetest.chat_send_player(loser, chat_prefix .. S("You have resigned."))
+			send_message(loser, S("You have resigned."))
 			if playerWhite ~= playerBlack then
-				minetest.chat_send_player(winner, chat_prefix .. S("@1 has resigned. You win!", loser))
+				send_message(winner, S("@1 has resigned. You win!", loser))
 			end
 			minetest.log("action", "[xdecor] Chess: "..loser.." has resigned from the game against "..winner)
 			update_formspec(meta)
 		else
-			minetest.chat_send_player(playerName, chat_prefix .. S("You can't resign, you're not playing in this game."))
+			send_message(playerName, S("You can't resign, you're not playing in this game."))
 		end
 		return
 	end
@@ -2683,27 +2740,23 @@ function realchess.fields(pos, _, fields, sender)
 		local promo = promotions[p]
 		if fields["p_"..promo] then
 			if not (playerName == playerWhite or playerName == playerBlack) then
-				minetest.chat_send_player(playerName, chat_prefix ..
-					S("You're only a spectator in this game of Chess."))
+				send_message(playerName, S("You're only a spectator in this game of Chess."))
 				return
 			end
 			local pcolor = promo:sub(-5)
 			local activePromo = meta:get_string("promotionActive")
 			if activePromo == "" then
-				minetest.chat_send_player(playerName, chat_prefix ..
-					S("This isn't the time for promotion."))
+				send_message(playerName, S("This isn't the time for promotion."))
 				return
 			elseif activePromo ~= pcolor then
-				minetest.chat_send_player(playerName, chat_prefix ..
-					S("It's not your turn! This promotion is meant for the other player."))
+				send_message(playerName, S("It's not your turn! This promotion is meant for the other player."))
 				return
 			end
 			if pcolor == "white" and playerName == playerWhite or pcolor == "black" and playerName == playerBlack then
 				realchess.promote_pawn(meta, pcolor, promo:sub(1, -7))
 				return
 			else
-				minetest.chat_send_player(playerName, chat_prefix ..
-					S("It's not your turn! This promotion is meant for the other player."))
+				send_message(playerName, S("It's not your turn! This promotion is meant for the other player."))
 				return
 			end
 		end
@@ -2728,12 +2781,12 @@ function realchess.dig(pos, player)
 		return true
 	else
 		if playerName == playerWhite or playerName == playerBlack or botColor == "both" then
-			minetest.chat_send_player(playerName, chat_prefix ..
+			send_message(playerName,
 					S("You can't dig the chessboard, a game has been started. " ..
 					"Reset it first or dig it again in @1.",
 					timeout_format(timeout_limit)))
 		else
-			minetest.chat_send_player(playerName, chat_prefix ..
+			send_message(playerName,
 					S("You can't dig the chessboard, a game has been started. " ..
 					"Try it again in @1.",
 					timeout_format(timeout_limit)))
