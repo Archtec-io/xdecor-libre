@@ -14,6 +14,11 @@ local BOT_DELAY_MOVE = 1.0
 -- Delay in seconds for a bot promoting a piece
 local BOT_DELAY_PROMOTE = 1.0
 
+-- Timeout in seconds to allow resetting the game or digging the chessboard.
+-- If no move was made for this time, everyone can reset the game
+-- and remove the chessboard.
+local TIMEOUT = 300
+
 screwdriver = screwdriver or {}
 
 -- Chess games are disabled because they are currently too broken.
@@ -2633,7 +2638,7 @@ end
 function realchess.fields(pos, _, fields, sender)
 	local playerName    = sender:get_player_name()
 	local meta          = minetest.get_meta(pos)
-	local timeout_limit = meta:get_int("lastMoveTime") + 300
+	local timeout_limit = meta:get_int("lastMoveTime") + TIMEOUT
 	local playerWhite   = meta:get_string("playerWhite")
 	local playerBlack   = meta:get_string("playerBlack")
 	local lastMoveTime  = meta:get_int("lastMoveTime")
@@ -2672,7 +2677,8 @@ function realchess.fields(pos, _, fields, sender)
 	end
 
 	local mode = meta:get_string("mode")
-	-- Timeout is 5 min. by default for resetting the game (non-players only)
+	-- If the game is ongoing and no move was made for TIMEOUT seconds,
+	-- the game can be aborted by everyone.
 	-- Also allow instant reset before White and Black moved,
 	-- as well as in Bot vs Bot mode
 	if fields.new then
@@ -2782,13 +2788,14 @@ function realchess.dig(pos, player)
 
 	local meta          = minetest.get_meta(pos)
 	local playerName    = player:get_player_name()
-	local timeout_limit = meta:get_int("lastMoveTime") + 300
+	local timeout_limit = meta:get_int("lastMoveTime") + TIMEOUT
 	local lastMoveTime  = meta:get_int("lastMoveTime")
 	local playerWhite   = meta:get_string("playerWhite")
 	local playerBlack   = meta:get_string("playerBlack")
 	local botColor      = meta:get_string("botColor")
 
-	-- Timeout is 5 min. by default for digging the chessboard (non-players only)
+	-- If the game is ongoing and no move was made for TIMEOUT seconds,
+	-- the board is free to be dug
 	if (lastMoveTime == 0 and minetest.get_gametime() > timeout_limit) then
 		return true
 	else
