@@ -140,14 +140,13 @@ local function send_message_2(playerName1, playerName2, message, botColor, isDeb
 	end
 end
 
-local letters = {'a','b','c','d','e','f','g','h'}
-
+local notation_letters = {'a','b','c','d','e','f','g','h'}
 local function index_to_notation(idx)
 	local x, y = index_to_xy(idx)
 	if not x or not y then
 		return "??"
 	end
-	local xstr = letters[x+1] or "?"
+	local xstr = notation_letters[x+1] or "?"
 	local ystr = tostring(9 - (y+1)) or "?"
 	return xstr .. ystr
 end
@@ -160,7 +159,6 @@ local function board_to_table(inv)
 
 	return t
 end
-
 
 local piece_values = {
 	pawn   = 10,
@@ -1165,6 +1163,63 @@ local function add_special_to_moves_list(meta, special)
 	add_move_to_moves_list(meta, "", "", "", "", special)
 end
 
+
+-- abbreviation for each piece for the string
+-- representation of the board (like in FEN)
+local piece_letters = {
+	white = {
+		pawn   = "P",
+		knight = "N",
+		bishop = "B",
+		rook   = "R",
+		queen  = "Q",
+		king   = "K",
+	},
+	black = {
+		pawn   = "p",
+		knight = "n",
+		bishop = "b",
+		rook   = "r",
+		queen  = "q",
+		king   = "k",
+	},
+}
+
+local function piece_to_letter(piece)
+	if piece == "" then
+		return "."
+	elseif piece:find("white") then
+		for k,v in pairs(piece_letters.white) do
+			if piece:find(k) then
+				return v
+			end
+		end
+	elseif piece:find("black") then
+		for k,v in pairs(piece_letters.black) do
+			if piece:find(k) then
+				return v
+			end
+		end
+	end
+end
+local function letter_to_piece(letter)
+	if letter == "." then
+		return ""
+	else
+		for k,v in pairs(piece_letters.white) do
+			if v == letter then
+				return v
+			end
+		end
+		for k,v in pairs(piece_letters.black) do
+			if v == letter then
+				return v
+			end
+		end
+	end
+	return nil
+end
+
 -- Returns a list of all positions so far, for the purposes
 -- of determining position equality under the "same position
 -- repeated X times" draw rule.
@@ -1199,37 +1254,7 @@ local function get_positions_history(meta)
 		for b=1, #board do
 			local piece = board[b]
 			local append
-			if piece == "" then
-				str = str .. "."
-			elseif piece:find("white") then
-				if piece:find("pawn") then
-					str = str .. "P"
-				elseif piece:find("bishop") then
-					str = str .. "B"
-				elseif piece:find("knight") then
-					str = str .. "N"
-				elseif piece:find("rook") then
-					str = str .. "R"
-				elseif piece:find("queen") then
-					str = str .. "Q"
-				elseif piece:find("king") then
-					str = str .. "K"
-				end
-			elseif piece:find("black") then
-				if piece:find("pawn") then
-					str = str .. "p"
-				elseif piece:find("bishop") then
-					str = str .. "b"
-				elseif piece:find("knight") then
-					str = str .. "n"
-				elseif piece:find("rook") then
-					str = str .. "r"
-				elseif piece:find("queen") then
-					str = str .. "q"
-				elseif piece:find("king") then
-					str = str .. "k"
-				end
-			end
+			str = str .. piece_to_letter(piece)
 		end
 		return str
 	end
@@ -1839,9 +1864,12 @@ local function update_game_result(meta)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw via the 75-move rule")
 	end
 
-	local repetitionDraw = false
+	-- Draw if same position appeared 5 times
+	-- First, generate the position history
+	local forceRepetitionDraw = false
 	local positions = get_positions_history(meta)
 	local positions_counter = {}
+	-- Count how often each position occurred
 	for p = 1, #positions do
 		local position = positions[p]
 		if positions_counter[position] == nil then
@@ -1850,21 +1878,60 @@ local function update_game_result(meta)
 			positions_counter[position] = positions_counter[position] + 1
 		end
 
-		if CHESS_DEBUG and p == #positions then
-			local msg = "Current position: \"" .. position .. "\""
-			if positions_counter[position] > 1 then
-				msg = msg .. " (occurred "..positions_counter[position].." times)"
-			end
-			--send_message_2(playerWhite, playerBlack, msg, botColor)
-		end
-
 		if positions_counter[position] == 5 then
-			repetitionDraw = true
+			forceRepetitionDraw = true
 			break
 		end
 	end
+	if CHESS_DEBUG then
+		-- Show message if last position occurred at least 2 times
+		local last_position = positions[#positions]
+		local msg = "Current position: \"" .. last_position .. "\""
+		if positions_counter[last_position] >= 2 then
+			msg = msg .. " (occurred "..positions_counter[last_position].." times)"
+		end
+		send_message_2(playerWhite, playerBlack, msg, botColor)
 
-	if repetitionDraw then
+		-- Compare the last position with the actual chessboard
+		-- to automatically test if the position history is still valid
+		local pos_split = last_position:split(" ")
+		local p_board = pos_split[1]
+		local p_player = pos_split[2]
+		local p_castling = pos_split[3]
+		local p_en_passant = pos_split[4]
+		local errors = 0
+		for b=1, #board_t do
+			local piece = board_t[b]
+			local letter_real = piece_to_letter(piece)
+			local letter_pos = string.sub(p_board, b, b)
+			if letter_real ~= letter_pos then
+				minetest.log("error", "[xdecor] Chess: Position history inconsistency on board index "..b..": '"..letter_pos.."' seen but '"..letter_real.."' expected")
+			end
+		end
+		-- Compare current player
+		if (lastMove == "black" or lastMove == "") and p_player ~= "w" then
+			minetest.log("error", "[xdecor] Chess: Position history inconsistency: Wrong player! '"..p_player.."' seen but 'w' expected")
+		elseif (lastMove == "white") and p_player ~= "b" then
+			minetest.log("error", "[xdecor] Chess: Position history inconsistency: Wrong player! '"..p_player.."' seen but 'b' expected")
+		end
+		-- Compare castling rights
+		local d_castling = castling_to_string(
+			meta:get_int("castlingWhiteR") == 1,
+			meta:get_int("castlingWhiteL") == 1,
+			meta:get_int("castlingBlackR") == 1,
+			meta:get_int("castlingBlackL") == 1)
+		if d_castling ~= p_castling then
+			minetest.log("error", "[xdecor] Chess: Position history inconsistency: Castling rights mismatch! '"..p_castling.."' seen but '"..d_castling.."' expected")
+		end
+		-- Compare en passant status
+		local double_step = meta:get_int("prevDoublePawnStepTo")
+		local d_en_passant = en_passant_to_string(double_step)
+		if d_en_passant ~= p_en_passant then
+			minetest.log("error", "[xdecor] Chess: Position history inconsistency: En passant status mismatch! '"..p_en_passant.."' seen but '"..d_en_passant.."' expected")
+		end
+	end
+
+	if forceRepetitionDraw then
 		meta:set_string("gameResult", "draw")
 		meta:set_string("gameResultReason", "same_position_5")
 		add_special_to_moves_list(meta, "draw")
@@ -2608,7 +2675,7 @@ local function bot_move(inv, meta)
 end
 
 local function bot_promote(inv, meta, pawnIndex)
-	minetest.after(BOT_DELAY_MOVE, function()
+	minetest.after(BOT_DELAY_PROMOTE, function()
 		local lastMove = meta:get_string("lastMove")
 		local color
 		if lastMove == "black" or lastMove == "" then
