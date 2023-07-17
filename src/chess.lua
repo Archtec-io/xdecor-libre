@@ -6,6 +6,8 @@ local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaqu
 -- Note: Asterisks added to avoid confusion with a player name
 -- because asterisks are forbidden in player names.
 local BOT_NAME = "*"..S("Weak Computer").."*"
+local BOT_NAME_1 = "*"..S("Weak Computer 1").."*"
+local BOT_NAME_2 = "*"..S("Weak Computer 2").."*"
 local BOT_DELAY_MOVE = 1.0
 local BOT_DELAY_PROMOTE = 1.0
 
@@ -16,6 +18,7 @@ screwdriver = screwdriver or {}
 local ENABLE_CHESS_GAMES = true
 
 -- If true, will show some hidden state for debugging purposes
+-- and enables a "Bot vs Bot" gamemode for testing the bot
 local CHESS_DEBUG = false
 
 local function index_to_xy(idx)
@@ -1014,6 +1017,13 @@ local function get_figurine_id(piece_itemname)
 end
 
 
+local fs_gamemode_x
+if CHESS_DEBUG then
+	fs_gamemode_x = 10.2
+else
+	fs_gamemode_x = 11.5
+end
+
 local fs_init = [[
 	formspec_version[2]
 	size[16,10.7563;]
@@ -1022,12 +1032,15 @@ local fs_init = [[
 	.."bgcolor[#080808BB;true]"
 	.."background[0,0;16,10.7563;chess_bg.png;true]"
 	.."style_type[button,item_image_button;bgcolor=#8f3000]"
-	.."label[11.5,1.8;"..FS("Select a mode:").."]"
-	.."button[11.5,2.1;2.5,0.8;single_w;"..FS("Singleplayer (white)").."]"
-	.."button[11.5,2.95;2.5,0.8;single_b;"..FS("Singleplayer (black)").."]"
-	.."button[11.5,4.1;2.5,0.8;multi;"..FS("Multiplayer").."]"
 	.."label[2.2,0.652;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
 	.."label[2.2,10.21;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
+	.."label["..fs_gamemode_x..",1.8;"..FS("Select a mode:").."]"
+	.."button["..fs_gamemode_x.."10.2,2.1;2.5,0.8;single_w;"..FS("Singleplayer (white)").."]"
+	.."button["..fs_gamemode_x.."10.2,2.95;2.5,0.8;single_b;"..FS("Singleplayer (black)").."]"
+	.."button["..fs_gamemode_x.."10.2,4.1;2.5,0.8;multi;"..FS("Multiplayer").."]"
+	if CHESS_DEBUG then
+		fs_init = fs_init .."button["..(gamemode_x+2.5)..",2.1;2.5,0.8;bot_vs_bot;"..FS("Bot vs Bot").."]"
+	end
 
 local fs = [[
 	formspec_version[2]
@@ -1407,6 +1420,7 @@ local function update_formspec(meta)
 	local lastMove  = meta:get_string("lastMove")
 	local gameResult = meta:get_string("gameResult")
 	local grReason  = meta:get_string("gameResultReason")
+	local mode = meta:get_string("mode")
 
 	-- arrow to show whose turn it is
 	local blackArr  = (gameResult == "" and lastMove == "white" and "image[1.2,0.252;0.7,0.7;chess_turn_black.png]") or ""
@@ -1473,7 +1487,7 @@ local function update_formspec(meta)
 		promotion_formstring =
 			"label[10.1,6.35;"..FS("PROMOTION\nFOR BLACK!").."]" ..
 			"animated_image[10.05,7.2;2,2;p_img_white;pawn_black_promo_anim.png;5;100]"
-		if botColor ~= "black" then
+		if botColor ~= "black" and botColor ~= "both" then
 			-- Hide buttons if computer player promotes
 			promotion_formstring = promotion_formstring ..
 			"label[13.15,6.35;"..FS("Promote pawn to:").."]" ..
@@ -1488,7 +1502,7 @@ local function update_formspec(meta)
 		promotion_formstring =
 			"label[10.1,6.35;"..FS("PROMOTION\nFOR WHITE!").."]" ..
 			"animated_image[10.05,7.2;2,2;p_img_white;pawn_white_promo_anim.png;5;100]"
-		if botColor ~= "white" then
+		if botColor ~= "white" and botColor ~= "both" then
 			-- Hide buttons if computer player promotes
 			promotion_formstring = promotion_formstring ..
 			"label[13.15,6.35;"..FS("Promote pawn to:").."]" ..
@@ -1500,7 +1514,7 @@ local function update_formspec(meta)
 	end
 
 	local game_buttons
-	if gameResult == "" and (playerWhite ~= "" and playerBlack ~= "") then
+	if mode ~= "bot_vs_bot" and (gameResult == "" and (playerWhite ~= "" and playerBlack ~= "")) then
 		game_buttons = "button[13.36,0.26;2,0.8;resign;"..FS("Resign").."]"
 	else
 		game_buttons = "button[13.36,0.26;2,0.8;new;"..FS("New game").."]"
@@ -2342,18 +2356,32 @@ local function bot_move(inv, meta)
 	local gameResult = meta:get_string("gameResult")
 	local botColor = meta:get_string("botColor")
 	if botColor == "" then
-		botColor = "black"
+		return
 	end
-	local opponentColor
+	local currentBotColor, opponentColor
+	local botName
 	if botColor == "black" then
+		currentBotColor = "black"
 		opponentColor = "white"
-	else
+		botName = BOT_NAME
+	elseif botColor == "white" then
+		currentBotColor = "white"
 		opponentColor = "black"
+		botName = BOT_NAME
+	elseif botColor == "both" then
+		opponentColor = lastMove
+		if lastMove == "black" or lastMove == "" then
+			currentBotColor = "white"
+			botName = BOT_NAME_1
+		else
+			currentBotColor = "black"
+			botName = BOT_NAME_2
+		end
 	end
-	if (lastMove == opponentColor or (botColor == "white" and lastMove == "")) and gameResult == "" then
+	if (lastMove == opponentColor or ((botColor == "white" or botColor == "both") and lastMove == "")) and gameResult == "" then
 		update_formspec(meta)
 
-		local moves = get_theoretical_moves_for(meta, board_t, botColor)
+		local moves = get_theoretical_moves_for(meta, board_t, currentBotColor)
 
 		local choice_from, choice_to = best_move(moves)
 		if choice_from == nil then
@@ -2367,19 +2395,19 @@ local function bot_move(inv, meta)
 		local board          = board_to_table(inv)
 		local black_king_idx, white_king_idx = locate_kings(board)
 		local bot_king_idx
-		if botColor == "black" then
+		if currentBotColor == "black" then
 			bot_king_idx = black_king_idx
 		else
 			bot_king_idx = white_king_idx
 		end
-		local botAttacked  = attacked(botColor, bot_king_idx, board)
+		local botAttacked  = attacked(currentBotColor, bot_king_idx, board)
 		local kingSafe       = true
 		local bestMoveSaveFrom, bestMoveSaveTo
 
 		if botAttacked then
 			kingSafe = false
-			meta:set_string(botColor.."Attacked", "true")
-			local is_safe, safe_moves = has_king_safe_move(moves, board, botColor)
+			meta:set_string(currentBotColor.."Attacked", "true")
+			local is_safe, safe_moves = has_king_safe_move(moves, board, currentBotColor)
 			if is_safe then
 				bestMoveSaveFrom, bestMoveSaveTo = best_move(safe_moves)
 			end
@@ -2390,19 +2418,23 @@ local function bot_move(inv, meta)
 			if gameResult ~= "" then
 				return
 			end
+			local botColor = meta:get_string("botColor")
+			if botColor == "" then
+				return
+			end
 			local lastMove = meta:get_string("lastMove")
 			local lastMoveTime = meta:get_int("lastMoveTime")
 			if lastMoveTime > 0 or lastMove == "" then
-				if botColor == "black" and meta:get_string("playerBlack") == "" then
-					meta:set_string("playerBlack", BOT_NAME)
-				elseif botColor == "white" and meta:get_string("playerWhite") == "" then
-					meta:set_string("playerWhite", BOT_NAME)
+				if currentBotColor == "black" and meta:get_string("playerBlack") == "" then
+					meta:set_string("playerBlack", botName)
+				elseif currentBotColor == "white" and meta:get_string("playerWhite") == "" then
+					meta:set_string("playerWhite", botName)
 				end
 				local moveOK = false
 				if not kingSafe then
 					-- Make a move to put the king out of check
 					if bestMoveSaveTo ~= nil then
-						moveOK = realchess.move(meta, "board", bestMoveSaveFrom, "board", bestMoveSaveTo, BOT_NAME)
+						moveOK = realchess.move(meta, "board", bestMoveSaveFrom, "board", bestMoveSaveTo, botName)
 						if not moveOK then
 							minetest.log("error", "[xdecor] Chess: Bot tried to make an invalid move (to protect the king) from "..
 								index_to_notation(bestMoveSaveFrom).." to "..index_to_notation(bestMoveSaveTo))
@@ -2412,7 +2444,7 @@ local function bot_move(inv, meta)
 					end
 				else
 					-- Make a regular move
-					moveOK = realchess.move(meta, "board", choice_from, "board", choice_to, BOT_NAME)
+					moveOK = realchess.move(meta, "board", choice_from, "board", choice_to, botName)
 					if not moveOK then
 						minetest.log("error", "[xdecor] Chess: Bot tried to make an invalid move from "..
 							index_to_notation(choice_from).." to "..index_to_notation(choice_to))
@@ -2421,7 +2453,7 @@ local function bot_move(inv, meta)
 				-- Bot resigns if it made an incorrect move
 				if not moveOK then
 					meta:set_string("gameResultReason", "resign")
-					if botColor == "black" then
+					if currentBotColor == "black" then
 						meta:set_string("gameResult", "whiteWon")
 						add_special_to_moves_list(meta, "whiteWon")
 					else
@@ -2439,9 +2471,15 @@ end
 
 local function bot_promote(inv, meta, pawnIndex)
 	minetest.after(BOT_DELAY_MOVE, function()
-		local botColor = meta:get_string("botColor")
+		local lastMove = meta:get_string("lastMove")
+		local color
+		if lastMove == "black" or lastMove == "" then
+			color = "white"
+		else
+			color = "black"
+		end
 		-- Always promote to queen
-		realchess.promote_pawn(meta, botColor, "queen")
+		realchess.promote_pawn(meta, color, "queen")
 	end)
 end
 
@@ -2469,25 +2507,41 @@ function realchess.fields(pos, _, fields, sender)
 	local gameResult    = meta:get_int("gameResult")
 	if fields.quit then return end
 
-	if fields.single_w or fields.single_b or fields.multi then
-		meta:set_string("mode", ((fields.single_w or fields.single_b) and "single" or "multi"))
-		if fields.single_w then
+	if fields.single_w or fields.single_b or fields.multi or fields.bot_vs_bot then
+		if fields.bot_vs_bot then
+			if not CHESS_DEBUG then
+				-- Bot vs Bot only allowed in Chess Debug Mode
+				return
+			end
+			meta:set_string("mode", "bot_vs_bot")
+			meta:set_string("botColor", "both")
+			meta:set_string("playerWhite", BOT_NAME_1)
+			meta:set_string("playerBlack", BOT_NAME_2)
+			local inv = meta:get_inventory()
+			bot_move(inv, meta)
+		elseif fields.single_w then
+			meta:set_string("mode", "single")
 			meta:set_string("botColor", "black")
 			meta:set_string("playerBlack", BOT_NAME)
 		elseif fields.single_b then
+			meta:set_string("mode", "single")
 			meta:set_string("botColor", "white")
 			meta:set_string("playerWhite", BOT_NAME)
 			local inv = meta:get_inventory()
 			bot_move(inv, meta)
+		elseif fields.multi then
+			meta:set_string("mode", "multi")
 		end
 		update_formspec(meta)
 		return
 	end
 
+	local mode = meta:get_string("mode")
 	-- Timeout is 5 min. by default for resetting the game (non-players only)
-	-- Also allow instant reset before White and Black moved
+	-- Also allow instant reset before White and Black moved,
+	-- as well as in Bot vs Bot mode
 	if fields.new then
-		if (playerWhite == playerName or playerBlack == playerName or playerWhite == "" or playerBlack == "") then
+		if mode == "bot_vs_bot" or (playerWhite == playerName or playerBlack == playerName or playerWhite == "" or playerBlack == "") then
 			realchess.init(pos)
 
 		elseif lastMoveTime > 0 then
@@ -2503,7 +2557,7 @@ function realchess.fields(pos, _, fields, sender)
 		return
 	end
 
-	if fields.resign then
+	if fields.resign and mode ~= "bot_vs_bot" then
 		local lastMove = meta:get_string("lastMove")
 		if playerWhite == "" and playerBlack == "" or lastMove == "" then
 			minetest.chat_send_player(playerName, chat_prefix .. S("Resigning is not possible yet."))
@@ -2601,12 +2655,13 @@ function realchess.dig(pos, player)
 	local lastMoveTime  = meta:get_int("lastMoveTime")
 	local playerWhite   = meta:get_string("playerWhite")
 	local playerBlack   = meta:get_string("playerBlack")
+	local botColor      = meta:get_string("botColor")
 
 	-- Timeout is 5 min. by default for digging the chessboard (non-players only)
 	if (lastMoveTime == 0 and minetest.get_gametime() > timeout_limit) then
 		return true
 	else
-		if playerName == playerWhite or playerName == playerBlack then
+		if playerName == playerWhite or playerName == playerBlack or botColor == "both" then
 			minetest.chat_send_player(playerName, chat_prefix ..
 					S("You can't dig the chessboard, a game has been started. " ..
 					"Reset it first or dig it again in @1.",
@@ -2639,8 +2694,10 @@ function realchess.move_piece(meta, pieceFrom, from_list, from_index, to_list, t
 	if botColor == "" then botColor = "black" end
 	local lastMove = meta:get_string("lastMove")
 	if lastMove == "" then lastMove = "black" end
+	local mode = meta:get_string("mode")
+	local gameResult = meta:get_string("gameResult")
 	-- Let the bot play when it its turn
-	if meta:get_string("mode") == "single" and lastMove ~= botColor and meta:get_string("gameResult") == "" then
+	if (mode == "bot_vs_bot" or (mode == "single" and lastMove ~= botColor)) and gameResult == "" then
 		if not promo then
 			bot_move(inv, meta)
 		else
@@ -2730,7 +2787,10 @@ function realchess.promote_pawn(meta, color, promoteTo)
 		if botColor == "" then botColor = "black" end
 		local lastMove = meta:get_string("lastMove")
 		if lastMove == "" then lastMove = "black" end
-		if meta:get_string("mode") == "single" and lastMove ~= botColor and meta:get_string("gameResult") == "" then
+
+		local mode = meta:get_string("mode")
+		local gameResult = meta:get_string("gameResult")
+		if (mode == "bot_vs_bot" or (mode == "single" and lastMove ~= botColor)) and gameResult == "" then
 			bot_move(inv, meta)
 		end
 	else
