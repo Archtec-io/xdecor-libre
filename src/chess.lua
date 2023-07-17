@@ -1,25 +1,17 @@
-local realchess = {}
+-- Init stuff
+if minetest.get_modpath("realchess") ~= nil then
+	-- If the 'realchess' mod was found, don't use any of this mod's Chess code
+	minetest.log("action", "[xdecor] 'realchess' mod detected. Disabling X-Decor-libre's Chess module in favor of realchess")
+	return
+end
+realchess = {}
+local chessbot = dofile(minetest.get_modpath(minetest.get_current_modname()).."/src/chessbot.lua")
+screwdriver = screwdriver or {}
+
+-- Translation init
 local S = minetest.get_translator("xdecor")
 local NS = function(s) return s end
 local FS = function(...) return minetest.formspec_escape(S(...)) end
-local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaque" or false
-
--- Bot names
-local BOT_NAME = NS("Weak Computer")
--- Bot names in Bot vs Bot mode
-local BOT_NAME_1 = NS("Weak Computer 1")
-local BOT_NAME_2 = NS("Weak Computer 2")
--- Delay in seconds for a bot moving a piece (excluding choosing a promotion)
-local BOT_DELAY_MOVE = 1.0
--- Delay in seconds for a bot promoting a piece
-local BOT_DELAY_PROMOTE = 1.0
-
--- Timeout in seconds to allow resetting the game or digging the chessboard.
--- If no move was made for this time, everyone can reset the game
--- and remove the chessboard.
-local TIMEOUT = 300
-
-screwdriver = screwdriver or {}
 
 -- Chess games are disabled because they are currently too broken.
 -- Set this to true to enable this again and try your luck.
@@ -28,6 +20,19 @@ local ENABLE_CHESS_GAMES = true
 -- If true, will show some hidden state for debugging purposes
 -- and enables a "Bot vs Bot" gamemode for testing the bot
 local CHESS_DEBUG = false
+
+-- Bot names
+local BOT_NAME = NS("Weak Computer")
+-- Bot names in Bot vs Bot mode
+local BOT_NAME_1 = NS("Weak Computer 1")
+local BOT_NAME_2 = NS("Weak Computer 2")
+
+-- Timeout in seconds to allow resetting the game or digging the chessboard.
+-- If no move was made for this time, everyone can reset the game
+-- and remove the chessboard.
+local TIMEOUT = 300
+
+local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaque" or false
 
 -- Returns the player name for the given player color.
 -- In case of a bot player, will return a translated
@@ -141,7 +146,7 @@ local function send_message_2(playerName1, playerName2, message, botColor, isDeb
 end
 
 local notation_letters = {'a','b','c','d','e','f','g','h'}
-local function index_to_notation(idx)
+function realchess.index_to_notation(idx)
 	local x, y = index_to_xy(idx)
 	if not x or not y then
 		return "??"
@@ -151,7 +156,7 @@ local function index_to_notation(idx)
 	return xstr .. ystr
 end
 
-local function board_to_table(inv)
+function realchess.board_to_table(inv)
 	local t = {}
 	for i = 1, 64 do
 		t[#t + 1] = inv:get_stack("board", i):get_name()
@@ -180,7 +185,7 @@ local rookThreats   = {false, true,  false, true,  true,  false, true,  false}
 local queenThreats  = {true,  true,  true,  true,  true,  true,  true,  true}
 local kingThreats   = {true,  true,  true,  true,  true,  true,  true,  true}
 
-local function attacked(color, idx, board)
+function realchess.attacked(color, idx, board)
 	local threatDetected = false
 	local kill           = color == "white"
 	local pawnThreats    = {kill, false, kill, false, false, not kill, false, not kill}
@@ -302,7 +307,7 @@ local function en_passant_to_string(double_step)
 		else
 			dsy = dsy + 1
 		end
-		s_en_passant = index_to_notation(xy_to_index(dsx, dsy))
+		s_en_passant = realchess.index_to_notation(xy_to_index(dsx, dsy))
 	end
 	return s_en_passant
 end
@@ -354,7 +359,7 @@ local function can_castle(meta, board, from_list, from_idx, to_idx)
 				-- Check if square of king as well the squares that king must cross and reach
 				-- are NOT attacked
 				for i = from_idx, from_idx + 2 * pc.acheck_dir, pc.acheck_dir do
-					if attacked(kingColor, i, board) then
+					if realchess.attacked(kingColor, i, board) then
 						return false
 					end
 				end
@@ -767,10 +772,10 @@ local function get_theoretical_moves_from(meta, board, from_idx)
 			-- King can't move to any attacked square
 			-- king_board simulates the board with the king moved already.
 			-- Required for the attacked() check to work
-			local king_board = board_to_table(inv)
+			local king_board = realchess.board_to_table(inv)
 			king_board[to_idx] = king_board[from_idx]
 			king_board[from_idx] = ""
-			if attacked(color, to_idx, king_board) then
+			if realchess.attacked(color, to_idx, king_board) then
 				moves[to_idx] = nil
 			else
 				local dx = from_x - to_x
@@ -798,6 +803,7 @@ local function get_theoretical_moves_from(meta, board, from_idx)
 		return {}
 	end
 
+	-- Rate the possible moves depending on its piece value
 	for i in pairs(moves) do
 		local stack_name = board[tonumber(i)]
 		if stack_name ~= "" then
@@ -825,7 +831,7 @@ end
 --   origin_index is the board index for the square to start the piece from (as string)
 --   and this is the key for a list of destination indixes.
 --   r1, r2, r3 ... are numeric values (normally 0) to "rate" this square for the bot.
-local function get_theoretical_moves_for(meta, board, player)
+function realchess.get_theoretical_moves_for(meta, board, player)
 	local moves = {}
 	for i = 1, 64 do
 		local possibleMoves = get_theoretical_moves_from(meta, board, i)
@@ -839,36 +845,7 @@ local function get_theoretical_moves_for(meta, board, player)
 	return moves
 end
 
-local function best_move(moves)
-	local value, choices = 0, {}
-
-	for from, _ in pairs(moves) do
-	for to, val in pairs(_) do
-		if val > value then
-			value = val
-			choices = {{
-				from = from,
-				to = to
-			}}
-		elseif val == value then
-			choices[#choices + 1] = {
-				from = from,
-				to = to
-			}
-		end
-	end
-	end
-
-	if #choices == 0 then
-		return nil
-	end
-	local random = math.random(1, #choices)
-	local choice_from, choice_to = choices[random].from, choices[random].to
-
-	return tonumber(choice_from), choice_to
-end
-
-local function locate_kings(board)
+function realchess.locate_kings(board)
 	local Bidx, Widx
 	for i = 1, 64 do
 		local piece, color = board[i]:match(":(%w+)_(%w+)")
@@ -888,10 +865,10 @@ end
 -- returns true if the player still has at least one move left,
 -- return false otherwise.
 -- 2nd return value is table of save moves
--- * theoretical_moves: moves table returned by get_theoretical_moves_for()
+-- * theoretical_moves: moves table returned by realchess.get_theoretical_moves_for()
 -- * board: board table
 -- * player: player color ("white" or "black")
-local function has_king_safe_move(theoretical_moves, board, player)
+function realchess.has_king_safe_move(theoretical_moves, board, player)
 	local safe_moves = {}
 	-- create a virtual board
 	local v_board = table.copy(board)
@@ -907,7 +884,7 @@ local function has_king_safe_move(theoretical_moves, board, player)
 		-- move the piece on the virtual board
 		v_board[to_idx]   = v_board[from_idx]
 		v_board[from_idx] = ""
-		local black_king_idx, white_king_idx = locate_kings(v_board)
+		local black_king_idx, white_king_idx = realchess.locate_kings(v_board)
 		if not black_king_idx or not white_king_idx then
 			minetest.log("error", "[xdecor] Chess: Insufficient kings on chessboard!")
 			return false
@@ -918,7 +895,7 @@ local function has_king_safe_move(theoretical_moves, board, player)
 		else
 			king_idx = white_king_idx
 		end
-		local playerAttacked = attacked(player, king_idx, v_board)
+		local playerAttacked = realchess.attacked(player, king_idx, v_board)
 		if not playerAttacked then
 			safe_moves[from_idx] = safe_moves[from_idx] or {}
 			safe_moves[from_idx][to_idx] = value
@@ -1421,8 +1398,8 @@ local function get_moves_formstring(meta)
 		end
 		local pieceTo_si_id   = pieceTo ~= "" and get_figurine_id(pieceTo)
 
-		local coordFrom = index_to_notation(from_idx)
-		local coordTo   = index_to_notation(to_idx)
+		local coordFrom = realchess.index_to_notation(from_idx)
+		local coordTo   = realchess.index_to_notation(to_idx)
 
 		if curPlayerIsWhite then
 			move_no = move_no + 1
@@ -1492,7 +1469,7 @@ local verify_eaten_list
 if CHESS_DEBUG then
 	verify_eaten_list = function(meta)
 		local inv = meta:get_inventory()
-		local board = board_to_table(inv)
+		local board = realchess.board_to_table(inv)
 		local whitePiecesLeft = 0
 		local whitePiecesEaten = 0
 		local blackPiecesLeft = 0
@@ -1744,7 +1721,7 @@ end
 
 local function update_game_result(meta)
 	local inv = meta:get_inventory()
-	local board_t = board_to_table(inv)
+	local board_t = realchess.board_to_table(inv)
 
 	local playerWhite = meta:get_string("playerWhite")
 	local playerBlack = meta:get_string("playerBlack")
@@ -1753,8 +1730,8 @@ local function update_game_result(meta)
 	local blackCanMove = false
 	local whiteCanMove = false
 
-	local blackMoves = get_theoretical_moves_for(meta, board_t, "black")
-	local whiteMoves = get_theoretical_moves_for(meta, board_t, "white")
+	local blackMoves = realchess.get_theoretical_moves_for(meta, board_t, "black")
+	local whiteMoves = realchess.get_theoretical_moves_for(meta, board_t, "white")
 	if next(blackMoves) then
 		blackCanMove = true
 	end
@@ -1765,7 +1742,7 @@ local function update_game_result(meta)
 	-- assume lastMove was updated *after* the player moved
 	local lastMove = meta:get_string("lastMove")
 
-	local black_king_idx, white_king_idx = locate_kings(board_t)
+	local black_king_idx, white_king_idx = realchess.locate_kings(board_t)
 	if not black_king_idx or not white_king_idx then
 		minetest.log("error", "[xdecor] Chess: Insufficient kings on chessboard!")
 		return
@@ -1784,10 +1761,10 @@ local function update_game_result(meta)
 
 	-- King attacked? This reduces the list of available moves,
 	-- so remove these, too and check if there are still any left.
-	local isKingAttacked = attacked(checkPlayer, king_idx, board_t)
+	local isKingAttacked = realchess.attacked(checkPlayer, king_idx, board_t)
 	if isKingAttacked then
 		meta:set_string(checkPlayer.."Attacked", "true")
-		local is_safe = has_king_safe_move(checkMoves, board_t, checkPlayer)
+		local is_safe = realchess.has_king_safe_move(checkMoves, board_t, checkPlayer)
 		-- If not safe moves left, player can't move
 		if not is_safe then
 			if checkPlayer == "black" then
@@ -2451,7 +2428,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 		local dy = from_y - to_y
 		local check = true
 		local inv = meta:get_inventory()
-		local board = board_to_table(inv)
+		local board = realchess.board_to_table(inv)
 
 		-- Castling
 		local cc, rook_start, rook_goal, rook_name = can_castle(meta, board, from_list, from_index, to_index)
@@ -2479,17 +2456,17 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 
 	end
 
-	local board       = board_to_table(inv)
+	local board       = realchess.board_to_table(inv)
 	board[to_index]   = board[from_index]
 	board[from_index] = ""
 
-	local black_king_idx, white_king_idx = locate_kings(board)
+	local black_king_idx, white_king_idx = realchess.locate_kings(board)
 	if not black_king_idx or not white_king_idx then
 		minetest.log("error", "[xdecor] Chess: Insufficient kings on chessboard!")
 		return false
 	end
-	local blackAttacked = attacked("black", black_king_idx, board)
-	local whiteAttacked = attacked("white", white_king_idx, board)
+	local blackAttacked = realchess.attacked("black", black_king_idx, board)
+	local whiteAttacked = realchess.attacked("white", white_king_idx, board)
 
 	-- Refuse to move if it would put or leave the own king
 	-- under attack
@@ -2554,138 +2531,19 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 	return true
 end
 
-local function bot_move(inv, meta)
-	local board_t = board_to_table(inv)
-	local lastMove = meta:get_string("lastMove")
-	local gameResult = meta:get_string("gameResult")
-	local botColor = meta:get_string("botColor")
-	if botColor == "" then
-		return
-	end
-	local currentBotColor, opponentColor
-	local botName
-	if botColor == "black" then
-		currentBotColor = "black"
-		opponentColor = "white"
-	elseif botColor == "white" then
-		currentBotColor = "white"
-		opponentColor = "black"
-	elseif botColor == "both" then
-		opponentColor = lastMove
-		if lastMove == "black" or lastMove == "" then
-			currentBotColor = "white"
-		else
-			currentBotColor = "black"
-		end
-	end
-	if currentBotColor == "white" then
-		botName = meta:get_string("playerWhite")
-	else
-		botName = meta:get_string("playerBlack")
-	end
-	if (lastMove == opponentColor or ((botColor == "white" or botColor == "both") and lastMove == "")) and gameResult == "" then
+-- Causes the player ("white" or "blue") to resign
+function realchess.resign(meta, playerColor)
+	if playerColor == "black" then
+		meta:set_string("gameResult", "whiteWon")
+		meta:set_string("gameResultReason", "resign")
+		add_special_to_moves_list(meta, "whiteWon")
 		update_formspec(meta)
-
-		local moves = get_theoretical_moves_for(meta, board_t, currentBotColor)
-
-		local choice_from, choice_to = best_move(moves)
-		if choice_from == nil then
-			-- No best move: stalemate or checkmate
-			return
-		end
-
-		local pieceFrom = inv:get_stack("board", choice_from):get_name()
-		local pieceTo   = inv:get_stack("board", choice_to):get_name()
-
-		local black_king_idx, white_king_idx = locate_kings(board_t)
-		local bot_king_idx
-		if currentBotColor == "black" then
-			bot_king_idx = black_king_idx
-		else
-			bot_king_idx = white_king_idx
-		end
-		local botAttacked  = attacked(currentBotColor, bot_king_idx, board_t)
-		local kingSafe       = true
-		local bestMoveSaveFrom, bestMoveSaveTo
-
-		if botAttacked then
-			kingSafe = false
-			meta:set_string(currentBotColor.."Attacked", "true")
-			local is_safe, safe_moves = has_king_safe_move(moves, board_t, currentBotColor)
-			if is_safe then
-				bestMoveSaveFrom, bestMoveSaveTo = best_move(safe_moves)
-			end
-		end
-
-		minetest.after(BOT_DELAY_MOVE, function()
-			local gameResult = meta:get_string("gameResult")
-			if gameResult ~= "" then
-				return
-			end
-			local botColor = meta:get_string("botColor")
-			if botColor == "" then
-				return
-			end
-			local lastMove = meta:get_string("lastMove")
-			local lastMoveTime = meta:get_int("lastMoveTime")
-			if lastMoveTime > 0 or lastMove == "" then
-				if currentBotColor == "black" and meta:get_string("playerBlack") == "" then
-					meta:set_string("playerBlack", botName)
-				elseif currentBotColor == "white" and meta:get_string("playerWhite") == "" then
-					meta:set_string("playerWhite", botName)
-				end
-				local moveOK = false
-				if not kingSafe then
-					-- Make a move to put the king out of check
-					if bestMoveSaveTo ~= nil then
-						moveOK = realchess.move(meta, "board", bestMoveSaveFrom, "board", bestMoveSaveTo, botName)
-						if not moveOK then
-							minetest.log("error", "[xdecor] Chess: Bot tried to make an invalid move (to protect the king) from "..
-								index_to_notation(bestMoveSaveFrom).." to "..index_to_notation(bestMoveSaveTo))
-						end
-					else
-					-- No safe move left: checkmate or stalemate
-						return
-					end
-				else
-					-- Make a regular move
-					moveOK = realchess.move(meta, "board", choice_from, "board", choice_to, botName)
-					if not moveOK then
-						minetest.log("error", "[xdecor] Chess: Bot tried to make an invalid move from "..
-							index_to_notation(choice_from).." to "..index_to_notation(choice_to))
-					end
-				end
-				-- Bot resigns if it made an incorrect move
-				if not moveOK then
-					meta:set_string("gameResultReason", "resign")
-					if currentBotColor == "black" then
-						meta:set_string("gameResult", "whiteWon")
-						add_special_to_moves_list(meta, "whiteWon")
-					else
-						meta:set_string("gameResult", "blackWon")
-						add_special_to_moves_list(meta, "blackWon")
-					end
-					update_formspec(meta)
-				end
-			end
-		end)
-	else
+	elseif playerColor == "white" then
+		meta:set_string("gameResult", "blackWon")
+		meta:set_string("gameResultReason", "resign")
+		add_special_to_moves_list(meta, "blackWon")
 		update_formspec(meta)
 	end
-end
-
-local function bot_promote(inv, meta, pawnIndex)
-	minetest.after(BOT_DELAY_PROMOTE, function()
-		local lastMove = meta:get_string("lastMove")
-		local color
-		if lastMove == "black" or lastMove == "" then
-			color = "white"
-		else
-			color = "black"
-		end
-		-- Always promote to queen
-		realchess.promote_pawn(meta, color, "queen")
-	end)
 end
 
 local function timeout_format(timeout_limit)
@@ -2725,7 +2583,7 @@ function realchess.fields(pos, _, fields, sender)
 			meta:set_string("playerWhite", "*"..BOT_NAME_1.."*")
 			meta:set_string("playerBlack", "*"..BOT_NAME_2.."*")
 			local inv = meta:get_inventory()
-			bot_move(inv, meta)
+			chessbot.move(inv, meta)
 		elseif fields.single_w then
 			meta:set_string("mode", "single")
 			meta:set_string("botColor", "black")
@@ -2735,7 +2593,7 @@ function realchess.fields(pos, _, fields, sender)
 			meta:set_string("botColor", "white")
 			meta:set_string("playerWhite", "*"..BOT_NAME.."*")
 			local inv = meta:get_inventory()
-			bot_move(inv, meta)
+			chessbot.move(inv, meta)
 		elseif fields.multi then
 			meta:set_string("mode", "multi")
 		end
@@ -2792,13 +2650,10 @@ function realchess.fields(pos, _, fields, sender)
 			whiteWon = true
 		end
 		if winner and loser then
-			meta:set_string("gameResultReason", "resign")
 			if whiteWon then
-				meta:set_string("gameResult", "whiteWon")
-				add_special_to_moves_list(meta, "whiteWon")
+				realchess.resign(meta, "black")
 			else
-				meta:set_string("gameResult", "blackWon")
-				add_special_to_moves_list(meta, "blackWon")
+				realchess.resign(meta, "white")
 			end
 
 			send_message(loser, S("You have resigned."))
@@ -2912,16 +2767,16 @@ function realchess.move_piece(meta, pieceFrom, from_list, from_index, to_list, t
 	-- Let the bot play when it its turn
 	if (mode == "bot_vs_bot" or (mode == "single" and lastMove ~= botColor)) and gameResult == "" then
 		if not promo then
-			bot_move(inv, meta)
+			chessbot.move(inv, meta)
 		else
-			bot_promote(inv, meta, to_index)
+			chessbot.promote(inv, meta, to_index)
 		end
 	end
 end
 
 function realchess.update_state(meta, from_index, to_index, thisMove, promoteFrom, promoteTo)
 	local inv         = meta:get_inventory()
-	local board       = board_to_table(inv)
+	local board       = realchess.board_to_table(inv)
 	local pieceTo     = board[to_index]
 	local pieceFrom   = promoteFrom or board[from_index]
 
@@ -2930,13 +2785,13 @@ function realchess.update_state(meta, from_index, to_index, thisMove, promoteFro
 		board[from_index] = ""
 	end
 
-	local black_king_idx, white_king_idx = locate_kings(board)
+	local black_king_idx, white_king_idx = realchess.locate_kings(board)
 	if not black_king_idx or not white_king_idx then
 		minetest.log("error", "[xdecor] Chess: Insufficient kings on chessboard!")
 		return
 	end
-	local blackAttacked = attacked("black", black_king_idx, board)
-	local whiteAttacked = attacked("white", white_king_idx, board)
+	local blackAttacked = realchess.attacked("black", black_king_idx, board)
+	local whiteAttacked = realchess.attacked("white", white_king_idx, board)
 
 	if blackAttacked then
 		meta:set_string("blackAttacked", "true")
@@ -3004,7 +2859,7 @@ function realchess.promote_pawn(meta, color, promoteTo)
 		local mode = meta:get_string("mode")
 		local gameResult = meta:get_string("gameResult")
 		if (mode == "bot_vs_bot" or (mode == "single" and lastMove ~= botColor)) and gameResult == "" then
-			bot_move(inv, meta)
+			chessbot.move(inv, meta)
 		end
 	else
 		minetest.log("error", "[xdecor] Chess: Could not find pawn to promote!")
