@@ -1245,12 +1245,28 @@ local function get_positions_history(meta)
 		return str
 	end
 
+	-- Record the position no. of the position from which
+	-- all positions before that can be ignored
+	-- when counting same positions.
+	-- This number is updated each time an irreversible
+	-- move is made:
+	-- * pawn move
+	-- * capturing move
+	-- * loss of castling rights
+	-- * loss of (theoretical) en passant availability
+	-- This works cuz when an irreversible move is made,
+	-- it is impossible for this and all positions before
+	-- that to occur again so the "repetition counter"
+	-- for each of these position never increases again.
+	local no_repetitions_before = 1
+
 	local moves_raw = meta:get_string("moves_raw")
 	local moves_split = string.split(moves_raw, ";")
 	local positions_list = ""
 	local board = table.copy(starting_grid)
 	local castling_state = { true, true, true, true }
 	local castling_str = castling_to_string(unpack(castling_state))
+	local pawn_double_step_index
 	positions_list = {}
 
 	local current_player = "w"
@@ -1273,6 +1289,11 @@ local function get_positions_history(meta)
 		else
 			current_player = "w"
 		end
+		-- Reset repetition counter on piece capture
+		if pieceTo ~= "" then
+			no_repetitions_before = m
+		end
+
 		-- Piece movement
 		board[to_idx] = board[from_idx]
 		board[from_idx] = ""
@@ -1291,24 +1312,34 @@ local function get_positions_history(meta)
 				if (from_x == 4 and to_x == 2) then
 					board[60] = board[57]
 					board[57] = ""
+					no_repetitions_before = m
 				elseif (from_x == 4 and to_x == 6) then
 					board[62] = board[64]
 					board[64] = ""
+					no_repetitions_before = m
 				end
 			elseif (from_y == 0 and to_y == 0) then
 				if (from_x == 4 and to_x == 2) then
 					board[4] = board[1]
 					board[1] = ""
+					no_repetitions_before = m
 				elseif (from_x == 4 and to_x == 6) then
 					board[6] = board[8]
 					board[8] = ""
+					no_repetitions_before = m
 				end
 			end
 			-- Lose castling rights on any king move
 			if pieceFrom:find("white") then
+				if castling_state[1] or castling_state[2] then
+					no_repetitions_before = m
+				end
 				castling_state[1] = false
 				castling_state[2] = false
 			else
+				if castling_state[3] or castling_state[4] then
+					no_repetitions_before = m
+				end
 				castling_state[3] = false
 				castling_state[4] = false
 			end
@@ -1317,20 +1348,43 @@ local function get_positions_history(meta)
 		elseif pieceFrom:sub(11,14) == "rook" then
 			if from_idx == 57 then
 				-- white queenside
-				castling_state[2] = false
+				if castling_state[2] then
+					castling_state[2] = false
+					no_repetitions_before = m
+				end
 			elseif from_idx == 64 then
 				-- white kingside
-				castling_state[1] = false
+				if castling_state[1] then
+					castling_state[1] = false
+					no_repetitions_before = m
+				end
 			elseif from_idx == 1 then
 				-- black queenside
-				castling_state[4] = false
+				if castling_state[4] then
+					castling_state[4] = false
+					no_repetitions_before = m
+				end
 			elseif from_idx == 8 then
 				-- black kingside
-				castling_state[3] = false
+				if castling_state[3] then
+					castling_state[3] = false
+					no_repetitions_before = m
+				end
 			end
 		end
 
-		local pawn_double_step_index
+		-- Pawn movement resets repetition counter
+		if pieceFrom:sub(11,14) == "pawn" then
+			no_repetitions_before = m
+		end
+
+		-- Loss of (theoretical) en passant capture availability
+		-- resets repetition counter
+		if pawn_double_step_index then
+			no_repetitions_before = m
+			pawn_double_step_index = nil
+		end
+
 		if pieceTo == "" and pieceFrom:sub(11,14) == "pawn" then
 			-- En passant (remove captured pawn)
 			if from_x ~= to_x then
@@ -1341,7 +1395,7 @@ local function get_positions_history(meta)
 					epp_y = to_y - 1
 				end
 				board[xy_to_index(to_x, epp_y)] = ""
-			-- Double pawn step (record positoin)
+			-- Double pawn step (record pos)
 			elseif math.abs(from_y-to_y) == 2 then
 				pawn_double_step_index = to_idx
 			end
@@ -1356,7 +1410,7 @@ local function get_positions_history(meta)
 	end
 	end
 	local p=#positions_list
-	return positions_list
+	return positions_list, no_repetitions_before
 end
 
 -- Returns the highest number of positions that are repeated
@@ -1364,11 +1418,13 @@ end
 -- Arguments:
 -- * positions: positions history list returned by get_position_history()
 -- * stop_counting_at: stop counting when this many repetitons have been found (optional)
-local function count_repeated_positions(positions, stop_counting_at)
+-- * first_position: index of first position to check (default: 1)
+local function count_repeated_positions(positions, stop_counting_at, first_position)
 	-- Count how often each position occurred
 	local positions_counter = {}
 	local maxRepeatedPositions = 0
-	for p = 1, #positions do
+	first_position = first_position or 1
+	for p = first_position, #positions do
 		local position = positions[p]
 		if positions_counter[position] == nil then
 			positions_counter[position] = 1
@@ -1733,8 +1789,8 @@ local function update_formspec(meta)
 
 		-- "same position has occured 3 times" rule
 		-- Count how often each position occurred
-		local positions = get_positions_history(meta)
-		local maxRepeatedPositions = count_repeated_positions(positions, 3)
+		local positions, first_p = get_positions_history(meta)
+		local maxRepeatedPositions = count_repeated_positions(positions, 3, first_p)
 		if maxRepeatedPositions == 2 then
 			-- If the same position is about to occur 3 times.
 			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw.
@@ -1969,9 +2025,9 @@ local function update_game_result(meta)
 	-- First, generate the position history
 	local forceRepetitionDraw = false
 	local chosenRepetitionDraw = false
-	local positions = get_positions_history(meta)
+	local positions, first_p = get_positions_history(meta)
 	-- Then count the repeated positions
-	local maxRepeatedPositions = count_repeated_positions(positions, 5)
+	local maxRepeatedPositions = count_repeated_positions(positions, 5, first_p)
 	if maxRepeatedPositions >= 3 then
 		chosenRepetitionDraw = true
 	end
@@ -2878,8 +2934,8 @@ function realchess.fields(pos, _, fields, sender)
 			return
 		end
 
-		local positions = get_positions_history(meta)
-		local maxRepeatedPositions = count_repeated_positions(positions, 3)
+		local positions, first_p = get_positions_history(meta)
+		local maxRepeatedPositions = count_repeated_positions(positions, 3, first_p)
 		if maxRepeatedPositions == 2 then
 			meta:set_string("drawClaim", "same_position_3")
 			update_formspec(meta)
