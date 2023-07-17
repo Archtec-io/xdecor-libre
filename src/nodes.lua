@@ -430,7 +430,7 @@ xdecor.register("enderchest", {
 				list[current_player;main;0,5;8,4;]
 				listring[current_player;enderchest]
 				listring[current_player;main] ]]
-				 .. xbg .. default.get_hotbar_bg(0,5))
+				 .. xdecor.xbg .. default.get_hotbar_bg(0,5))
 
 		meta:set_string("infotext", S("Ender Chest"))
 	end

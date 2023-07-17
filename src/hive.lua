@@ -34,7 +34,7 @@ function hive.set_formspec(meta, status)
 			list[current_player;main;0,2.35;8,4;]
 			listring[current_player;main]
 			listring[context;honey] ]] ..
-			xbg .. default.get_hotbar_bg(0,2.35)
+			xdecor.xbg .. default.get_hotbar_bg(0,2.35)
 	meta:set_string("formspec", formspec)
 end
 

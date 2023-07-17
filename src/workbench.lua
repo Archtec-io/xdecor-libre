@@ -123,7 +123,7 @@ local formspecs = {
 function workbench:set_formspec(meta, id)
 	meta:set_string("formspec",
 		"size[8,7;]list[current_player;main;0,3.25;8,4;]" ..
-		formspecs[id] .. xbg .. default.get_hotbar_bg(0,3.25))
+		formspecs[id] .. xdecor.xbg .. default.get_hotbar_bg(0,3.25))
 end
 
 function workbench.construct(pos)

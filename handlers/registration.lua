@@ -1,6 +1,6 @@
 local S = minetest.get_translator("xdecor")
 
-xbg = default.gui_bg .. default.gui_bg_img .. default.gui_slots
+xdecor.xbg = default.gui_bg .. default.gui_bg_img .. default.gui_slots
 local default_inventory_size = 32
 
 local default_inventory_formspecs = {

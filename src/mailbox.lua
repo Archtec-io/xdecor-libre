@@ -80,7 +80,7 @@ function mailbox:formspec(pos, owner, is_owner)
 			"table[6,0.75;3.3,4;givers;" .. giver .. "]" ..
 			"list[nodemeta:" .. spos .. ";mailbox;0,0.75;6,4;]" ..
 			"listring[nodemeta:" .. spos .. ";mailbox]" ..
-			xbg .. default.get_hotbar_bg(0.75, 5.25)
+			xdecor.xbg .. default.get_hotbar_bg(0.75, 5.25)
 	end
 
 	return  "size[8,5]" ..
@@ -90,7 +90,7 @@ function mailbox:formspec(pos, owner, is_owner)
 			minetest.colorize("#FFFF00", owner) or owner)) .. "]" ..
 		"list[nodemeta:" .. spos .. ";drop;3.5,0;1,1;]" ..
 		"listring[]" ..
-		xbg .. default.get_hotbar_bg(0, 1.25)
+		xdecor.xbg .. default.get_hotbar_bg(0, 1.25)
 end
 
 function mailbox.dig(pos, player)
