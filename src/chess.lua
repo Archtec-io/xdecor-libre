@@ -1102,7 +1102,7 @@ local fs_init = [[
 	]]
 	.."bgcolor[#080808BB;true]"
 	.."background[0,0;16,10.7563;chess_bg.png;true]"
-	.."style_type[button,item_image_button;bgcolor=#8f3000]"
+	.."style_type[button,image_button,item_image_button;bgcolor=#8f3000]"
 	.."label[2.2,0.652;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
 	.."label[2.2,10.21;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
 	.."label["..fs_gamemode_x..",1.8;"..FS("Select a mode:").."]"
@@ -1119,7 +1119,7 @@ local fs = [[
 	no_prepend[]
 	bgcolor[#080808BB;true]
 	background[0,0;16,10.7563;chess_bg.png;true]
-	style_type[button,item_image_button;bgcolor=#8f3000]
+	style_type[button,image_button,item_image_button;bgcolor=#8f3000]
 	style_type[list;spacing=0.1;size=0.975]
 	listcolors[#00000000;#00000000;#00000000;#30434C;#FFF]
 	list[context;board;0.47,1.155;8,8;]
@@ -1357,6 +1357,33 @@ local function get_positions_history(meta)
 	end
 	local p=#positions_list
 	return positions_list
+end
+
+-- Returns the highest number of positions that are repeated
+-- in the given positions history list.
+-- Arguments:
+-- * positions: positions history list returned by get_position_history()
+-- * stop_counting_at: stop counting when this many repetitons have been found (optional)
+local function count_repeated_positions(positions, stop_counting_at)
+	-- Count how often each position occurred
+	local positions_counter = {}
+	local maxRepeatedPositions = 0
+	for p = 1, #positions do
+		local position = positions[p]
+		if positions_counter[position] == nil then
+			positions_counter[position] = 1
+		else
+			positions_counter[position] = positions_counter[position] + 1
+		end
+
+		if positions_counter[position] > maxRepeatedPositions then
+			maxRepeatedPositions = positions_counter[position]
+		end
+		if stop_counting_at and maxRepeatedPositions >= stop_counting_at then
+			break
+		end
+	end
+	return maxRepeatedPositions
 end
 
 -- Create the full formspec string for the sequence of moves.
@@ -1673,12 +1700,53 @@ local function update_formspec(meta)
 		end
 	end
 
-	local game_buttons
-	if mode ~= "bot_vs_bot" and (gameResult == "" and (playerWhite ~= "" and playerBlack ~= "")) then
-		game_buttons = "button[13.36,0.26;2,0.8;resign;"..FS("Resign").."]"
-	else
-		game_buttons = "button[13.36,0.26;2,0.8;new;"..FS("New game").."]"
+	-- Resign / Start new game
+	local game_buttons = ""
+	game_buttons = game_buttons .. "button[13.36,0.26;2,0.8;new;"..FS("New game").."]"
+
+	local playerActionsAvailable = mode ~= "bot_vs_bot" and gameResult == ""
+
+	if playerActionsAvailable and (playerWhite ~= "" and playerBlack ~= "") then
+		game_buttons = game_buttons .. "image_button[14.56,9.7;0.8,0.8;chess_resign.png;resign;]" ..
+			"tooltip[resign;"..FS("Resign").."]"
 	end
+
+	if playerActionsAvailable then
+		-- 50-move rule
+		local halfmoveClock = meta:get_int("halfmoveClock")
+		if halfmoveClock == 99 then
+			-- when the 50 moves without capture / pawn move is about to occur
+			game_buttons = game_buttons .. "image_button[13.36,9.7;0.8,0.8;chess_draw_50move_next.png;draw_50_moves;]"..
+				"tooltip[draw_50_moves;"..
+				FS("Invoke the 50-move rule and try to draw the game in your next move.").."\n"..
+				FS("If your next move is the 50th consecutive move of both players where no pawn moved and no piece was captured, the game will be drawn.").."]"
+		elseif halfmoveClock >= 100 then
+			-- when the 50 moves without capture / pawn move have occured occur
+			game_buttons = game_buttons .. "image_button[13.36,9.7;0.8,0.8;chess_draw_50move.png;draw_50_moves;]"..
+				"tooltip[draw_50_moves;"..
+				FS("Invoke the 50-move rule and draw the game.").."\n"..
+				FS("(In the last 50 moves of both players, no pawn moved and no piece was captured.)").."]"
+		end
+
+		-- "same position has occured 3 times" rule
+		-- Count how often each position occurred
+		local positions = get_positions_history(meta)
+		local maxRepeatedPositions = count_repeated_positions(positions, 3)
+		if maxRepeatedPositions == 2 then
+			-- If the same position is about to occur 3 times
+			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3_next.png;draw_repeat_3;]"..
+				"tooltip[draw_repeat_3;"..
+				FS("Invoke the 'same position' rule and try to draw the game in your next move.").."\n"..
+				S("If your next move causes the same position to occur a 3rd time, the game will be drawn.").."]"
+		elseif maxRepeatedPositions >= 3 then
+			-- If the same position has already occured 3 times
+			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3.png;draw_repeat_3;]"..
+				"tooltip[draw_repeat_3;"..
+				FS("Invoke the 'same position' rule and draw the game.").."\n"..
+				S("(The same position has occured 3 times.)").."]"
+		end
+	end
+
 
 	local debug_formstring = ""
 	if CHESS_DEBUG then
@@ -1711,7 +1779,7 @@ local function update_formspec(meta)
 		local d_fullmove = tostring(get_current_fullmove(meta) + 1)
 
 		local debug_str = d_turn .. " " .. d_castling .. " " .. d_en_passant .. " " .. d_halfmove_clock .. " " .. d_fullmove
-		debug_formstring = "label[9.9,10.2;DEBUG: "..debug_str.."]"
+		debug_formstring = "label[6.9,10.2;DEBUG: "..debug_str.."]"
 	end
 
 	local formspec = fs ..
@@ -1854,28 +1922,15 @@ local function update_game_result(meta)
 	-- First, generate the position history
 	local forceRepetitionDraw = false
 	local positions = get_positions_history(meta)
-	local positions_counter = {}
-	-- Count how often each position occurred
-	for p = 1, #positions do
-		local position = positions[p]
-		if positions_counter[position] == nil then
-			positions_counter[position] = 1
-		else
-			positions_counter[position] = positions_counter[position] + 1
-		end
-
-		if positions_counter[position] == 5 then
-			forceRepetitionDraw = true
-			break
-		end
+	-- Then count the repeated positions
+	local maxRepeatedPositions = count_repeated_positions(positions, 5)
+	if maxRepeatedPositions >= 5 then
+		forceRepetitionDraw = true
 	end
 	if CHESS_DEBUG then
-		-- Show message if last position occurred at least 2 times
+		-- Show last position
 		local last_position = positions[#positions]
 		local msg = "Current position: \"" .. last_position .. "\""
-		if positions_counter[last_position] >= 2 then
-			msg = msg .. " (occurred "..positions_counter[last_position].." times)"
-		end
 		send_message_2(playerWhite, playerBlack, msg, botColor)
 
 		-- Compare the last position with the actual chessboard
@@ -2673,6 +2728,98 @@ function realchess.fields(pos, _, fields, sender)
 			update_formspec(meta)
 		else
 			send_message(playerName, S("You can't resign, you're not playing in this game."))
+		end
+		return
+	end
+
+	-- Claim or declare draw via the 50-move rule
+	if fields.draw_50_moves then
+		local botColor = meta:get_string("botColor")
+		local lastMove = meta:get_string("lastMove")
+		if playerWhite == "" and playerBlack == "" or lastMove == "" then
+			return
+		end
+		local currentPlayer
+		if lastMove == "black" or lastMove == "" then
+			currentPlayer = "white"
+		else
+			currentPlayer = "black"
+		end
+
+		local claimer, other
+		if (currentPlayer == "white" and playerWhite == playerName) then
+			claimer = playerWhite
+			other = playerBlack
+		elseif (currentPlayer == "black" and playerBlack == playerName) then
+			claimer = playerBlack
+			other = playerWhite
+		else
+			send_message(playerName, S("You can't claim a draw, it's not your turn!"))
+			return
+		end
+
+		local halfmoveClock = meta:get_int("halfmoveClock")
+		if halfmoveClock == 99 then
+			send_message(claimer, S("<not implemented>"), botColor)
+		elseif halfmoveClock >= 100 then
+			meta:set_string("gameResult", "draw")
+			meta:set_string("gameResultReason", "50_move_rule")
+			add_special_to_moves_list(meta, "draw")
+			update_formspec(meta)
+			send_message(claimer, S("You have drawn the game by applying the 50-move rule."), botColor)
+			if claimer ~= other then
+				send_message(other, S("@1 has drawn the game by applying the 50-move rule.", claimer), botColor)
+			end
+			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has applied the 50-move rule")
+		else
+			send_message(claimer, S("Your draw claim is invalid!"), botColor)
+		end
+
+		return
+	end
+
+	-- Claim or declare draw via the same position rule (same position occured >= 3 times)
+	if fields.draw_repeat_3 then
+		local botColor = meta:get_string("botColor")
+		local lastMove = meta:get_string("lastMove")
+		if playerWhite == "" and playerBlack == "" or lastMove == "" then
+			return
+		end
+		local currentPlayer
+		if lastMove == "black" or lastMove == "" then
+			currentPlayer = "white"
+		else
+			currentPlayer = "black"
+		end
+
+		local claimer, other
+		if (currentPlayer == "white" and playerWhite == playerName) then
+			claimer = playerWhite
+			other = playerBlack
+		elseif (currentPlayer == "black" and playerBlack == playerName) then
+			claimer = playerBlack
+			other = playerWhite
+		else
+			send_message(playerName, S("You can't claim a draw, it's not your turn!"))
+			return
+		end
+
+		local positions = get_positions_history(meta)
+		local maxRepeatedPositions = count_repeated_positions(positions, 3)
+		if maxRepeatedPositions == 2 then
+			send_message(claimer, S("<not implemented>"), botColor)
+		elseif maxRepeatedPositions >= 3 then
+			meta:set_string("gameResult", "draw")
+			meta:set_string("gameResultReason", "same_position_3")
+			add_special_to_moves_list(meta, "draw")
+			update_formspec(meta)
+			send_message(claimer, S("You have drawn the game by applying the same position rule."), botColor)
+			if claimer ~= other then
+				send_message(other, S("@1 has drawn the game by applying the same position rule.", claimer), botColor)
+			end
+			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has applied the same position rule")
+		else
+			send_message(claimer, S("Your draw claim is invalid!"), botColor)
 		end
 		return
 	end
