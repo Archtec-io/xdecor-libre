@@ -3,12 +3,17 @@ local S = minetest.get_translator("xdecor")
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaque" or false
 
+-- Bot names
 -- Note: Asterisks added to avoid confusion with a player name
 -- because asterisks are forbidden in player names.
+-- Bot name if playing against a player
 local BOT_NAME = "*"..S("Weak Computer").."*"
+-- Bot names in Bot vs Bot mode
 local BOT_NAME_1 = "*"..S("Weak Computer 1").."*"
 local BOT_NAME_2 = "*"..S("Weak Computer 2").."*"
+-- Delay in seconds for a bot moving a piece (excluding choosing a promotion)
 local BOT_DELAY_MOVE = 1.0
+-- Delay in seconds for a bot promoting a piece
 local BOT_DELAY_PROMOTE = 1.0
 
 screwdriver = screwdriver or {}
@@ -1039,7 +1044,7 @@ local fs_init = [[
 	.."button["..fs_gamemode_x.."10.2,2.95;2.5,0.8;single_b;"..FS("Singleplayer (black)").."]"
 	.."button["..fs_gamemode_x.."10.2,4.1;2.5,0.8;multi;"..FS("Multiplayer").."]"
 	if CHESS_DEBUG then
-		fs_init = fs_init .."button["..(gamemode_x+2.5)..",2.1;2.5,0.8;bot_vs_bot;"..FS("Bot vs Bot").."]"
+		fs_init = fs_init .."button["..(fs_gamemode_x+2.5)..",2.1;2.5,0.8;bot_vs_bot;"..FS("Bot vs Bot").."]"
 	end
 
 local fs = [[
@@ -1375,13 +1380,63 @@ local function get_moves_formstring(meta)
 	return moves_out, move_no
 end
 
-local function add_to_eaten_list(meta, pieceTo)
-	local eaten = meta:get_string("eaten")
-	if pieceTo ~= "" then
-		local pieceTo_s = pieceTo:match(":(%w+_%w+)") or ""
-		eaten = eaten .. pieceTo_s .. ","
+-- Verify eaten list
+local verify_eaten_list
+if CHESS_DEBUG then
+	verify_eaten_list = function(meta, board)
+		local whitePiecesLeft = 0
+		local whitePiecesEaten = 0
+		local blackPiecesLeft = 0
+		local blackPiecesEaten = 0
+		for b=1, 64 do
+			local piece = board[b]
+			if piece:find("white") then
+				whitePiecesLeft = whitePiecesLeft + 1
+			elseif piece:find("black") then
+				blackPiecesLeft = blackPiecesLeft + 1
+			end
+		end
+		local eaten = meta:get_string("eaten")
+		local eaten_split = string.split(eaten, ",")
+		for e=1, #eaten_split do
+			local piece = eaten_split[e]
+			if piece:find("white") then
+				whitePiecesEaten = whitePiecesEaten + 1
+			elseif piece:find("black") then
+				blackPiecesEaten = blackPiecesEaten + 1
+			end
+		end
+		local eatenError = false
+		if whitePiecesLeft + whitePiecesEaten ~= 16 then
+			minetest.log("error", "[xdecor] Chess: Incorrect number of white pieces in eaten list! pieces="..whitePiecesLeft.."; eaten="..whitePiecesEaten)
+			eatenError = true
+		elseif blackPiecesLeft + blackPiecesEaten ~= 16 then
+			minetest.log("error", "[xdecor] Chess: Incorrect number of black pieces in eaten list! pieces="..blackPiecesLeft.."; eaten="..blackPiecesEaten)
+			eatenError = true
+		end
+		if eatenError then
+			-- halt bots
+			local mode = meta:get_string("mode")
+			if mode == "bot_vs_bot" then
+				meta:set_string("botColor", "")
+			end
+		end
 	end
-	meta:set_string("eaten", eaten)
+end
+
+local function add_to_eaten_list(meta, pieceTo, board)
+	if pieceTo ~= "" then
+		local eaten = meta:get_string("eaten")
+		if eaten ~= "" then
+			eaten = eaten .. ","
+		end
+		local pieceTo_s = pieceTo:match(":(%w+_%w+)") or ""
+		eaten = eaten .. pieceTo_s
+		meta:set_string("eaten", eaten)
+		if CHESS_DEBUG then
+			verify_eaten_list(meta, board)
+		end
+	end
 end
 
 local function get_eaten_formstring(meta)
@@ -2745,7 +2800,7 @@ function realchess.update_state(meta, from_index, to_index, thisMove, promoteFro
 		special = "promo__"..promoteTo
 	end
 	add_move_to_moves_list(meta, pieceFrom, pieceTo, from_index, to_index, special)
-	add_to_eaten_list(meta, pieceTo)
+	add_to_eaten_list(meta, pieceTo, board)
 end
 
 function realchess.promote_pawn(meta, color, promoteTo)
