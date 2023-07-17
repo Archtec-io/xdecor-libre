@@ -1383,7 +1383,9 @@ end
 -- Verify eaten list
 local verify_eaten_list
 if CHESS_DEBUG then
-	verify_eaten_list = function(meta, board)
+	verify_eaten_list = function(meta)
+		local inv = meta:get_inventory()
+		local board = board_to_table(inv)
 		local whitePiecesLeft = 0
 		local whitePiecesEaten = 0
 		local blackPiecesLeft = 0
@@ -1424,17 +1426,22 @@ if CHESS_DEBUG then
 	end
 end
 
-local function add_to_eaten_list(meta, pieceTo, board)
-	if pieceTo ~= "" then
+-- Reports that a piece was "eaten" (=captured).
+-- Must be called right after the board inventory was updated
+-- on which the piece is already removed
+-- * meta: Chessboard node metadata
+-- * piece: The itemname of the piece that was captured
+local function add_to_eaten_list(meta, piece)
+	if piece ~= "" then
 		local eaten = meta:get_string("eaten")
 		if eaten ~= "" then
 			eaten = eaten .. ","
 		end
-		local pieceTo_s = pieceTo:match(":(%w+_%w+)") or ""
-		eaten = eaten .. pieceTo_s
+		local piece_s = piece:match(":(%w+_%w+)") or ""
+		eaten = eaten .. piece_s
 		meta:set_string("eaten", eaten)
 		if CHESS_DEBUG then
-			verify_eaten_list(meta, board)
+			verify_eaten_list(meta)
 		end
 	end
 end
@@ -2358,6 +2365,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 	if pieceTo ~= "" then
 		resetHalfmoveClock = true
 	end
+
 	-- The halfmove clock counts the number of consecutive halfmoves
 	-- in which neither a pawn was moved nor a piece was captured.
 	if resetHalfmoveClock then
@@ -2367,7 +2375,10 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 	end
 
 	if en_passant_target then
+		-- Capture pawn en passant
+		local capturedPiece = inv:get_stack(to_list, en_passant_target):get_name()
 		inv:set_stack(to_list, en_passant_target, "")
+		add_to_eaten_list(meta, capturedPiece)
 	end
 
 	if kingMoved and thisMove == "white" then
@@ -2736,8 +2747,16 @@ end
 -- Will also update the state for the Chessboard.
 function realchess.move_piece(meta, pieceFrom, from_list, from_index, to_list, to_index)
 	local inv = meta:get_inventory()
+	local pieceTo = inv:get_stack(to_list, to_index):get_name()
+
+	-- Update inventory slots
 	inv:set_stack(from_list, from_index, "")
 	inv:set_stack(to_list, to_index, pieceFrom)
+
+	-- Report the eaten piece
+	if pieceTo ~= "" then
+		add_to_eaten_list(meta, pieceTo)
+	end
 
 	local promo = meta:get_string("promotionActive") ~= ""
 	if not promo then
@@ -2800,7 +2819,6 @@ function realchess.update_state(meta, from_index, to_index, thisMove, promoteFro
 		special = "promo__"..promoteTo
 	end
 	add_move_to_moves_list(meta, pieceFrom, pieceTo, from_index, to_index, special)
-	add_to_eaten_list(meta, pieceTo, board)
 end
 
 function realchess.promote_pawn(meta, color, promoteTo)
