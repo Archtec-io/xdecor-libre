@@ -256,6 +256,7 @@ xdecor.register("workbench", {
 	description = S("Work Bench"),
 	_tt_help = S("For cutting blocks, repairing tools with a hammer, crafting and storing items"),
 	groups = {cracky = 2, choppy = 2, oddly_breakable_by_hand = 1},
+	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
 	tiles = {
 		"xdecor_workbench_top.png","xdecor_workbench_top.png",
@@ -369,6 +370,7 @@ for i = 1, #nodes do
 			tiles = tiles_special_cut,
 			use_texture_alpha = def.use_texture_alpha,
 			groups = groups,
+			is_ground_content = def.is_ground_content,
 			node_box = xdecor.pixelbox(16, d[3]),
 			sunlight_propagates = true,
 			on_place = minetest.rotate_node

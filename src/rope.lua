@@ -86,6 +86,7 @@ xdecor.register("rope", {
 	walkable = false,
 	climbable = true,
 	groups = {dig_immediate = 3, flammable = 3},
+	is_ground_content = false,
 	tiles = {"xdecor_rope.png"},
 	inventory_image = "xdecor_rope_inv.png",
 	wield_image = "xdecor_rope_inv.png",

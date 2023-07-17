@@ -229,6 +229,7 @@ xdecor.register("enchantment_table", {
 		"xdecor_enchantment_side.png", "xdecor_enchantment_side.png"
 	},
 	groups = {cracky = 1, level = 1},
+	is_ground_content = false,
 	light_source = 6,
 	sounds = default.node_sound_stone_defaults(),
 	on_rotate = screwdriver.rotate_simple,

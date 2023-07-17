@@ -2889,6 +2889,7 @@ local chessboarddef = {
 	tiles = {"chessboard_top.png", "chessboard_top.png", "chessboard_sides.png"},
 	use_texture_alpha = ALPHA_OPAQUE,
 	groups = {choppy=3, oddly_breakable_by_hand=2, flammable=3},
+	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
 	node_box = {type = "fixed", fixed = {-.375, -.5, -.375, .375, -.4375, .375}},
 	sunlight_propagates = true,

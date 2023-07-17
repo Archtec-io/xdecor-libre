@@ -160,6 +160,7 @@ xdecor.register("itemframe", {
 	description = S("Item Frame"),
 	_tt_help = S("For presenting a single item"),
 	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3},
+	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
 	on_rotate = screwdriver.disallow,
 	sunlight_propagates = true,

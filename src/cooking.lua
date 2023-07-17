@@ -245,6 +245,7 @@ xdecor.register("cauldron_empty", {
 	description = S("Cauldron"),
 	_tt_help = S("For storing water and cooking soup"),
 	groups = {cracky=2, oddly_breakable_by_hand=1,cauldron=1},
+	is_ground_content = false,
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {"xdecor_cauldron_top_empty.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
@@ -261,6 +262,7 @@ xdecor.register("cauldron_empty", {
 xdecor.register("cauldron_idle", {
 	description = S("Cauldron with Water (cold)"),
 	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1,cauldron=2},
+	is_ground_content = false,
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {"xdecor_cauldron_top_idle.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
@@ -274,6 +276,7 @@ xdecor.register("cauldron_idle", {
 xdecor.register("cauldron_idle_river_water", {
 	description = S("Cauldron with River Water (cold)"),
 	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1,cauldron=2},
+	is_ground_content = false,
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {"xdecor_cauldron_top_idle_river_water.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
@@ -287,6 +290,7 @@ xdecor.register("cauldron_idle_river_water", {
 xdecor.register("cauldron_idle_soup", {
 	description = S("Cauldron with Soup (cold)"),
 	groups = {cracky = 2, oddly_breakable_by_hand = 1, not_in_creative_inventory = 1,cauldron=2},
+	is_ground_content = false,
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
 	tiles = {"xdecor_cauldron_top_idle_soup.png", "xdecor_cauldron_sides.png"},
@@ -307,6 +311,7 @@ xdecor.register("cauldron_idle_soup", {
 xdecor.register("cauldron_boiling", {
 	description = S("Cauldron with Water (boiling)"),
 	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1,cauldron=3},
+	is_ground_content = false,
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
 	damage_per_second = 2,
@@ -330,6 +335,7 @@ xdecor.register("cauldron_boiling", {
 xdecor.register("cauldron_boiling_river_water", {
 	description = S("Cauldron with River Water (boiling)"),
 	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1,cauldron=3},
+	is_ground_content = false,
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
 	damage_per_second = 2,
@@ -355,6 +361,7 @@ xdecor.register("cauldron_boiling_river_water", {
 xdecor.register("cauldron_soup", {
 	description = S("Cauldron with Soup (boiling)"),
 	groups = {cracky = 2, oddly_breakable_by_hand = 1, not_in_creative_inventory = 1,cauldron=3},
+	is_ground_content = false,
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
 	damage_per_second = 2,

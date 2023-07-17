@@ -126,6 +126,7 @@ xdecor.register("hive", {
 		 "xdecor_hive_side.png", "xdecor_hive_side.png",
 		 "xdecor_hive_side.png", "xdecor_hive_front.png"},
 	groups = {choppy=3, oddly_breakable_by_hand=2, flammable=1},
+	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
 	on_construct = hive.construct,
 	on_timer = hive.timer,
