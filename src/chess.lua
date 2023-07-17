@@ -884,37 +884,51 @@ end
 -- Given a table of theoretical moves and the king of the player is attacked,
 -- returns true if the player still has at least one move left,
 -- return false otherwise.
--- 2nd return value ist table of save moves
+-- 2nd return value is table of save moves
 -- * theoretical_moves: moves table returned by get_theoretical_moves_for()
 -- * board: board table
 -- * player: player color ("white" or "black")
 local function has_king_safe_move(theoretical_moves, board, player)
-	local save_moves = {}
-	local s_board = table.copy(board)
+	local safe_moves = {}
+	-- create a virtual board
+	local v_board = table.copy(board)
+
 	for from_idx, _ in pairs(theoretical_moves) do
 	for to_idx, value in pairs(_) do
 		from_idx = tonumber(from_idx)
-		s_board[to_idx]   = s_board[from_idx]
-		s_board[from_idx] = ""
-		local black_king_idx, white_king_idx = locate_kings(s_board)
+
+		-- save the old board values before manipulating them
+		local bak_to = v_board[to_idx]
+		local bak_from = v_board[from_idx]
+
+		-- move the piece on the virtual board
+		v_board[to_idx]   = v_board[from_idx]
+		v_board[from_idx] = ""
+		local black_king_idx, white_king_idx = locate_kings(v_board)
+		if not black_king_idx or not white_king_idx then
+			minetest.log("error", "[xdecor] Chess: Insufficient kings on chessboard!")
+			return false
+		end
 		local king_idx
 		if player == "black" then
 			king_idx = black_king_idx
 		else
 			king_idx = white_king_idx
 		end
-		if king_idx then
-			local playerAttacked = attacked(player, king_idx, s_board)
-			if not playerAttacked then
-				save_moves[from_idx] = save_moves[from_idx] or {}
-				save_moves[from_idx][to_idx] = value
-			end
+		local playerAttacked = attacked(player, king_idx, v_board)
+		if not playerAttacked then
+			safe_moves[from_idx] = safe_moves[from_idx] or {}
+			safe_moves[from_idx][to_idx] = value
 		end
+
+		-- restore the old state of the virtual board
+		v_board[to_idx] = bak_to
+		v_board[from_idx] = bak_from
 	end
 	end
 
-	if next(save_moves) then
-		return true, save_moves
+	if next(safe_moves) then
+		return true, safe_moves
 	else
 		return false
 	end
@@ -1711,15 +1725,11 @@ local function update_game_result(meta)
 
 	local blackMoves = get_theoretical_moves_for(meta, board_t, "black")
 	local whiteMoves = get_theoretical_moves_for(meta, board_t, "white")
-	local b = 0
-	for k,v in pairs(blackMoves) do
+	if next(blackMoves) then
 		blackCanMove = true
-		b = b+1
 	end
-	b = 0
-	for k,v in pairs(whiteMoves) do
+	if next(whiteMoves) then
 		whiteCanMove = true
-		b = b+1
 	end
 
 	-- assume lastMove was updated *after* the player moved
@@ -1727,18 +1737,19 @@ local function update_game_result(meta)
 
 	local black_king_idx, white_king_idx = locate_kings(board_t)
 	if not black_king_idx or not white_king_idx then
+		minetest.log("error", "[xdecor] Chess: Insufficient kings on chessboard!")
 		return
 	end
 
 	local checkPlayer, king_idx, checkMoves
-	if lastMove == "white" then
-		checkPlayer = "black"
-		checkMoves = blackMoves
-		king_idx = black_king_idx
-	else
+	if lastMove == "black" or lastMove == "" then
 		checkPlayer = "white"
 		checkMoves = whiteMoves
 		king_idx = white_king_idx
+	else
+		checkPlayer = "black"
+		checkMoves = blackMoves
+		king_idx = black_king_idx
 	end
 
 	-- King attacked? This reduces the list of available moves,
@@ -2402,6 +2413,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 
 	local black_king_idx, white_king_idx = locate_kings(board)
 	if not black_king_idx or not white_king_idx then
+		minetest.log("error", "[xdecor] Chess: Insufficient kings on chessboard!")
 		return false
 	end
 	local blackAttacked = attacked("black", black_king_idx, board)
@@ -2513,22 +2525,21 @@ local function bot_move(inv, meta)
 		local pieceFrom = inv:get_stack("board", choice_from):get_name()
 		local pieceTo   = inv:get_stack("board", choice_to):get_name()
 
-		local board          = board_to_table(inv)
-		local black_king_idx, white_king_idx = locate_kings(board)
+		local black_king_idx, white_king_idx = locate_kings(board_t)
 		local bot_king_idx
 		if currentBotColor == "black" then
 			bot_king_idx = black_king_idx
 		else
 			bot_king_idx = white_king_idx
 		end
-		local botAttacked  = attacked(currentBotColor, bot_king_idx, board)
+		local botAttacked  = attacked(currentBotColor, bot_king_idx, board_t)
 		local kingSafe       = true
 		local bestMoveSaveFrom, bestMoveSaveTo
 
 		if botAttacked then
 			kingSafe = false
 			meta:set_string(currentBotColor.."Attacked", "true")
-			local is_safe, safe_moves = has_king_safe_move(moves, board, currentBotColor)
+			local is_safe, safe_moves = has_king_safe_move(moves, board_t, currentBotColor)
 			if is_safe then
 				bestMoveSaveFrom, bestMoveSaveTo = best_move(safe_moves)
 			end
@@ -2561,6 +2572,7 @@ local function bot_move(inv, meta)
 								index_to_notation(bestMoveSaveFrom).." to "..index_to_notation(bestMoveSaveTo))
 						end
 					else
+					-- No safe move left: checkmate or stalemate
 						return
 					end
 				else
@@ -2846,6 +2858,7 @@ function realchess.update_state(meta, from_index, to_index, thisMove, promoteFro
 
 	local black_king_idx, white_king_idx = locate_kings(board)
 	if not black_king_idx or not white_king_idx then
+		minetest.log("error", "[xdecor] Chess: Insufficient kings on chessboard!")
 		return
 	end
 	local blackAttacked = attacked("black", black_king_idx, board)
