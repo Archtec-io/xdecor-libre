@@ -1711,17 +1711,20 @@ local function update_formspec(meta)
 			"tooltip[resign;"..FS("Resign").."]"
 	end
 
-	if playerActionsAvailable then
+	local drawClaim = meta:get_string("drawClaim")
+	if playerActionsAvailable and drawClaim == "" then
 		-- 50-move rule
 		local halfmoveClock = meta:get_int("halfmoveClock")
 		if halfmoveClock == 99 then
-			-- when the 50 moves without capture / pawn move is about to occur
+			-- When the 50 moves without capture / pawn move is about to occur.
+			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw
 			game_buttons = game_buttons .. "image_button[13.36,9.7;0.8,0.8;chess_draw_50move_next.png;draw_50_moves;]"..
 				"tooltip[draw_50_moves;"..
 				FS("Invoke the 50-move rule and try to draw the game in your next move.").."\n"..
 				FS("If your next move is the 50th consecutive move of both players where no pawn moved and no piece was captured, the game will be drawn.").."]"
 		elseif halfmoveClock >= 100 then
-			-- when the 50 moves without capture / pawn move have occured occur
+			-- When the 50 moves without capture / pawn move have occured occur.
+			-- Will insta-draw.
 			game_buttons = game_buttons .. "image_button[13.36,9.7;0.8,0.8;chess_draw_50move.png;draw_50_moves;]"..
 				"tooltip[draw_50_moves;"..
 				FS("Invoke the 50-move rule and draw the game.").."\n"..
@@ -1733,20 +1736,40 @@ local function update_formspec(meta)
 		local positions = get_positions_history(meta)
 		local maxRepeatedPositions = count_repeated_positions(positions, 3)
 		if maxRepeatedPositions == 2 then
-			-- If the same position is about to occur 3 times
+			-- If the same position is about to occur 3 times.
+			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw.
 			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3_next.png;draw_repeat_3;]"..
 				"tooltip[draw_repeat_3;"..
 				FS("Invoke the 'same position' rule and try to draw the game in your next move.").."\n"..
-				S("If your next move causes the same position to occur a 3rd time, the game will be drawn.").."]"
+				FS("If your next move causes the same position to occur a 3rd time, the game will be drawn.").."]"
 		elseif maxRepeatedPositions >= 3 then
 			-- If the same position has already occured 3 times
+			-- Will insta-draw.
 			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3.png;draw_repeat_3;]"..
 				"tooltip[draw_repeat_3;"..
 				FS("Invoke the 'same position' rule and draw the game.").."\n"..
-				S("(The same position has occured 3 times.)").."]"
+				FS("(The same position has occured 3 times.)").."]"
 		end
 	end
 
+	local s_draw_claim = ""
+	-- Change interface when in "draw claim" mode to make the move
+	-- that triggers the draw condition
+	if drawClaim == "50_move_rule" then
+		eaten_img = ""
+		s_draw_claim = "" ..
+			"image[13.36,9.7;0.8,0.8;chess_draw_50move_next.png]" ..
+			"tooltip[13.36,9.7;0.8,0.8;"..
+			FS("Draw claim active: 50-move rule").."\n"..
+			FS("If the next move satisfies the 50-move rule, the game is drawn.").."]"
+	elseif drawClaim == "same_position_3" then
+		eaten_img = ""
+		s_draw_claim = "" ..
+			"image[12.36,9.7;0.8,0.8;chess_draw_repeat3_next.png]" ..
+			"tooltip[12.36,9.7;0.8,0.8;"..
+			FS("Draw claim active: Same position").."\n"..
+			FS("If the next move satisfies the same position rule, the game is drawn.").."]"
+	end
 
 	local debug_formstring = ""
 	if CHESS_DEBUG then
@@ -1788,6 +1811,7 @@ local function update_formspec(meta)
 		"label[2.2,10.21;" .. turnWhite .. minetest.formspec_escape(status_white) .. "]" ..
 		whiteArr ..
 		"table[9.9,1.25;5.45,4;moves;" .. moves .. ";"..mlistlen.."]" ..
+		s_draw_claim ..
 		promotion_formstring ..
 		eaten_img ..
 		game_buttons ..
@@ -1906,24 +1930,51 @@ local function update_game_result(meta)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by dead position")
 	end
 
-	-- 75-moves rule. Automatically draw game if the last 75 moves of EACH player (thus 150 halfmoves)
+	-- 50-move rule, after a player issued a draw claim when the halfmove clock was at 99.
+	-- If no pawn moved nor a piece was captured for >= 100 halfmoves, the game is drawn.
+	if meta:get_int("halfmoveClock") >= 100 and meta:get_string("drawClaim") == "50_move_rule" then
+		meta:set_string("drawClaim", "")
+		meta:set_string("gameResult", "draw")
+		meta:set_string("gameResultReason", "50_move_rule")
+		add_special_to_moves_list(meta, "draw")
+		update_formspec(meta)
+		local claimer, other
+		if lastMove == "black" or lastMove == "" then
+			claimer = playerWhite
+			other = playerBlack
+		else
+			claimer = playerBlack
+			other = playerWhite
+		end
+		send_message(claimer, S("You have drawn the game by invoking the 50-move rule."), botColor)
+		if claimer ~= other then
+			send_message(other, S("@1 has drawn the game by invoking the 50-move rule.", claimer), botColor)
+		end
+		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has applied the 50-move rule")
+
+	-- 75-move rule. Automatically draw game if the last 75 moves of EACH player (thus 150 halfmoves)
 	-- neither moved a pawn or captured a piece.
 	-- Important: This rule MUST be checked AFTER checkmate because checkmate takes precedence.
-	if meta:get_int("halfmoveClock") >= 150 then
+	elseif meta:get_int("halfmoveClock") >= 150 then
 		meta:set_string("gameResult", "draw")
-		meta:set_string("gameResultReason", "75_moves_rule")
+		meta:set_string("gameResultReason", "75_move_rule")
 		add_special_to_moves_list(meta, "draw")
 		local msg = S("No piece was captured and no pawn was moved for 75 consecutive moves of each player. It's a draw!")
 		send_message_2(playerWhite, playerBlack, msg, botColor)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw via the 75-move rule")
 	end
 
-	-- Draw if same position appeared 5 times
+	-- Draw if same position appeared >= 5 times
+	-- or if it appeared >= 3 times and the player claimed the draw previously
 	-- First, generate the position history
 	local forceRepetitionDraw = false
+	local chosenRepetitionDraw = false
 	local positions = get_positions_history(meta)
 	-- Then count the repeated positions
 	local maxRepeatedPositions = count_repeated_positions(positions, 5)
+	if maxRepeatedPositions >= 3 then
+		chosenRepetitionDraw = true
+	end
 	if maxRepeatedPositions >= 5 then
 		forceRepetitionDraw = true
 	end
@@ -1979,7 +2030,28 @@ local function update_game_result(meta)
 		local msg = S("The exact same position has occured 5 times. It's a draw!")
 		send_message_2(playerWhite, playerBlack, msg, botColor)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because the same position has appeared 5 times")
+	elseif chosenRepetitionDraw and meta:get_string("drawClaim") == "same_position_3" then
+		meta:set_string("drawClaim", "")
+		meta:set_string("gameResult", "draw")
+		meta:set_string("gameResultReason", "same_position_3")
+		add_special_to_moves_list(meta, "draw")
+		update_formspec(meta)
+		local claimer, other
+		if lastMove == "black" or lastMove == "" then
+			claimer = playerWhite
+			other = playerBlack
+		else
+			claimer = playerBlack
+			other = playerWhite
+		end
+		send_message(claimer, S("You have drawn the game by invoking the same position rule."), botColor)
+		if claimer ~= other then
+			send_message(other, S("@1 has drawn the game by invoking the same position rule.", claimer), botColor)
+		end
+		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has applied the same position rule")
 	end
+
+	meta:set_string("drawClaim", "")
 end
 
 
@@ -1995,6 +2067,7 @@ function realchess.init(pos)
 	meta:set_string("lastMove",    "")
 	meta:set_string("gameResult",  "")
 	meta:set_string("gameResultReason", "")
+	meta:set_string("drawClaim",   "")
 	meta:set_string("blackAttacked", "")
 	meta:set_string("whiteAttacked", "")
 	meta:set_string("promotionActive", "")
@@ -2760,15 +2833,16 @@ function realchess.fields(pos, _, fields, sender)
 
 		local halfmoveClock = meta:get_int("halfmoveClock")
 		if halfmoveClock == 99 then
-			send_message(claimer, S("<not implemented>"), botColor)
+			meta:set_string("drawClaim", "50_move_rule")
+			update_formspec(meta)
 		elseif halfmoveClock >= 100 then
 			meta:set_string("gameResult", "draw")
 			meta:set_string("gameResultReason", "50_move_rule")
 			add_special_to_moves_list(meta, "draw")
 			update_formspec(meta)
-			send_message(claimer, S("You have drawn the game by applying the 50-move rule."), botColor)
+			send_message(claimer, S("You have drawn the game by invoking the 50-move rule."), botColor)
 			if claimer ~= other then
-				send_message(other, S("@1 has drawn the game by applying the 50-move rule.", claimer), botColor)
+				send_message(other, S("@1 has drawn the game by invoking the 50-move rule.", claimer), botColor)
 			end
 			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has applied the 50-move rule")
 		else
@@ -2807,15 +2881,16 @@ function realchess.fields(pos, _, fields, sender)
 		local positions = get_positions_history(meta)
 		local maxRepeatedPositions = count_repeated_positions(positions, 3)
 		if maxRepeatedPositions == 2 then
-			send_message(claimer, S("<not implemented>"), botColor)
+			meta:set_string("drawClaim", "same_position_3")
+			update_formspec(meta)
 		elseif maxRepeatedPositions >= 3 then
 			meta:set_string("gameResult", "draw")
 			meta:set_string("gameResultReason", "same_position_3")
 			add_special_to_moves_list(meta, "draw")
 			update_formspec(meta)
-			send_message(claimer, S("You have drawn the game by applying the same position rule."), botColor)
+			send_message(claimer, S("You have drawn the game by invoking the same position rule."), botColor)
 			if claimer ~= other then
-				send_message(other, S("@1 has drawn the game by applying the same position rule.", claimer), botColor)
+				send_message(other, S("@1 has drawn the game by invoking the same position rule.", claimer), botColor)
 			end
 			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has applied the same position rule")
 		else
