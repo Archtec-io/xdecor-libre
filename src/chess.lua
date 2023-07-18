@@ -1207,8 +1207,8 @@ local function letter_to_piece(letter)
 end
 
 -- Returns a list of all positions so far, for the purposes
--- of determining position equality under the "same position
--- repeated X times" draw rule.
+-- of determining position equality under the
+-- "3-/5-fold repetition" draw rules.
 -- Each possible position is uniquely identified by a string
 -- so equal positions have the same string and unequal positons
 -- have a different string.
@@ -1777,7 +1777,7 @@ local function update_formspec(meta)
 			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw
 			game_buttons = game_buttons .. "image_button[13.36,9.7;0.8,0.8;chess_draw_50move_next.png;draw_50_moves;]"..
 				"tooltip[draw_50_moves;"..
-				FS("Invoke the 50-move rule for the next move.").."\n"..
+				FS("Invoke the 50-move rule for your next move.").."\n"..
 				FS("If invoked and in the next turn, no piece is captured and no pawn is moved, the game will be drawn.").."]"
 		elseif halfmoveClock >= 100 then
 			-- When the 50 moves without capture / pawn move have occured occur.
@@ -1788,7 +1788,7 @@ local function update_formspec(meta)
 				FS("(In the last 50 moves of each player, no pawn moved and no piece was captured.)").."]"
 		end
 
-		-- "same position has occured 3 times" rule
+		-- Threefold repetition rule
 		-- Count how often each position occurred
 		local positions, first_p = get_positions_history(meta)
 		local maxRepeatedPositions, lastOccurred = count_repeated_positions(positions, first_p)
@@ -1797,14 +1797,14 @@ local function update_formspec(meta)
 			-- Will insta-draw.
 			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3.png;draw_repeat_3;]"..
 				"tooltip[draw_repeat_3;"..
-				FS("Invoke the 'same position' rule and draw the game.").."\n"..
+				FS("Invoke the threefold repetition rule and draw the game.").."\n"..
 				FS("(The same position has occured at least 3 times.)").."]"
 		elseif maxRepeatedPositions >= 2 then
-			-- If the same position is about to occur 3 times.
+			-- If the same position may be about to occur 3 times.
 			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw.
 			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3_next.png;draw_repeat_3;]"..
 				"tooltip[draw_repeat_3;"..
-				FS("Invoke the 'same position' rule in your next move.").."\n"..
+				FS("Invoke the threefold repetition rule for your next move.").."\n"..
 				FS("If invoked and the next move repeats a position for a 3rd time, the game will be drawn.").."]"
 		end
 	end
@@ -1824,7 +1824,7 @@ local function update_formspec(meta)
 		s_draw_claim = "" ..
 			"image[12.36,9.7;0.8,0.8;chess_draw_repeat3_next.png]" ..
 			"tooltip[12.36,9.7;0.8,0.8;"..
-			FS("Draw claim active: Same position").."\n"..
+			FS("Draw claim active: Threefold repetition").."\n"..
 			FS("If the next move repeats the same position for a 3rd time, the game is drawn.").."]"
 	end
 
@@ -2080,6 +2080,7 @@ local function update_game_result(meta)
 		end
 	end
 
+	-- fivefold repetition
 	if forceRepetitionDraw then
 		meta:set_string("gameResult", "draw")
 		meta:set_string("gameResultReason", "same_position_5")
@@ -2087,6 +2088,8 @@ local function update_game_result(meta)
 		local msg = S("The exact same position has occured 5 times. It's a draw!")
 		send_message_2(playerWhite, playerBlack, msg, botColor)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because the same position has appeared 5 times")
+
+	-- threefold repetition
 	elseif chosenRepetitionDraw and meta:get_string("drawClaim") == "same_position_3" then
 		meta:set_string("drawClaim", "")
 		meta:set_string("gameResult", "draw")
@@ -2101,11 +2104,11 @@ local function update_game_result(meta)
 			claimer = playerBlack
 			other = playerWhite
 		end
-		send_message(claimer, S("You have drawn the game by invoking the 'same position' rule."), botColor)
+		send_message(claimer, S("You have drawn the game by invoking the threefold repetition rule."), botColor)
 		if claimer ~= other then
-			send_message(other, S("@1 has drawn the game by invoking the 'same position' rule.", claimer), botColor)
+			send_message(other, S("@1 has drawn the game by invoking the threefold repetition rule.", claimer), botColor)
 		end
-		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the 'same position' rule")
+		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the threefold repetition rule")
 	end
 
 	meta:set_string("drawClaim", "")
@@ -2909,7 +2912,7 @@ function realchess.fields(pos, _, fields, sender)
 		return
 	end
 
-	-- Claim or declare draw via the same position rule (same position occured >= 3 times)
+	-- Claim or declare draw via the threefold repetition rule (same position occured >= 3 times)
 	if fields.draw_repeat_3 then
 		local botColor = meta:get_string("botColor")
 		local lastMove = meta:get_string("lastMove")
@@ -2942,11 +2945,11 @@ function realchess.fields(pos, _, fields, sender)
 			meta:set_string("gameResultReason", "same_position_3")
 			add_special_to_moves_list(meta, "draw")
 			update_formspec(meta)
-			send_message(claimer, S("You have drawn the game by invoking the 'same position' rule."), botColor)
+			send_message(claimer, S("You have drawn the game by invoking the threefold repetition rule."), botColor)
 			if claimer ~= other then
-				send_message(other, S("@1 has drawn the game by invoking the 'same position' rule.", claimer), botColor)
+				send_message(other, S("@1 has drawn the game by invoking the threefold repetition rule.", claimer), botColor)
 			end
-			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the 'same position' rule")
+			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the threefold repetition rule")
 		elseif maxRepeatedPositions == 2 then
 			meta:set_string("drawClaim", "same_position_3")
 			update_formspec(meta)
