@@ -1414,32 +1414,33 @@ local function get_positions_history(meta)
 end
 
 -- Returns the highest number of positions that are repeated
--- in the given positions history list.
+-- in the given positions history list as well as the number
+-- of occurrances of the last position.
+--
 -- Arguments:
 -- * positions: positions history list returned by get_position_history()
--- * stop_counting_at: stop counting when this many repetitons have been found (optional)
--- * first_position: index of first position to check (default: 1)
-local function count_repeated_positions(positions, stop_counting_at, first_position)
+-- * first_position_no: index of first position to check (default: 1)
+--
+-- Returns <max. no. of repetitions in history starting from first_position_no>, <no. of repetitions of last position>
+local function count_repeated_positions(positions, first_position_no)
 	-- Count how often each position occurred
 	local positions_counter = {}
 	local maxRepeatedPositions = 0
-	first_position = first_position or 1
-	for p = first_position, #positions do
+	first_position_no = first_position_no or 1
+	for p = first_position_no, #positions do
 		local position = positions[p]
 		if positions_counter[position] == nil then
 			positions_counter[position] = 1
 		else
 			positions_counter[position] = positions_counter[position] + 1
 		end
-
 		if positions_counter[position] > maxRepeatedPositions then
 			maxRepeatedPositions = positions_counter[position]
 		end
-		if stop_counting_at and maxRepeatedPositions >= stop_counting_at then
-			break
-		end
 	end
-	return maxRepeatedPositions
+	local lastPosition = positions[#positions]
+	local lastPositionOccurredTimes = positions_counter[lastPosition] or 0
+	return maxRepeatedPositions, lastPositionOccurredTimes
 end
 
 -- Create the full formspec string for the sequence of moves.
@@ -1790,21 +1791,21 @@ local function update_formspec(meta)
 		-- "same position has occured 3 times" rule
 		-- Count how often each position occurred
 		local positions, first_p = get_positions_history(meta)
-		local maxRepeatedPositions = count_repeated_positions(positions, 3, first_p)
-		if maxRepeatedPositions == 2 then
-			-- If the same position is about to occur 3 times.
-			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw.
-			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3_next.png;draw_repeat_3;]"..
-				"tooltip[draw_repeat_3;"..
-				FS("Invoke the 'same position' rule in your next move.").."\n"..
-				FS("If invoked and the next move repeats a position for a 3rd time, the game will be drawn.").."]"
-		elseif maxRepeatedPositions >= 3 then
+		local maxRepeatedPositions, lastOccurred = count_repeated_positions(positions, first_p)
+		if lastOccurred >= 3 then
 			-- If the same position has already occured 3 times
 			-- Will insta-draw.
 			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3.png;draw_repeat_3;]"..
 				"tooltip[draw_repeat_3;"..
 				FS("Invoke the 'same position' rule and draw the game.").."\n"..
 				FS("(The same position has occured at least 3 times.)").."]"
+		elseif maxRepeatedPositions >= 2 then
+			-- If the same position is about to occur 3 times.
+			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw.
+			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3_next.png;draw_repeat_3;]"..
+				"tooltip[draw_repeat_3;"..
+				FS("Invoke the 'same position' rule in your next move.").."\n"..
+				FS("If invoked and the next move repeats a position for a 3rd time, the game will be drawn.").."]"
 		end
 	end
 
@@ -2027,11 +2028,11 @@ local function update_game_result(meta)
 	local chosenRepetitionDraw = false
 	local positions, first_p = get_positions_history(meta)
 	-- Then count the repeated positions
-	local maxRepeatedPositions = count_repeated_positions(positions, 5, first_p)
-	if maxRepeatedPositions >= 3 then
+	local _, lastOccurred = count_repeated_positions(positions, first_p)
+	if lastOccurred >= 3 then
 		chosenRepetitionDraw = true
 	end
-	if maxRepeatedPositions >= 5 then
+	if lastOccurred >= 5 then
 		forceRepetitionDraw = true
 	end
 	if CHESS_DEBUG then
@@ -2935,11 +2936,8 @@ function realchess.fields(pos, _, fields, sender)
 		end
 
 		local positions, first_p = get_positions_history(meta)
-		local maxRepeatedPositions = count_repeated_positions(positions, 3, first_p)
-		if maxRepeatedPositions == 2 then
-			meta:set_string("drawClaim", "same_position_3")
-			update_formspec(meta)
-		elseif maxRepeatedPositions >= 3 then
+		local maxRepeatedPositions, lastOccurred = count_repeated_positions(positions, first_p)
+		if lastOccurred >= 3 then
 			meta:set_string("gameResult", "draw")
 			meta:set_string("gameResultReason", "same_position_3")
 			add_special_to_moves_list(meta, "draw")
@@ -2949,6 +2947,9 @@ function realchess.fields(pos, _, fields, sender)
 				send_message(other, S("@1 has drawn the game by invoking the 'same position' rule.", claimer), botColor)
 			end
 			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the 'same position' rule")
+		elseif maxRepeatedPositions == 2 then
+			meta:set_string("drawClaim", "same_position_3")
+			update_formspec(meta)
 		else
 			send_message(claimer, S("Your draw claim is invalid!"), botColor)
 		end
