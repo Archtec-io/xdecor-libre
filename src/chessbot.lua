@@ -91,8 +91,8 @@ function chessbot.move(inv, meta)
 		if botAttacked then
 			kingSafe = false
 			meta:set_string(currentBotColor.."Attacked", "true")
-			local is_safe, safe_moves = realchess.has_king_safe_move(moves, board_t, currentBotColor)
-			if is_safe then
+			local safe_moves, save_moves_count = realchess.get_king_safe_move(moves, board_t, currentBotColor)
+			if save_moves_count >= 1 then
 				bestMoveSaveFrom, bestMoveSaveTo = best_move(safe_moves)
 			end
 		end

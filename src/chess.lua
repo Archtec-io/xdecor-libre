@@ -877,15 +877,16 @@ function realchess.locate_kings(board)
 	return Bidx, Widx
 end
 
--- Given a table of theoretical moves and the king of the player is attacked,
--- returns true if the player still has at least one move left,
--- return false otherwise.
--- 2nd return value is table of save moves
+-- Given a table of theoretical moves, returns a table
+-- of moves that are safe for the king, i.e. moves
+-- that neither put or leave the king at risk.
+-- 2nd return value is the number of said safe moves.
 -- * theoretical_moves: moves table returned by realchess.get_theoretical_moves_for()
 -- * board: board table
 -- * player: player color ("white" or "black")
-function realchess.has_king_safe_move(theoretical_moves, board, player)
+function realchess.get_king_safe_move(theoretical_moves, board, player)
 	local safe_moves = {}
+	local safe_moves_count = 0
 	-- create a virtual board
 	local v_board = table.copy(board)
 
@@ -903,7 +904,7 @@ function realchess.has_king_safe_move(theoretical_moves, board, player)
 		local black_king_idx, white_king_idx = realchess.locate_kings(v_board)
 		if not black_king_idx or not white_king_idx then
 			minetest.log("error", "[xdecor] Chess: Insufficient kings on chessboard!")
-			return false
+			return {}, 0
 		end
 		local king_idx
 		if player == "black" then
@@ -915,6 +916,7 @@ function realchess.has_king_safe_move(theoretical_moves, board, player)
 		if not playerAttacked then
 			safe_moves[from_idx] = safe_moves[from_idx] or {}
 			safe_moves[from_idx][to_idx] = value
+			safe_moves_count = safe_moves_count + 1
 		end
 
 		-- restore the old state of the virtual board
@@ -923,11 +925,7 @@ function realchess.has_king_safe_move(theoretical_moves, board, player)
 	end
 	end
 
-	if next(safe_moves) then
-		return true, safe_moves
-	else
-		return false
-	end
+	return safe_moves, safe_moves_count
 end
 
 -- Given a chessboard, checks whether it is in a "dead position",
@@ -1924,9 +1922,9 @@ local function update_game_result(meta)
 	local isKingAttacked = realchess.attacked(checkPlayer, king_idx, board_t)
 	if isKingAttacked then
 		meta:set_string(checkPlayer.."Attacked", "true")
-		local is_safe = realchess.has_king_safe_move(checkMoves, board_t, checkPlayer)
+		local _, save_moves = realchess.get_king_safe_move(checkMoves, board_t, checkPlayer)
 		-- If not safe moves left, player can't move
-		if not is_safe then
+		if save_moves == 0 then
 			if checkPlayer == "black" then
 				blackCanMove = false
 			else
