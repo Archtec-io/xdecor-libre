@@ -1107,7 +1107,6 @@ local fs_init = [[
 	size[16,10.7563;]
 	no_prepend[]
 	]]
-	.."bgcolor[#080808BB;true]"
 	.."background[0,0;16,10.7563;chess_bg.png;true]"
 	.."style_type[button,image_button,item_image_button;bgcolor=#8f3000]"
 	.."label[2.2,0.652;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
@@ -1124,7 +1123,6 @@ local fs = [[
 	formspec_version[2]
 	size[16,10.7563;]
 	no_prepend[]
-	bgcolor[#080808BB;true]
 	background[0,0;16,10.7563;chess_bg.png;true]
 	style_type[button,image_button,item_image_button;bgcolor=#8f3000]
 	style_type[list;spacing=0.1;size=0.975]
