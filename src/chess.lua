@@ -2231,42 +2231,43 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 	local thisMove    -- Will replace lastMove when move is legal
 
 	if pieceFrom:find("white") then
+		if playerWhite ~= "" and playerWhite ~= playerName then
+			send_message(playerName, S("Someone else plays white pieces!"))
+			return false
+		end
+
 		if pieceTo:find("white") then
 			-- Don't replace pieces of same color
 			return false
 		end
 
 		if lastMove == "white" then
-			-- let the other invocation decide in case of a capture
-			return pieceTo == "" and 0 or 1
-		end
-
-		if playerWhite ~= "" and playerWhite ~= playerName then
-			send_message(playerName, S("Someone else plays white pieces!"))
-			return false
+			send_message(playerName, S("It's not your turn!"))
+			return
 		end
 
 		playerWhite = playerName
 		thisMove = "white"
 
 	elseif pieceFrom:find("black") then
+		if playerBlack ~= "" and playerBlack ~= playerName then
+			send_message(playerName, S("Someone else plays black pieces!"))
+			return false
+		end
+
 		if pieceTo:find("black") then
 			-- Don't replace pieces of same color
 			return false
 		end
 
 		if lastMove == "black" then
-			-- let the other invocation decide in case of a capture
-			return false
-		end
-
-		if playerBlack ~= "" and playerBlack ~= playerName then
-			send_message(playerName, S("Someone else plays black pieces!"))
+			send_message(playerName, S("It's not your turn!"))
 			return false
 		end
 
 		if lastMove == "" then
 			-- Nobody has moved yet, and Black cannot move first
+			send_message(playerName, S("Black cannot move first!"))
 			return false
 		end
 
