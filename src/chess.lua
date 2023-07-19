@@ -1110,12 +1110,11 @@ local fs_init = [[
 	.."style_type[button,image_button,item_image_button;bgcolor=#8f3000]"
 	.."label[2.2,0.652;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
 	.."label[2.2,10.21;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
-	.."label["..fs_gamemode_x..",1.8;"..FS("Select a mode:").."]"
-	.."button["..fs_gamemode_x.."10.2,2.1;2.5,0.8;single_w;"..FS("Singleplayer (white)").."]"
-	.."button["..fs_gamemode_x.."10.2,2.95;2.5,0.8;single_b;"..FS("Singleplayer (black)").."]"
-	.."button["..fs_gamemode_x.."10.2,4.1;2.5,0.8;multi;"..FS("Multiplayer").."]"
+	.."label[11.2,1.8;"..FS("Select a mode:").."]"
+	.."button[11,2.1;3,0.8;single;"..FS("Singleplayer").."]"
+	.."button[11,3.1;3,0.8;multi;"..FS("Multiplayer").."]"
 	if CHESS_DEBUG then
-		fs_init = fs_init .."button["..(fs_gamemode_x+2.5)..",2.1;2.5,0.8;bot_vs_bot;"..FS("Bot vs Bot").."]"
+		fs_init = fs_init .."button[11,4.1;3,0.8;bot_vs_bot;"..FS("Bot vs Bot").."]"
 	end
 
 local fs = [[
@@ -1792,6 +1791,15 @@ local function update_formspec(meta)
 	if playerActionsAvailable and (playerWhite ~= "" and playerBlack ~= "") then
 		game_buttons = game_buttons .. "image_button[14.56,9.7;0.8,0.8;chess_resign.png;resign;]" ..
 			"tooltip[resign;"..FS("Resign").."]"
+	end
+
+	-- Let player choose with which to play singleplayer
+	if lastMove == "" and gameResult == "" and mode == "single" and playerWhite == "" then
+		game_buttons = game_buttons .. "label[11.2,1.8;"..FS("Select a color:").."]"
+			.."style[single_black;bgcolor=#000000FF;textcolor=#FFFFFFFF]"
+			.."style[single_white;bgcolor=#FFFFFFFF;textcolor=#000000FF]"
+			.."button[11,2.1;3,0.8;single_white;"..FS("White").."]"
+			.."button[11,3.1;3,0.8;single_black;"..FS("Black").."]"
 	end
 
 	if playerActionsAvailable and drawClaim == "" then
@@ -2747,6 +2755,13 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 
 	if meta:get_string("playerWhite") == "" then
 		meta:set_string("playerWhite", playerWhite)
+		-- If in singleplayer, the player moved a white piece first without
+		-- explicitly selecting a color, interpret this as the player wanting
+		-- to play as white
+		if meta:get_string("mode") == "single" and lastMove == "" and meta:get_string("gameResult") == "" then
+			meta:set_string("playerBlack", "*"..BOT_NAME.."*")
+			meta:set_string("botColor", "black")
+		end
 	elseif meta:get_string("playerBlack") == "" then
 		meta:set_string("playerBlack", playerBlack)
 	end
@@ -2795,7 +2810,7 @@ function realchess.fields(pos, _, fields, sender)
 	local gameResult    = meta:get_int("gameResult")
 	if fields.quit then return end
 
-	if fields.single_w or fields.single_b or fields.multi or fields.bot_vs_bot then
+	if fields.single or fields.multi or fields.bot_vs_bot then
 		if fields.bot_vs_bot then
 			if not CHESS_DEBUG then
 				-- Bot vs Bot only allowed in Chess Debug Mode
@@ -2809,16 +2824,8 @@ function realchess.fields(pos, _, fields, sender)
 			meta:set_string("playerBlack", "*"..BOT_NAME_2.."*")
 			local inv = meta:get_inventory()
 			chessbot.move(inv, meta)
-		elseif fields.single_w then
+		elseif fields.single then
 			meta:set_string("mode", "single")
-			meta:set_string("botColor", "black")
-			meta:set_string("playerBlack", "*"..BOT_NAME.."*")
-		elseif fields.single_b then
-			meta:set_string("mode", "single")
-			meta:set_string("botColor", "white")
-			meta:set_string("playerWhite", "*"..BOT_NAME.."*")
-			local inv = meta:get_inventory()
-			chessbot.move(inv, meta)
 		elseif fields.multi then
 			meta:set_string("mode", "multi")
 		end
@@ -2827,6 +2834,24 @@ function realchess.fields(pos, _, fields, sender)
 	end
 
 	local mode = meta:get_string("mode")
+	-- "Play as White/Black" button in Singleplayer when nobody has moved yet
+	if (fields.single_black or fields.single_white) and mode == "single" and meta:get_string("gameResult") == "" and meta:get_string("lastMove") == "" then
+		if fields.single_white then
+			meta:set_string("botColor", "black")
+			meta:set_string("playerWhite", playerName)
+			meta:set_string("playerBlack", "*"..BOT_NAME.."*")
+			update_formspec(meta)
+		else
+			meta:set_string("botColor", "white")
+			meta:set_string("playerWhite", "*"..BOT_NAME.."*")
+			meta:set_string("playerBlack", playerName)
+			update_formspec(meta)
+			local inv = meta:get_inventory()
+			chessbot.move(inv, meta)
+		end
+		return
+	end
+
 	-- If the game is ongoing and no move was made for TIMEOUT seconds,
 	-- the game can be aborted by everyone.
 	-- Also allow instant reset before White and Black moved,
