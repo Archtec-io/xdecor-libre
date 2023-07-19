@@ -205,7 +205,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "xdecor:stone_tile",
+	output = "xdecor:stone_tile_x",
 	recipe = {
 		{"default:stone_block"},
 	}
@@ -273,7 +273,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "xdecor:wood_tile 2",
+	output = "xdecor:wood_tile_x 2",
 	recipe = {
 		{"", "group:wood", ""},
 		{"group:wood", "", "group:wood"},
@@ -377,7 +377,7 @@ minetest.register_craft({
 })
 minetest.register_craft({
 	type = "fuel",
-	recipe = "xdecor:wood_tile",
+	recipe = "xdecor:wood_tile_x",
 	burntime = 10,
 })
 minetest.register_craft({

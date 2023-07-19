@@ -748,7 +748,7 @@ local function register_hard_node(name, desc, def)
 	def = def or {}
 	xdecor.register(name, {
 		description = desc,
-		tiles = {"xdecor_" .. name .. ".png"},
+		tiles = def.tiles or {"xdecor_" .. name .. ".png"},
 		groups = def.groups or {cracky = 1},
 		is_ground_content = false,
 		sounds = def.sounds or default.node_sound_stone_defaults()
@@ -760,18 +760,28 @@ register_hard_node("coalstone_tile", S("Coal Stone Tile"))
 register_hard_node("desertstone_tile", S("Polished Desert Stone Block"))
 register_hard_node("hard_clay", S("Hardened Clay"))
 register_hard_node("moonbrick", S("Moon Brick"))
-register_hard_node("stone_tile", S("Polished Stone Block"))
 register_hard_node("stone_rune", S("Runestone"))
+
+-- renamed from stone_tile to fix naming collision with moreblocks
+-- mod for the registrations under the 'stairs:' namespace
+register_hard_node("stone_tile_x", S("Polished Stone Block"), {
+	tiles = {"xdecor_stone_tile.png"},
+})
+xdecor.register_moreblocks_aliases("stone_tile", "stone_tile_x")
 
 register_hard_node("packed_ice", S("Packed Ice"), {
 	groups = {cracky = 1, cools_lava = 1, slippery = 3},
 	sounds = default.node_sound_glass_defaults()
 })
 
-register_hard_node("wood_tile", S("Wooden Tile"), {
+-- renamed from wood_tile to fix naming collision with moreblocks
+-- mod for the registrations under the 'stairs:' namespace
+register_hard_node("wood_tile_x", S("Wooden Tile"), {
 	groups = {choppy = 1, wood = 1, flammable = 2},
-	sounds = default.node_sound_wood_defaults()
+	sounds = default.node_sound_wood_defaults(),
+	tiles = {"xdecor_wood_tile.png"},
 })
+xdecor.register_moreblocks_aliases("wood_tile", "wood_tile_x")
 
 xdecor.register("table", {
 	description = S("Table"),

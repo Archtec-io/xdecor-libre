@@ -157,3 +157,24 @@ function xdecor.register(name, def)
 		end
 	end
 end
+
+-- Registers aliases for a node that had a name collision
+-- with a node from the moreblocks mod
+function xdecor.register_moreblocks_aliases(original_basename, new_basename)
+	minetest.register_alias("xdecor:"..original_basename, "xdecor:"..new_basename)
+	minetest.register_alias("xdecor:"..original_basename.."_panel", "xdecor:"..new_basename.."_panel")
+	minetest.register_alias("xdecor:"..original_basename.."_doublepanel", "xdecor:"..new_basename.."_doublepanel")
+	minetest.register_alias("xdecor:"..original_basename.."_micropanel", "xdecor:"..new_basename.."_micropanel")
+	minetest.register_alias("xdecor:"..original_basename.."_halfstair", "xdecor:"..new_basename.."_halfstair")
+	minetest.register_alias("xdecor:"..original_basename.."_thinstair", "xdecor:"..new_basename.."_thinstair")
+	minetest.register_alias("xdecor:"..original_basename.."_cube", "xdecor:"..new_basename.."_cube")
+	minetest.register_alias("xdecor:"..original_basename.."_microslab", "xdecor:"..new_basename.."_microslab")
+	minetest.register_alias("xdecor:"..original_basename.."_nanoslab", "xdecor:"..new_basename.."_nanoslab")
+	if not minetest.get_modpath("moreblocks") then
+		minetest.register_alias("stairs:slab_"..original_basename, "stairs:slab_"..new_basename)
+		minetest.register_alias("stairs:stair_"..original_basename, "stairs:stair_"..new_basename)
+		minetest.register_alias("stairs:stair_outer_"..original_basename, "stairs:stair_outer_"..new_basename)
+		minetest.register_alias("stairs:stair_inner_"..original_basename, "stairs:stair_inner"..new_basename)
+	end
+end
+
