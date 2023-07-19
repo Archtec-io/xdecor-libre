@@ -1452,7 +1452,7 @@ end
 local function get_moves_formstring(meta)
 	local moves_raw = meta:get_string("moves_raw")
 	if moves_raw == "" then
-		return "", 1
+		return "", 0
 	end
 
 	local moves_split = string.split(moves_raw, ";")
@@ -1872,12 +1872,18 @@ local function update_formspec(meta)
 		debug_formstring = "label[6.9,10.2;DEBUG: "..debug_str.."]"
 	end
 
+	local moves_list = ""
+	if mlistlen > 0 then
+		-- Moves list (show only if not empty)
+		moves_list = "table[9.9,1.25;5.45,4;moves;" .. moves .. ";"..mlistlen.."]"
+	end
+
 	local formspec = fs ..
 		"label[2.2,0.652;"  .. turnBlack .. minetest.formspec_escape(status_black) .. "]" ..
 		blackArr ..
 		"label[2.2,10.21;" .. turnWhite .. minetest.formspec_escape(status_white) .. "]" ..
 		whiteArr ..
-		"table[9.9,1.25;5.45,4;moves;" .. moves .. ";"..mlistlen.."]" ..
+		moves_list ..
 		promotion_formstring ..
 		draw_claim_formstring ..
 		eaten_img ..
