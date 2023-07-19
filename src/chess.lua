@@ -884,7 +884,7 @@ end
 -- * theoretical_moves: moves table returned by realchess.get_theoretical_moves_for()
 -- * board: board table
 -- * player: player color ("white" or "black")
-function realchess.get_king_safe_move(theoretical_moves, board, player)
+function realchess.get_king_safe_moves(theoretical_moves, board, player)
 	local safe_moves = {}
 	local safe_moves_count = 0
 	-- create a virtual board
@@ -1917,19 +1917,19 @@ local function update_game_result(meta)
 		king_idx = black_king_idx
 	end
 
-	-- King attacked? This reduces the list of available moves,
-	-- so remove these, too and check if there are still any left.
+	-- King attacked?
 	local isKingAttacked = realchess.attacked(checkPlayer, king_idx, board_t)
 	if isKingAttacked then
 		meta:set_string(checkPlayer.."Attacked", "true")
-		local _, save_moves = realchess.get_king_safe_move(checkMoves, board_t, checkPlayer)
-		-- If not safe moves left, player can't move
-		if save_moves == 0 then
-			if checkPlayer == "black" then
-				blackCanMove = false
-			else
-				whiteCanMove = false
-			end
+	end
+
+	-- If not safe moves left, player can't move
+	local safe_moves, safe_moves_count = realchess.get_king_safe_moves(checkMoves, board_t, checkPlayer)
+	if safe_moves_count == 0 then
+		if checkPlayer == "black" then
+			blackCanMove = false
+		else
+			whiteCanMove = false
 		end
 	end
 

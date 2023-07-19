@@ -66,9 +66,13 @@ function chessbot.move(inv, meta)
 		botName = meta:get_string("playerBlack")
 	end
 	if (lastMove == opponentColor or ((botColor == "white" or botColor == "both") and lastMove == "")) and gameResult == "" then
-		local moves = realchess.get_theoretical_moves_for(meta, board_t, currentBotColor)
 
-		local choice_from, choice_to = best_move(moves)
+		local moves = realchess.get_theoretical_moves_for(meta, board_t, currentBotColor)
+		local safe_moves, safe_moves_count = realchess.get_king_safe_moves(moves, board_t, currentBotColor)
+		if safe_moves_count == 0 then
+			-- No safe move: stalemate or checkmate
+		end
+		local choice_from, choice_to = best_move(safe_moves)
 		if choice_from == nil then
 			-- No best move: stalemate or checkmate
 			return
@@ -76,26 +80,6 @@ function chessbot.move(inv, meta)
 
 		local pieceFrom = inv:get_stack("board", choice_from):get_name()
 		local pieceTo   = inv:get_stack("board", choice_to):get_name()
-
-		local black_king_idx, white_king_idx = realchess.locate_kings(board_t)
-		local bot_king_idx
-		if currentBotColor == "black" then
-			bot_king_idx = black_king_idx
-		else
-			bot_king_idx = white_king_idx
-		end
-		local botAttacked = realchess.attacked(currentBotColor, bot_king_idx, board_t)
-		local kingSafe    = true
-		local bestMoveSaveFrom, bestMoveSaveTo
-
-		if botAttacked then
-			kingSafe = false
-			meta:set_string(currentBotColor.."Attacked", "true")
-			local safe_moves, save_moves_count = realchess.get_king_safe_move(moves, board_t, currentBotColor)
-			if save_moves_count >= 1 then
-				bestMoveSaveFrom, bestMoveSaveTo = best_move(safe_moves)
-			end
-		end
 
 		minetest.after(BOT_DELAY_MOVE, function()
 			local gameResult = meta:get_string("gameResult")
@@ -109,33 +93,20 @@ function chessbot.move(inv, meta)
 			local lastMove = meta:get_string("lastMove")
 			local lastMoveTime = meta:get_int("lastMoveTime")
 			if lastMoveTime > 0 or lastMove == "" then
+				-- Set the bot name if not set already
 				if currentBotColor == "black" and meta:get_string("playerBlack") == "" then
 					meta:set_string("playerBlack", botName)
 				elseif currentBotColor == "white" and meta:get_string("playerWhite") == "" then
 					meta:set_string("playerWhite", botName)
 				end
-				local moveOK = false
-				if not kingSafe then
-					-- Make a move to put the king out of check
-					if bestMoveSaveTo ~= nil then
-						moveOK = realchess.move(meta, "board", bestMoveSaveFrom, "board", bestMoveSaveTo, botName)
-						if not moveOK then
-							minetest.log("error", "[xdecor] Chess: Bot tried to make an invalid move (to protect the king) from "..
-								realchess.index_to_notation(bestMoveSaveFrom).." to "..realchess.index_to_notation(bestMoveSaveTo))
-						end
-					else
-					-- No safe move left: checkmate or stalemate
-						return
-					end
-				else
-					-- Make a regular move
-					moveOK = realchess.move(meta, "board", choice_from, "board", choice_to, botName)
-					if not moveOK then
-						minetest.log("error", "[xdecor] Chess: Bot tried to make an invalid move from "..
-							realchess.index_to_notation(choice_from).." to "..realchess.index_to_notation(choice_to))
-					end
+
+				-- Make a move
+				local moveOK = realchess.move(meta, "board", choice_from, "board", choice_to, botName)
+				if not moveOK then
+					minetest.log("error", "[xdecor] Chess: Bot tried to make an invalid move from "..
+						realchess.index_to_notation(choice_from).." to "..realchess.index_to_notation(choice_to))
 				end
-				-- Bot resigns if it made an incorrect move
+				-- Bot resigns if it tried to make an invalid move
 				if not moveOK then
 					realchess.resign(meta, currentBotColor)
 				end
