@@ -32,7 +32,7 @@ blocks with special features:
       in some food items. Collect the soup with a bowl
 * Lever: Pull the lever to activate doors next to it
 * Pressure Plate: Step on it to activate doors next to it
-* Chessboard: Play Chess against a player or the computer
+* Chessboard: Play Chess against a player or the computer (see `CHESS_RULES.md`)
 
 The radio and speaker are purely decorative and have no special functionality.
 
@@ -101,6 +101,7 @@ Maintenance updates:
 * Add tooltip extensions for some interactive items (uses `tt` mod)
 * Add crafting guide support for `unified_inventory` mod (honey)
 * Rope no longer extends infinitely in Creative Mode
+* Added manual for chess in `CHESS_RULES.md`
 
 #### List of replaced files
 
