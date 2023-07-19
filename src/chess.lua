@@ -2892,10 +2892,7 @@ function realchess.fields(pos, _, fields, sender)
 		end
 
 		local halfmoveClock = meta:get_int("halfmoveClock")
-		if halfmoveClock == 99 then
-			meta:set_string("drawClaim", "50_move_rule")
-			update_formspec(meta)
-		elseif halfmoveClock >= 100 then
+		if halfmoveClock >= 100 then
 			meta:set_string("gameResult", "draw")
 			meta:set_string("gameResultReason", "50_move_rule")
 			add_special_to_moves_list(meta, "draw")
@@ -2906,7 +2903,8 @@ function realchess.fields(pos, _, fields, sender)
 			end
 			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the 50-move rule")
 		else
-			send_message(claimer, S("Your draw claim is invalid!"), botColor)
+			meta:set_string("drawClaim", "50_move_rule")
+			update_formspec(meta)
 		end
 
 		return
@@ -2939,7 +2937,7 @@ function realchess.fields(pos, _, fields, sender)
 		end
 
 		local positions, first_p = get_positions_history(meta)
-		local maxRepeatedPositions, lastOccurred = count_repeated_positions(positions, first_p)
+		local _, lastOccurred = count_repeated_positions(positions, first_p)
 		if lastOccurred >= 3 then
 			meta:set_string("gameResult", "draw")
 			meta:set_string("gameResultReason", "same_position_3")
@@ -2950,11 +2948,9 @@ function realchess.fields(pos, _, fields, sender)
 				send_message(other, S("@1 has drawn the game by invoking the threefold repetition rule.", claimer), botColor)
 			end
 			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the threefold repetition rule")
-		elseif maxRepeatedPositions == 2 then
+		else
 			meta:set_string("drawClaim", "same_position_3")
 			update_formspec(meta)
-		else
-			send_message(claimer, S("Your draw claim is invalid!"), botColor)
 		end
 		return
 	end
