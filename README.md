@@ -32,7 +32,7 @@ blocks with special features:
       in some food items. Collect the soup with a bowl
 * Lever: Pull the lever to activate doors next to it
 * Pressure Plate: Step on it to activate doors next to it
-* Chessboard: Play Chess against a player or the computer (see `CHESS_RULES.md`)
+* Chessboard: Play Chess against a player or the computer (see `CHESS_README.md`)
 
 The radio and speaker are purely decorative and have no special functionality.
 
@@ -71,11 +71,15 @@ The following bugs of X-Decor (as of 01/07/2023) are fixed:
 * Fixed the broken Chess game
 
 Maintenance updates:
-* Chess reworked to comply with FIDE rules (more or less):
-    * En passant added
-    * Can now choose pawn promotion
+* HUGE rework of Chess to make it actually be like real Chess (more or less)
+* New supported Chess rules (based on the FIDE Laws of Chess)
+    * En passant
+    * Choose your pawn promotion
     * Fixed incomplete enforcement of castling rule
-    * Technical UI improvements
+    * 50-turn rule and 75-turn rule
+    * Threefold repetition rule and fivefold repetition rule
+    * Announce the winner or loser, or a drawn game
+* Many technical improvements for Chess
 * Renamed blocks:
     * "Empty Shelf" to "Plain Shelf"
     * "Slide Door" to "Paper Door"
@@ -101,7 +105,7 @@ Maintenance updates:
 * Add tooltip extensions for some interactive items (uses `tt` mod)
 * Add crafting guide support for `unified_inventory` mod (honey)
 * Rope no longer extends infinitely in Creative Mode
-* Added manual for chess in `CHESS_README.md`
+* Added manual for Chess in `CHESS_README.md`
 
 #### List of replaced files
 
