@@ -29,6 +29,13 @@ local ENABLE_CHESS_GAMES = true
 -- and enables a "Bot vs Bot" gamemode for testing the bot
 local CHESS_DEBUG = false
 
+-- Number of consecutive halfmoves in which no pawn was moved
+-- and no piece was captured after which a player can claim a draw.
+local DRAWCLAIM_LONGGAME_PLAYER = 100 -- 50-move rule
+-- Number of consecutive halfmoves in which no pawn was moved
+-- and no piece was captured after which the game draw automatically.
+local DRAWCLAIM_LONGGAME_FORCE = 150 -- 75-move rule
+
 -- Bot names
 local BOT_NAME = NS("Weak Computer")
 -- Bot names in Bot vs Bot mode
@@ -1757,6 +1764,27 @@ local function update_formspec(meta)
 		end
 	end
 
+	local drawClaim = meta:get_string("drawClaim")
+	local draw_claim_formstring = ""
+	if drawClaim ~= "" and gameResult == "" then
+		if lastMove == "black" or lastMove == "" then
+			draw_claim_formstring = "label[10.1,6.35;"..FS("DRAW CLAIM\nBY WHITE!").."]"
+		else
+			draw_claim_formstring = "label[10.1,6.35;"..FS("DRAW CLAIM\nBY BLACK!").."]"
+		end
+		if drawClaim == "50_move_rule" then
+			eaten_img = ""
+			draw_claim_formstring = draw_claim_formstring ..
+				"image[10.05,7.2;2,2;chess_draw_50move_next.png]"..
+				"textarea[13,6.35;2.2,3.2;;;"..FS("The player has invoked the 50-move rule for the next move. The next move might draw the game.").."]"
+		elseif drawClaim == "same_position_3" then
+			eaten_img = ""
+			draw_claim_formstring = draw_claim_formstring ..
+				"image[10.05,7.2;2,2;chess_draw_repeat3_next.png]"..
+				"textarea[13,6.35;2.2,3.2;;;"..FS("The player has invoked the threefold-repetition rule for the next move. The next move might draw the game.").."]"
+		end
+	end
+
 	-- Resign / Start new game
 	local game_buttons = ""
 	game_buttons = game_buttons .. "button[13.36,0.26;2,0.8;new;"..FS("New game").."]"
@@ -1768,24 +1796,21 @@ local function update_formspec(meta)
 			"tooltip[resign;"..FS("Resign").."]"
 	end
 
-	local drawClaim = meta:get_string("drawClaim")
 	if playerActionsAvailable and drawClaim == "" then
 		-- 50-move rule
 		local halfmoveClock = meta:get_int("halfmoveClock")
-		if halfmoveClock == 99 then
+		if halfmoveClock == DRAWCLAIM_LONGGAME_PLAYER - 1 then
 			-- When the 50 moves without capture / pawn move is about to occur.
 			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw
 			game_buttons = game_buttons .. "image_button[13.36,9.7;0.8,0.8;chess_draw_50move_next.png;draw_50_moves;]"..
 				"tooltip[draw_50_moves;"..
-				FS("Invoke the 50-move rule for your next move.").."\n"..
-				FS("If invoked and in the next turn, no piece is captured and no pawn is moved, the game will be drawn.").."]"
-		elseif halfmoveClock >= 100 then
+				FS("Invoke the 50-move rule for your next move").."]"
+		elseif halfmoveClock >= DRAWCLAIM_LONGGAME_PLAYER then
 			-- When the 50 moves without capture / pawn move have occured occur.
 			-- Will insta-draw.
 			game_buttons = game_buttons .. "image_button[13.36,9.7;0.8,0.8;chess_draw_50move.png;draw_50_moves;]"..
 				"tooltip[draw_50_moves;"..
-				FS("Invoke the 50-move rule and draw the game.").."\n"..
-				FS("(In the last 50 moves of each player, no pawn moved and no piece was captured.)").."]"
+				FS("Invoke the 50-move rule and draw the game").."]"
 		end
 
 		-- Threefold repetition rule
@@ -1797,35 +1822,14 @@ local function update_formspec(meta)
 			-- Will insta-draw.
 			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3.png;draw_repeat_3;]"..
 				"tooltip[draw_repeat_3;"..
-				FS("Invoke the threefold repetition rule and draw the game.").."\n"..
-				FS("(The same position has occured at least 3 times.)").."]"
+				FS("Invoke the threefold repetition rule and draw the game").."]"
 		elseif maxRepeatedPositions >= 2 then
 			-- If the same position may be about to occur 3 times.
 			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw.
 			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3_next.png;draw_repeat_3;]"..
 				"tooltip[draw_repeat_3;"..
-				FS("Invoke the threefold repetition rule for your next move.").."\n"..
-				FS("If invoked and the next move repeats a position for a 3rd time, the game will be drawn.").."]"
+				FS("Invoke the threefold repetition rule for your next move").."]"
 		end
-	end
-
-	local s_draw_claim = ""
-	-- Change interface when in "draw claim" mode to make the move
-	-- that triggers the draw condition
-	if drawClaim == "50_move_rule" then
-		eaten_img = ""
-		s_draw_claim = "" ..
-			"image[13.36,9.7;0.8,0.8;chess_draw_50move_next.png]" ..
-			"tooltip[13.36,9.7;0.8,0.8;"..
-			FS("Draw claim active: 50-move rule").."\n"..
-			FS("If no pawn moves and no capture occurs in the next move, the game is drawn.").."]"
-	elseif drawClaim == "same_position_3" then
-		eaten_img = ""
-		s_draw_claim = "" ..
-			"image[12.36,9.7;0.8,0.8;chess_draw_repeat3_next.png]" ..
-			"tooltip[12.36,9.7;0.8,0.8;"..
-			FS("Draw claim active: Threefold repetition").."\n"..
-			FS("If the next move repeats the same position for a 3rd time, the game is drawn.").."]"
 	end
 
 	local debug_formstring = ""
@@ -1868,8 +1872,8 @@ local function update_formspec(meta)
 		"label[2.2,10.21;" .. turnWhite .. minetest.formspec_escape(status_white) .. "]" ..
 		whiteArr ..
 		"table[9.9,1.25;5.45,4;moves;" .. moves .. ";"..mlistlen.."]" ..
-		s_draw_claim ..
 		promotion_formstring ..
+		draw_claim_formstring ..
 		eaten_img ..
 		game_buttons ..
 		debug_formstring
@@ -1987,19 +1991,20 @@ local function update_game_result(meta)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by dead position")
 	end
 
+	local drawClaim = meta:get_string("drawClaim")
 	-- 75-move rule. Automatically draw game if the last 75 moves of EACH player (thus 150 halfmoves)
 	-- neither moved a pawn or captured a piece.
 	-- Important: This rule MUST be checked AFTER checkmate because checkmate takes precedence.
-	if meta:get_int("halfmoveClock") >= 150 then
+	if meta:get_int("halfmoveClock") >= DRAWCLAIM_LONGGAME_FORCE then
 		meta:set_string("gameResult", "draw")
 		meta:set_string("gameResultReason", "75_move_rule")
 		add_special_to_moves_list(meta, "draw")
 		local msg = S("No piece was captured and no pawn was moved for 75 consecutive moves of each player. It's a draw!")
 		send_message_2(playerWhite, playerBlack, msg, botColor)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw via the 75-move rule")
-	-- 50-move rule, after a player issued a draw claim when the halfmove clock was at 99.
+	-- 50-move rule, after a player issued a draw claim for their next move.
 	-- If no pawn moved nor a piece was captured for >= 100 halfmoves, the game is drawn.
-	elseif meta:get_int("halfmoveClock") >= 100 and meta:get_string("drawClaim") == "50_move_rule" then
+	elseif meta:get_int("halfmoveClock") >= DRAWCLAIM_LONGGAME_PLAYER and drawClaim == "50_move_rule" then
 		meta:set_string("drawClaim", "")
 		meta:set_string("gameResult", "draw")
 		meta:set_string("gameResultReason", "50_move_rule")
@@ -2018,7 +2023,7 @@ local function update_game_result(meta)
 			send_message(other, S("@1 has drawn the game by invoking the 50-move rule.", claimer), botColor)
 		end
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the 50-move rule")
-	elseif meta:get_string("drawClaim") == "50_move_rule" then
+	elseif drawClaim == "50_move_rule" then
 		local claimer, other
 		if lastMove == "black" or lastMove == "" then
 			claimer = playerWhite
@@ -2102,7 +2107,7 @@ local function update_game_result(meta)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because the same position has appeared 5 times")
 
 	-- threefold repetition
-	elseif chosenRepetitionDraw and meta:get_string("drawClaim") == "same_position_3" then
+	elseif chosenRepetitionDraw and drawClaim == "same_position_3" then
 		meta:set_string("drawClaim", "")
 		meta:set_string("gameResult", "draw")
 		meta:set_string("gameResultReason", "same_position_3")
@@ -2121,7 +2126,7 @@ local function update_game_result(meta)
 			send_message(other, S("@1 has drawn the game by invoking the threefold repetition rule.", claimer), botColor)
 		end
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the threefold repetition rule")
-	elseif meta:get_string("drawClaim") == "same_position_3" then
+	elseif drawClaim == "same_position_3" then
 		local claimer, other
 		if lastMove == "black" or lastMove == "" then
 			claimer = playerWhite
@@ -2917,7 +2922,7 @@ function realchess.fields(pos, _, fields, sender)
 		end
 
 		local halfmoveClock = meta:get_int("halfmoveClock")
-		if halfmoveClock >= 100 then
+		if halfmoveClock >= DRAWCLAIM_LONGGAME_PLAYER then
 			meta:set_string("gameResult", "draw")
 			meta:set_string("gameResultReason", "50_move_rule")
 			add_special_to_moves_list(meta, "draw")
