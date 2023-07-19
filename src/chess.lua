@@ -1987,9 +1987,19 @@ local function update_game_result(meta)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by dead position")
 	end
 
+	-- 75-move rule. Automatically draw game if the last 75 moves of EACH player (thus 150 halfmoves)
+	-- neither moved a pawn or captured a piece.
+	-- Important: This rule MUST be checked AFTER checkmate because checkmate takes precedence.
+	if meta:get_int("halfmoveClock") >= 150 then
+		meta:set_string("gameResult", "draw")
+		meta:set_string("gameResultReason", "75_move_rule")
+		add_special_to_moves_list(meta, "draw")
+		local msg = S("No piece was captured and no pawn was moved for 75 consecutive moves of each player. It's a draw!")
+		send_message_2(playerWhite, playerBlack, msg, botColor)
+		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw via the 75-move rule")
 	-- 50-move rule, after a player issued a draw claim when the halfmove clock was at 99.
 	-- If no pawn moved nor a piece was captured for >= 100 halfmoves, the game is drawn.
-	if meta:get_int("halfmoveClock") >= 100 and meta:get_string("drawClaim") == "50_move_rule" then
+	elseif meta:get_int("halfmoveClock") >= 100 and meta:get_string("drawClaim") == "50_move_rule" then
 		meta:set_string("drawClaim", "")
 		meta:set_string("gameResult", "draw")
 		meta:set_string("gameResultReason", "50_move_rule")
@@ -2008,17 +2018,19 @@ local function update_game_result(meta)
 			send_message(other, S("@1 has drawn the game by invoking the 50-move rule.", claimer), botColor)
 		end
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the 50-move rule")
-
-	-- 75-move rule. Automatically draw game if the last 75 moves of EACH player (thus 150 halfmoves)
-	-- neither moved a pawn or captured a piece.
-	-- Important: This rule MUST be checked AFTER checkmate because checkmate takes precedence.
-	elseif meta:get_int("halfmoveClock") >= 150 then
-		meta:set_string("gameResult", "draw")
-		meta:set_string("gameResultReason", "75_move_rule")
-		add_special_to_moves_list(meta, "draw")
-		local msg = S("No piece was captured and no pawn was moved for 75 consecutive moves of each player. It's a draw!")
-		send_message_2(playerWhite, playerBlack, msg, botColor)
-		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw via the 75-move rule")
+	elseif meta:get_string("drawClaim") == "50_move_rule" then
+		local claimer, other
+		if lastMove == "black" or lastMove == "" then
+			claimer = playerWhite
+			other = playerBlack
+		else
+			claimer = playerBlack
+			other = playerWhite
+		end
+		send_message(claimer, S("You have failed to make a game-drawing move. The game continues."), botColor)
+		if claimer ~= other then
+			send_message(other, S("@1 made a draw claim using the 50-move rule but it was false. The game continues.", claimer), botColor)
+		end
 	end
 
 	-- Draw if same position appeared >= 5 times
@@ -2109,6 +2121,19 @@ local function update_game_result(meta)
 			send_message(other, S("@1 has drawn the game by invoking the threefold repetition rule.", claimer), botColor)
 		end
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the threefold repetition rule")
+	elseif meta:get_string("drawClaim") == "same_position_3" then
+		local claimer, other
+		if lastMove == "black" or lastMove == "" then
+			claimer = playerWhite
+			other = playerBlack
+		else
+			claimer = playerBlack
+			other = playerWhite
+		end
+		send_message(claimer, S("You have failed to make a game-drawing move. The game continues."), botColor)
+		if claimer ~= other then
+			send_message(other, S("@1 made a draw claim using the threefold repetition rule but it was false. The game continues.", claimer), botColor)
+		end
 	end
 
 	meta:set_string("drawClaim", "")
