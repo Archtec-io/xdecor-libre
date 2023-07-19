@@ -2828,9 +2828,10 @@ function realchess.fields(pos, _, fields, sender)
 	-- If the game is ongoing and no move was made for TIMEOUT seconds,
 	-- the game can be aborted by everyone.
 	-- Also allow instant reset before White and Black moved,
-	-- as well as in Bot vs Bot mode
+	-- as well as in Bot vs Bot mode, as well
+	-- when the game ended.
 	if fields.new then
-		if mode == "bot_vs_bot" or (playerWhite == playerName or playerBlack == playerName or playerWhite == "" or playerBlack == "") then
+		if mode == "bot_vs_bot" or (playerWhite == playerName or playerBlack == playerName or playerWhite == "" or playerBlack == "") or meta:get_string("gameResult") ~= "" then
 			realchess.init(pos)
 
 		elseif lastMoveTime > 0 then
