@@ -54,8 +54,7 @@ White King=Weißer König
 Black King=Schwarzer König
 Select a game mode=Wählen Sie einen Spielmodus
 Select a mode:=Modus wählen:
-Singleplayer (white)=Einzelspieler (weiß)
-Singleplayer (black)=Einzelspieler (schwarz)
+Singleplayer=Einzelspieler
 Multiplayer=Mehrspieler
 Bot vs Bot=Bot vs. Bot
 PROMOTION@nFOR BLACK!=UMWANDLUNG@nFÜR SCHWARZ!
@@ -67,6 +66,9 @@ The player has invoked the 50-move rule for the next move. The next move might d
 The player has invoked the threefold-repetition rule for the next move. The next move might draw the game.=Der Spieler will für den nächsten Zug die Regel für wiederholte Stellungen anwenden. Der nächste Zug könnte die Partie remis enden lassen.
 New game=Neues Spiel
 Resign=Aufgeben
+Select a color:=
+White=
+Black=
 Invoke the 50-move rule for your next move=50-Züge-Regel für den nächsten Zug anwenden
 Invoke the 50-move rule and draw the game=50-Züge-Regel anwenden und die Partie remis enden lassen
 Invoke the threefold repetition rule and draw the game=Stellungswiederholungsregel anwenden und die Partie remis enden lassen
@@ -222,7 +224,8 @@ Back=Zurück
 
 ##### not used anymore #####
 
+Singleplayer (white)=Einzelspieler (weiß)
+Singleplayer (black)=Einzelspieler (schwarz)
 Dumb AI=Dumme KI
 You can't reset the chessboard, a game has been started. If you aren't a current player, try again in @1=Das Schachbrett kann nicht zurückgesetzt werden, da ein Spiel im Gang ist. Versuchen Sie es in @1 erneut, falls Sie kein Mitspieler sind.
 You can't dig the chessboard, a game has been started. Reset it first if you're a current player, or dig it again in @1=Das Schachbrett ist während eines Schachspieles nicht abbaubar. Setzen Sie das Spiel zurück, falls Sie ein Mitspieler sind oder versuchen Sie es in @1 erneut.
-Singleplayer=Einzelspieler
