@@ -101,7 +101,7 @@ Maintenance updates:
 * Add tooltip extensions for some interactive items (uses `tt` mod)
 * Add crafting guide support for `unified_inventory` mod (honey)
 * Rope no longer extends infinitely in Creative Mode
-* Added manual for chess in `CHESS_RULES.md`
+* Added manual for chess in `CHESS_README.md`
 
 #### List of replaced files
 
