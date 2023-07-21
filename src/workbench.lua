@@ -1,4 +1,5 @@
 local workbench = {}
+local registered_cuttable_nodes = {}
 
 screwdriver = screwdriver or {}
 local min, ceil = math.min, math.ceil
@@ -42,6 +43,27 @@ function workbench:repairable(stack)
 			return true
 		end
 	end
+	return false
+end
+
+-- Returns true if item can be cut into basic stairs and slabs
+function workbench:cuttable(itemname)
+	local split = string.split(itemname, ":")
+	if split and split[1] and split[2] then
+		if minetest.registered_nodes["stairs:stair_"..split[2]] ~= nil or
+		minetest.registered_nodes["stairs:slab_"..split[2]] ~= nil then
+			return true
+		end
+	end
+	if registered_cuttable_nodes[itemname] == true then
+		return true
+	end
+	return false
+end
+
+-- Returns true if item can be cut into xdecor extended shapes (thinslab, panel, cube, etc.)
+function workbench:cuttable_extended(itemname)
+	return registered_cuttable_nodes[itemname] == true
 end
 
 -- method to allow other mods to check if an item is repairable
@@ -51,13 +73,18 @@ end
 
 function workbench:get_output(inv, input, name)
 	local output = {}
+	local extended = workbench:cuttable_extended(input:get_name())
 	for i = 1, #self.defs do
 		local nbox = self.defs[i]
-		local count = min(nbox[2] * input:get_count(), input:get_stack_max())
-		local item = name .. "_" .. nbox[1]
+		if extended or nbox[3] == nil then
+			local count = min(nbox[2] * input:get_count(), input:get_stack_max())
+			local item = name .. "_" .. nbox[1]
 
-		item = nbox[3] and item or "stairs:" .. nbox[1] .. "_" .. name:match(":(.*)")
-		output[i] = item .. " " .. count
+			item = nbox[3] and item or "stairs:" .. nbox[1] .. "_" .. name:match(":(.*)")
+			if minetest.registered_items[item] then
+				output[i] = item .. " " .. count
+			end
+		end
 	end
 
 	inv:set_list("forms", output)
@@ -179,7 +206,7 @@ function workbench.allow_put(pos, listname, index, stack, player)
 	local stackname = stack:get_name()
 	if (listname == "tool" and stack:get_wear() > 0 and
 		workbench:repairable(stackname)) or
-	   (listname == "input" and minetest.registered_nodes[stackname .. "_cube"]) or
+	   (listname == "input" and workbench:cuttable(stackname)) or
 	   (listname == "hammer" and stackname == "xdecor:hammer") or
 	    listname == "storage" then
 		return stack:get_count()
@@ -224,7 +251,7 @@ function workbench.on_take(pos, listname, index, stack, player)
 	local stackname = stack:get_name()
 
 	if listname == "input" then
-		if stackname == inputname and minetest.registered_nodes[inputname .. "_cube"] then
+		if stackname == inputname and workbench:cuttable(inputname) then
 			workbench:get_output(inv, input, stackname)
 		else
 			inv:set_list("forms", {})
@@ -281,6 +308,7 @@ for nodename, def in pairs(minetest.registered_nodes) do
 	local modname = nodenamesplit[1]
 	if (modname == "xdecor" or modname == "default") and xdecor.stairs_valid_def(def) then
 		cuttable_nodes[#cuttable_nodes + 1] = nodename
+		registered_cuttable_nodes[nodename] = true
 	end
 end
 
