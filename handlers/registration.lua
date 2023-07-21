@@ -134,7 +134,7 @@ function xdecor.register(name, def)
 
 			inv:set_size("main", size)
 			meta:set_string("formspec",
-				(inventory.formspec or get_formspec_by_size(size)) .. xbg)
+				(inventory.formspec or get_formspec_by_size(size)) .. xdecor.xbg)
 		end
 
 		def.can_dig = def.can_dig or default_can_dig
