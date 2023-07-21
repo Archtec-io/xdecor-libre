@@ -223,8 +223,7 @@ end
 
 function workbench.allow_put(pos, listname, index, stack, player)
 	local stackname = stack:get_name()
-	if (listname == "tool" and stack:get_wear() > 0 and
-		workbench:repairable(stackname)) or
+	if (listname == "tool" and workbench:repairable(stackname)) or
 	   (listname == "input" and workbench:cuttable(stackname)) or
 	   (listname == "hammer" and stackname == "xdecor:hammer") or
 	    listname == "storage" then
@@ -246,7 +245,16 @@ function workbench.on_put(pos, listname, index, stack, player)
 end
 
 function workbench.allow_move(pos, from_list, from_index, to_list, to_index, count, player)
-	return (to_list == "storage" and from_list ~= "forms") and count or 0
+	if (to_list == "storage" and from_list ~= "forms") then
+		return count
+	elseif (to_list == "hammer" and from_list == "tool") or (to_list == "tool" and from_list == "hammer") then
+		local inv = minetest.get_inventory({type="node", pos=pos})
+		local stack = inv:get_stack(from_list, from_index)
+		if stack:get_name() == "xdecor:hammer" then
+			return count
+		end
+	end
+	return 0
 end
 
 function workbench.on_move(pos, from_list, from_index, to_list, to_index, count, player)
