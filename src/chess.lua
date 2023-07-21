@@ -3052,9 +3052,13 @@ function realchess.fields(pos, _, fields, sender)
 	end
 end
 
-function realchess.dig(pos, player)
-	if not player then
+function realchess.can_dig(pos, player)
+	if not player or not player:is_player() then
 		return false
+	end
+	-- Protection_bypass priv guarantees digging rights
+	if minetest.check_player_privs(player, "protection_bypass") then
+		return true
 	end
 
 	local meta          = minetest.get_meta(pos)
@@ -3242,7 +3246,7 @@ if ENABLE_CHESS_GAMES then
 	-- Extend chess board node definition if chess games are enabled
 	chessboarddef._tt_help = S("Play a game of Chess against another player or the computer")
 	chessboarddef.on_blast = realchess.blast
-	chessboarddef.can_dig = realchess.dig
+	chessboarddef.can_dig = realchess.can_dig
 	chessboarddef.on_construct = realchess.init
 	chessboarddef.on_receive_fields = realchess.fields
 	-- The move logic of Chess is here (at least for players)

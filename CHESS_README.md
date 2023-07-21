@@ -430,6 +430,9 @@ can’t be stopped by other players. But to prevent two players blocking a
 chessboard forever, there is a 5-minute timer. If no player makes a move
 for 5 minutes, then the chessboard can be reset and dug by anyone.
 
+Exception: Players with the `protection_bypass` privilege can always
+dig the chessboard.
+
 
 ## Appendix
 
