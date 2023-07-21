@@ -1869,7 +1869,7 @@ local function update_formspec(meta)
 		local d_fullmove = tostring(get_current_fullmove(meta) + 1)
 
 		local debug_str = d_turn .. " " .. d_castling .. " " .. d_en_passant .. " " .. d_halfmove_clock .. " " .. d_fullmove
-		debug_formstring = "label[6.9,10.2;DEBUG: "..debug_str.."]"
+		debug_formstring = "label[7.9,10.2;DEBUG: "..debug_str.."]"
 	end
 
 	local moves_list = ""
