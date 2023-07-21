@@ -3069,7 +3069,10 @@ function realchess.can_dig(pos, player)
 	local playerBlack   = meta:get_string("playerBlack")
 	local botColor      = meta:get_string("botColor")
 
-	if (meta:get_string("gameResult") ~= "") then
+	-- Bot matches always allow dig
+	if (meta:get_string("mode") == "bot_vs_bot") then
+		return true
+	elseif (meta:get_string("gameResult") ~= "") then
 	-- If the game was completed, the board is free to be dug
 		return true
 	-- If the game is ongoing and no move was made for TIMEOUT seconds,
