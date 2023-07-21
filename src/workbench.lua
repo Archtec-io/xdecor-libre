@@ -1,18 +1,10 @@
 local workbench = {}
-local nodes = {}
 
 screwdriver = screwdriver or {}
 local min, ceil = math.min, math.ceil
 local S = minetest.get_translator("xdecor")
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 
--- Nodes allowed to be cut
--- Only the regular, solid blocks without metas or explosivity can be cut
-for node, def in pairs(minetest.registered_nodes) do
-	if xdecor.stairs_valid_def(def) then
-		nodes[#nodes + 1] = node
-	end
-end
 
 -- Nodeboxes definitions
 workbench.defs = {
@@ -29,9 +21,9 @@ workbench.defs = {
 			{ 0, 8,  8, 16, 8, 8  }}, S("Double Panel")},
 	{"halfstair",   2,  {{ 0, 0,  0, 8,  8, 16 },
 			{ 0, 8,  8, 8,  8, 8  }}, S("Half-Stair")},
-	{"stair_outer", 1,  nil, S("Outer Stair")},
+	{"stair_outer", 1,  nil, nil},
 	{"stair",       1,  nil, S("Stair")},
-	{"stair_inner", 1,  nil, S("Inner Stair")},
+	{"stair_inner", 1,  nil, nil},
 }
 
 local repairable_tools = {"pick", "axe", "shovel", "sword", "hoe", "armor", "shield"}
@@ -277,9 +269,24 @@ xdecor.register("workbench", {
 	allow_metadata_inventory_move = workbench.allow_move
 })
 
+
+minetest.register_on_mods_loaded(function()
+local cuttable_nodes = {}
+
+-- Nodes allowed to be cut:
+-- Only the regular, solid blocks without metas or explosivity
+-- from the xdecor or default mods.
+for nodename, def in pairs(minetest.registered_nodes) do
+	local nodenamesplit = string.split(nodename, ":")
+	local modname = nodenamesplit[1]
+	if (modname == "xdecor" or modname == "default") and xdecor.stairs_valid_def(def) then
+		cuttable_nodes[#cuttable_nodes + 1] = nodename
+	end
+end
+
 for _, d in ipairs(workbench.defs) do
-for i = 1, #nodes do
-	local node = nodes[i]
+for i = 1, #cuttable_nodes do
+	local node = cuttable_nodes[i]
 	local mod_name, item_name = node:match("^(.-):(.*)")
 	local def = minetest.registered_nodes[node]
 
@@ -388,6 +395,7 @@ for i = 1, #nodes do
 	end
 end
 end
+end)
 
 -- Craft items
 
