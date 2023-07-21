@@ -28,8 +28,6 @@ workbench.defs = {
 	{"stair_inner", 1,  nil, nil},
 }
 
-local repairable_tools = {"pick", "axe", "shovel", "sword", "hoe", "armor", "shield"}
-
 local custom_repairable = {}
 function xdecor:register_repairable(item)
 	custom_repairable[item] = true
@@ -37,16 +35,19 @@ end
 
 -- Tools allowed to be repaired
 function workbench:repairable(stack)
+	-- Explicitly registeded as repairable: Overrides everything else
 	if custom_repairable[stack] then
 		return true
 	end
-
-	for _, t in ipairs(repairable_tools) do
-		if stack:find(t) and minetest.get_item_group(t, "disable_repair") == 0 then
-			return true
-		end
+	-- no repair if non-tool
+	if not minetest.registered_tools[stack] then
+		return false
 	end
-	return false
+	-- no repair if disable_repair group
+	if minetest.get_item_group(stack, "disable_repair") == 1 then
+		return false
+	end
+	return true
 end
 
 -- Returns true if item can be cut into basic stairs and slabs
