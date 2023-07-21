@@ -1,5 +1,6 @@
 local workbench = {}
 local registered_cuttable_nodes = {}
+local special_cuts = {}
 
 screwdriver = screwdriver or {}
 local min, ceil = math.min, math.ceil
@@ -76,18 +77,33 @@ function workbench:get_output(inv, input, name)
 	local extended = workbench:cuttable_extended(input:get_name())
 	for i = 1, #self.defs do
 		local nbox = self.defs[i]
+		local cuttype = nbox[1]
+		local count = min(nbox[2] * input:get_count(), input:get_stack_max())
+		local was_cut = false
 		if extended or nbox[3] == nil then
-			local count = min(nbox[2] * input:get_count(), input:get_stack_max())
-			local item = name .. "_" .. nbox[1]
+			local item = name .. "_" .. cuttype
 
-			item = nbox[3] and item or "stairs:" .. nbox[1] .. "_" .. name:match(":(.*)")
+			item = nbox[3] and item or "stairs:" .. cuttype .. "_" .. name:match(":(.*)")
 			if minetest.registered_items[item] then
 				output[i] = item .. " " .. count
+				was_cut = true
+			end
+		end
+		if not was_cut and special_cuts[input:get_name()] ~= nil then
+			local cut = special_cuts[input:get_name()][cuttype]
+			if cut then
+				output[i] = cut .. " " .. count
+				was_cut = true
 			end
 		end
 	end
 
 	inv:set_list("forms", output)
+end
+
+function workbench:register_special_cut(nodename, cutlist)
+	registered_cuttable_nodes[nodename] = true
+	special_cuts[nodename] = cutlist
 end
 
 local main_fs = "label[0.9,1.23;"..FS("Cut").."]"
@@ -453,3 +469,7 @@ minetest.register_craft({
 		{"group:wood", "group:wood"}
 	}
 })
+
+-- Special cuts for cushion block and cabinet
+workbench:register_special_cut("xdecor:cushion_block", { slab = "xdecor:cushion" })
+workbench:register_special_cut("xdecor:cabinet", { slab = "xdecor:cabinet_half" })
