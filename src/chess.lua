@@ -2883,7 +2883,8 @@ function realchess.fields(pos, _, fields, sender)
 
 	if fields.resign and mode ~= "bot_vs_bot" then
 		local lastMove = meta:get_string("lastMove")
-		if playerWhite == "" and playerBlack == "" or lastMove == "" then
+		if (playerName == playerWhite and playerWhite == "") or (playerName == playerBlack and playerBlack == "") then
+			-- Can't resign before the player name has been recorded
 			send_message(playerName, S("Resigning is not possible yet."))
 			return
 		end
