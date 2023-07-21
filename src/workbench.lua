@@ -81,7 +81,12 @@ function workbench:get_output(inv, input, name)
 	for i = 1, #self.defs do
 		local nbox = self.defs[i]
 		local cuttype = nbox[1]
-		local count = min(nbox[2] * input:get_count(), input:get_stack_max())
+		local count = nbox[2] * input:get_count()
+		local max_count = input:get_stack_max()
+		if count > max_count then
+			-- Limit count to maximum multiple to avoid waste
+			count = nbox[2] * math.floor(max_count / nbox[2])
+		end
 		local was_cut = false
 		if extended or nbox[3] == nil then
 			local item = name .. "_" .. cuttype
