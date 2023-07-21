@@ -37,10 +37,12 @@ end
 
 -- Tools allowed to be repaired
 function workbench:repairable(stack)
-	if custom_repairable[stack] then return true end
+	if custom_repairable[stack] then
+		return true
+	end
 
 	for _, t in ipairs(repairable_tools) do
-		if stack:find(t) then
+		if stack:find(t) and minetest.get_item_group(t, "disable_repair") == 0 then
 			return true
 		end
 	end
