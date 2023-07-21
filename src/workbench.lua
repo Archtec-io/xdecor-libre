@@ -456,6 +456,7 @@ end)
 
 minetest.register_tool("xdecor:hammer", {
 	description = S("Hammer"),
+	_tt_help = S("Repairs tools at the work bench"),
 	inventory_image = "xdecor_hammer.png",
 	wield_image = "xdecor_hammer.png",
 	on_use = function() do
