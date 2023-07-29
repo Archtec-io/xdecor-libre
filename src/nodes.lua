@@ -767,7 +767,7 @@ register_hard_node("stone_rune", S("Runestone"))
 register_hard_node("stone_tile_x", S("Polished Stone Block"), {
 	tiles = {"xdecor_stone_tile.png"},
 })
-xdecor.register_moreblocks_aliases("stone_tile", "stone_tile_x")
+xdecor.register_legacy_aliases("stone_tile", "stone_tile_x")
 
 register_hard_node("packed_ice", S("Packed Ice"), {
 	groups = {cracky = 1, cools_lava = 1, slippery = 3},
@@ -781,7 +781,7 @@ register_hard_node("wood_tile_x", S("Wooden Tile"), {
 	sounds = default.node_sound_wood_defaults(),
 	tiles = {"xdecor_wood_tile.png"},
 })
-xdecor.register_moreblocks_aliases("wood_tile", "wood_tile_x")
+xdecor.register_legacy_aliases("wood_tile", "wood_tile_x")
 
 xdecor.register("table", {
 	description = S("Table"),

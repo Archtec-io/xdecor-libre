@@ -160,7 +160,7 @@ end
 
 -- Registers aliases for a node that had a name collision
 -- with a node from the moreblocks mod
-function xdecor.register_moreblocks_aliases(original_basename, new_basename)
+function xdecor.register_legacy_aliases(original_basename, new_basename)
 	minetest.register_alias("xdecor:"..original_basename, "xdecor:"..new_basename)
 	minetest.register_alias("xdecor:"..original_basename.."_panel", "xdecor:"..new_basename.."_panel")
 	minetest.register_alias("xdecor:"..original_basename.."_doublepanel", "xdecor:"..new_basename.."_doublepanel")
@@ -175,6 +175,9 @@ function xdecor.register_moreblocks_aliases(original_basename, new_basename)
 		minetest.register_alias("stairs:stair_"..original_basename, "stairs:stair_"..new_basename)
 		minetest.register_alias("stairs:stair_outer_"..original_basename, "stairs:stair_outer_"..new_basename)
 		minetest.register_alias("stairs:stair_inner_"..original_basename, "stairs:stair_inner"..new_basename)
+	end
+	if minetest.get_modpath("stairsplus") and minetest.global_exists("stairsplus") and stairsplus.api then
+		stairsplus.api.register_alias_all("xdecor:"..original_basename, "xdecor:"..new_basename)
 	end
 end
 
