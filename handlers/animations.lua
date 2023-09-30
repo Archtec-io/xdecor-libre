@@ -1,5 +1,6 @@
 local mod_playerphysics = minetest.get_modpath("playerphysics") ~= nil
 local mod_player_api = minetest.get_modpath("player_api") ~= nil
+local mod_player_monoids = minetest.get_modpath("player_monoids") ~= nil
 
 local function top_face(pointed_thing)
 	if not pointed_thing then return end
@@ -26,6 +27,9 @@ function xdecor.sit(pos, node, clicker, pointed_thing)
 		if mod_playerphysics then
 			playerphysics.remove_physics_factor(clicker, "speed", "xdecor:sit_speed")
 			playerphysics.remove_physics_factor(clicker, "jump", "xdecor:sit_jump")
+		elseif mod_player_monoids then
+			player_monoids.speed:del_change(clicker, "xdecor:sit_speed")
+			player_monoids.jump:del_change(clicker, "xdecor:sit_jump")
 		else
 			clicker:set_physics_override({speed = 1, jump = 1})
 		end
@@ -39,6 +43,9 @@ function xdecor.sit(pos, node, clicker, pointed_thing)
 		if mod_playerphysics then
 			playerphysics.add_physics_factor(clicker, "speed", "xdecor:sit_speed", 0)
 			playerphysics.add_physics_factor(clicker, "jump", "xdecor:sit_jump", 0)
+		elseif mod_player_monoids then
+			player_monoids.speed:add_change(clicker, 0, "xdecor:sit_speed")
+			player_monoids.jump:add_change(clicker, 0, "xdecor:sit_jump")
 		else
 			clicker:set_physics_override({speed = 0, jump = 0})
 		end

@@ -336,6 +336,45 @@ enchanting:register_tools("default", {
 	},
 })
 
+if minetest.get_modpath("moreores") then
+	enchanting:register_tools("moreores", {
+		materials = "silver, mithril",
+		material_desc = {silver = S("Silver"), mithril = S("Mithril")},
+		tools = {
+			axe    = {enchants = "durable, fast", desc = S("Axe")},
+			pick   = {enchants = "durable, fast", desc = S("Pickaxe")},
+			shovel = {enchants = "durable, fast", desc = S("Shovel")},
+			sword  = {enchants = "sharp", desc = S("Sword")}
+		},
+	})
+end
+
+if minetest.get_modpath("ethereal") then
+	enchanting:register_tools("ethereal", {
+		materials = "crystal",
+		material_desc = {crystal = S("Crystal")},
+		tools = {
+			axe    = {enchants = "durable, fast", desc = S("Axe")},
+			pick   = {enchants = "durable, fast", desc = S("Pickaxe")},
+			shovel = {enchants = "durable, fast", desc = S("Shovel")},
+			sword  = {enchants = "sharp", desc = S("Sword")}
+		},
+	})
+end
+
+if minetest.get_modpath("techage") and minetest.registered_items["techage:meridium_ingot"] then -- meridium is not always enabled
+	enchanting:register_tools("techage", {
+		materials = "meridium",
+		material_desc = {meridium = S("meridium")},
+		tools = {
+			axe    = {enchants = "durable, fast", desc = S("Axe")},
+			pick   = {enchants = "durable, fast", desc = S("Pickaxe")},
+			shovel = {enchants = "durable, fast", desc = S("Shovel")},
+			sword  = {enchants = "sharp", desc = S("Sword")}
+		},
+	})
+end
+
 -- Recipes
 
 minetest.register_craft({
