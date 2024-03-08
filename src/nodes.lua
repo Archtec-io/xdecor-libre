@@ -234,7 +234,7 @@ xdecor.register("cobweb", {
 })
 
 local curtain_colors = {
-	red = S("Red Curtain"),
+	red = { S("Red Curtain"), "wool_red.png", "wool:red" },
 }
 
 -- For preserve_metadata for curtains.
@@ -248,15 +248,16 @@ local cleanup_curtain_meta = function(_,_,_,drops)
 	end
 end
 
-for c, desc in pairs(curtain_colors) do
+for c, info in pairs(curtain_colors) do
+	local desc = info[1]
+	local base_texture = info[2]
+	local craft_item = info[3]
 	xdecor.register("curtain_" .. c, {
 		description = desc,
 		walkable = false,
-		tiles = {"wool_white.png"},
-		color = c,
-		inventory_image = "wool_white.png^[colorize:" .. c ..
-			":170^xdecor_curtain_open_overlay.png^[makealpha:255,126,126",
-		wield_image = "wool_white.png^[colorize:" .. c .. ":170",
+		tiles = {base_texture},
+		inventory_image = base_texture.."^xdecor_curtain_open_overlay.png^[makealpha:255,126,126",
+		wield_image = base_texture.."^xdecor_curtain_open_overlay.png^[makealpha:255,126,126",
 		drawtype = "signlike",
 		paramtype2 = "colorwallmounted",
 		groups = {dig_immediate = 3, flammable = 3},
@@ -270,8 +271,7 @@ for c, desc in pairs(curtain_colors) do
 	})
 
 	xdecor.register("curtain_open_" .. c, {
-		tiles = {"wool_white.png^xdecor_curtain_open_overlay.png^[makealpha:255,126,126"},
-		color = c,
+		tiles = {base_texture.."^xdecor_curtain_open_overlay.png^[makealpha:255,126,126"},
 		drawtype = "signlike",
 		paramtype2 = "colorwallmounted",
 		walkable = false,
@@ -289,8 +289,8 @@ for c, desc in pairs(curtain_colors) do
 	minetest.register_craft({
 		output = "xdecor:curtain_" .. c .. " 4",
 		recipe = {
-			{"", "wool:" .. c, ""},
-			{"", "wool:" .. c, ""}
+			{"", craft_item, ""},
+			{"", craft_item, ""}
 		}
 	})
 end
