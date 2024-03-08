@@ -1,10 +1,12 @@
 local rope = {}
 local S = minetest.get_translator("xdecor")
+local MAX_ROPES = 99
 
 local ropesounds = default.node_sound_leaves_defaults()
 
 -- Code by Mirko K. (modified by Temperest, Wulfsdad, kilbith and Wuzzy) (License: GPL).
 function rope.place(itemstack, placer, pointed_thing)
+	local creative = minetest.is_creative_enabled(placer:get_player_name())
 	if pointed_thing.type == "node" then
 		-- Use pointed node's on_rightclick function first, if present
 		if placer and not placer:get_player_control().sneak then
@@ -23,24 +25,33 @@ function rope.place(itemstack, placer, pointed_thing)
 
 		local oldnode = minetest.get_node(pos)
 		local stackname = itemstack:get_name()
-		-- Limit max. rope length to max. stack size
-		-- Prevents the rope to extend infinitely in Creative Mode
-		local max_ropes = itemstack:get_stack_max()
+		-- Limit rope length to max. stack size or MAX_ROPES (whatever is smaller).
+		-- Prevents the rope to extend infinitely in Creative Mode.
+		local max_ropes = math.min(itemstack:get_stack_max(), MAX_ROPES)
 
+		-- Start placing ropes and extend it downwards until we run out of ropes
+		-- or hit the maximum
 		local start_pos = table.copy(pos)
-		local ropes_placed = 0
-		while oldnode.name == "air" and not itemstack:is_empty() and ropes_placed < max_ropes do
-			local newnode = {name = stackname, param1 = 0}
-			minetest.set_node(pos, newnode)
-			if not minetest.is_creative_enabled(placer:get_player_name()) then
-				itemstack:take_item()
-			end
+		local ropes_to_place = 0
+		local new_rope_nodes = {}
+		while oldnode.name == "air" and (creative or (ropes_to_place < itemstack:get_size())) and ropes_to_place < max_ropes do
+			table.insert(new_rope_nodes, table.copy(pos))
 			pos.y = pos.y - 1
 			oldnode = minetest.get_node(pos)
-			ropes_placed = ropes_placed + 1
+			ropes_to_place = ropes_to_place + 1
 		end
+		local newnode = {name = stackname}
+		if ropes_to_place == 1 then
+			minetest.set_node(new_rope_nodes[1], newnode)
+		else
+			minetest.bulk_set_node(new_rope_nodes, newnode)
+		end
+		if not creative then
+			itemstack:take_item(ropes_to_place)
+		end
+
 		-- Play placement sound manually
-		if ropes_placed > 0 then
+		if ropes_to_place > 0 then
 			minetest.sound_play(ropesounds.place, {pos=start_pos}, true)
 		end
 	end
