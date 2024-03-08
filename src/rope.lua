@@ -7,6 +7,8 @@ local ropesounds = default.node_sound_leaves_defaults()
 -- Code by Mirko K. (modified by Temperest, Wulfsdad, kilbith and Wuzzy) (License: GPL).
 function rope.place(itemstack, placer, pointed_thing)
 	local creative = minetest.is_creative_enabled(placer:get_player_name())
+	local protection_bypass = minetest.check_player_privs(placer, "protection_bypass")
+	local pname = placer:get_player_name()
 	if pointed_thing.type == "node" then
 		-- Use pointed node's on_rightclick function first, if present
 		if placer and not placer:get_player_control().sneak then
@@ -17,9 +19,8 @@ function rope.place(itemstack, placer, pointed_thing)
 		end
 		local pos = pointed_thing.above
 		-- Check protection
-		if minetest.is_protected(pos, placer:get_player_name()) and
-				not minetest.check_player_privs(placer, "protection_bypass") then
-			minetest.record_protection_violation(pos, placer:get_player_name())
+		if minetest.is_protected(pos, pname) and not protection_bypass then
+			minetest.record_protection_violation(pos, pname)
 			return itemstack
 		end
 
@@ -29,12 +30,17 @@ function rope.place(itemstack, placer, pointed_thing)
 		-- Prevents the rope to extend infinitely in Creative Mode.
 		local max_ropes = math.min(itemstack:get_stack_max(), MAX_ROPES)
 
-		-- Start placing ropes and extend it downwards until we run out of ropes
-		-- or hit the maximum
+		-- Start placing ropes and extend it downwards until we hit an obstacle,
+		-- run out of ropes or hit the maximum rope length.
 		local start_pos = table.copy(pos)
 		local ropes_to_place = 0
 		local new_rope_nodes = {}
 		while oldnode.name == "air" and (creative or (ropes_to_place < itemstack:get_size())) and ropes_to_place < max_ropes do
+			-- Stop extending rope into protected area
+			if minetest.is_protected(pos, pname) and not protection_bypass then
+				break
+			end
+
 			table.insert(new_rope_nodes, table.copy(pos))
 			pos.y = pos.y - 1
 			oldnode = minetest.get_node(pos)
