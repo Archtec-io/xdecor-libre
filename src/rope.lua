@@ -37,7 +37,7 @@ function rope.place(itemstack, placer, pointed_thing)
 		local start_pos = table.copy(pos)
 		local ropes_to_place = 0
 		local new_rope_nodes = {}
-		while oldnode.name == "air" and (creative or (ropes_to_place < itemstack:get_size())) and ropes_to_place < max_ropes do
+		while oldnode.name == "air" and (creative or (ropes_to_place < itemstack:get_count())) and ropes_to_place < max_ropes do
 			-- Stop extending rope into protected area
 			if minetest.is_protected(pos, pname) and not protection_bypass then
 				break
