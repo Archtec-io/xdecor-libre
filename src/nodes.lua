@@ -806,11 +806,26 @@ xdecor.register("tatami", {
 
 xdecor.register("trampoline", {
 	description = S("Trampoline"),
-	tiles = {"xdecor_trampoline.png", "mailbox_blank16.png", "xdecor_trampoline_sides.png"},
+	tiles = {"xdecor_trampoline.png", "xdecor_trampoline_bottom.png", "xdecor_trampoline_sides.png"},
 	use_texture_alpha = ALPHA_CLIP,
 	groups = {cracky = 3, oddly_breakable_by_hand = 1, fall_damage_add_percent = -80, bouncy = 90},
 	is_ground_content = false,
-	node_box = xdecor.nodebox.slab_y(0.5),
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{ -0.5, -1/16, -0.5, 0.5, 0, 0.5 }, -- bouncy top
+			{ -0.5, -0.5, -0.5, -3/16, 0, -3/16 }, -- leg 1
+			{ 3/16, -0.5, -0.5, 0.5, 0, -3/16 }, -- leg 2
+			{ -0.5, -0.5, 3/16, -3/16, 0, 0.5 }, -- leg 3
+			{ 3/16, -0.5, 3/16, 0.5, 0, 0.5 }, -- leg 4
+			{ -3/16, -5/16, -0.5, 3/16, -1/16, -7/16 }, -- connector 1
+			{ -0.5, -5/16, -3/16, -7/16, -1/16, 3/16 }, -- connector 2
+			{ -3/16, -5/16, 7/16, 3/16, -1/16, 0.5 }, -- connector 3
+			{ 7/16, -5/16, -3/16, 0.5, -1/16, 3/16 }, -- connector 4
+		},
+	},
+	selection_box = xdecor.nodebox.slab_y(0.5),
+	collision_box = xdecor.nodebox.slab_y(0.5),
 	sounds = default.node_sound_defaults({
 		footstep = {
 			name = "xdecor_bouncy",
