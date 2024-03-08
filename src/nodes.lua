@@ -255,11 +255,18 @@ for c, info in pairs(curtain_colors) do
 	xdecor.register("curtain_" .. c, {
 		description = desc,
 		walkable = false,
-		tiles = {base_texture},
+		tiles = {base_texture, "("..base_texture..")^[transformFY", "blank.png"},
+		use_texture_alpha = ALPHA_CLIP,
 		inventory_image = base_texture.."^xdecor_curtain_open_overlay.png^[makealpha:255,126,126",
 		wield_image = base_texture.."^xdecor_curtain_open_overlay.png^[makealpha:255,126,126",
-		drawtype = "signlike",
-		paramtype2 = "colorwallmounted",
+		drawtype = "nodebox",
+		paramtype2 = "wallmounted",
+		node_box = {
+			type = "wallmounted",
+			wall_side = { -0.5, -0.5, -0.5, -7/16, 0.5, 0.5 },
+			wall_top = { -0.5, 7/16, -0.5, 0.5, 0.5, 0.5 },
+			wall_bottom = { -0.5, -0.5, -0.5, 0.5, -7/16, 0.5 },
+		},
 		groups = {dig_immediate = 3, flammable = 3},
 		is_ground_content = false,
 		selection_box = {type = "wallmounted"},
@@ -270,10 +277,18 @@ for c, info in pairs(curtain_colors) do
 		preserve_metadata = cleanup_curtain_meta,
 	})
 
+	local open_tile = base_texture.."^xdecor_curtain_open_overlay.png^[makealpha:255,126,126"
 	xdecor.register("curtain_open_" .. c, {
-		tiles = {base_texture.."^xdecor_curtain_open_overlay.png^[makealpha:255,126,126"},
-		drawtype = "signlike",
-		paramtype2 = "colorwallmounted",
+		tiles = {open_tile, "("..open_tile..")^[transformFY", "blank.png"},
+		use_texture_alpha = ALPHA_CLIP,
+		drawtype = "nodebox",
+		paramtype2 = "wallmounted",
+		node_box = {
+			type = "wallmounted",
+			wall_side = { -0.5, -0.5, -0.5, -7/16, 0.5, 0.5 },
+			wall_top = { -0.5, 7/16, -0.5, 0.5, 0.5, 0.5 },
+			wall_bottom = { -0.5, -0.5, -0.5, 0.5, -7/16, 0.5 },
+		},
 		walkable = false,
 		groups = {dig_immediate = 3, flammable = 3, not_in_creative_inventory = 1},
 		is_ground_content = false,
