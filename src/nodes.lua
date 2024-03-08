@@ -237,6 +237,8 @@ local curtain_colors = {
 	red = { S("Red Curtain"), "wool_red.png", "wool:red" },
 }
 
+local CURTAIN_OFFSET = 1/16
+
 -- For preserve_metadata for curtains.
 -- Erases metadata from the drops
 -- because the item metadata should be empty
@@ -255,7 +257,7 @@ for c, info in pairs(curtain_colors) do
 	xdecor.register("curtain_" .. c, {
 		description = desc,
 		walkable = false,
-		tiles = {base_texture, "("..base_texture..")^[transformFY", "blank.png"},
+		tiles = {base_texture, "("..base_texture..")^[transformFY", base_texture},
 		use_texture_alpha = ALPHA_CLIP,
 		inventory_image = base_texture.."^xdecor_curtain_open_overlay.png^[makealpha:255,126,126",
 		wield_image = base_texture.."^xdecor_curtain_open_overlay.png^[makealpha:255,126,126",
@@ -263,13 +265,12 @@ for c, info in pairs(curtain_colors) do
 		paramtype2 = "wallmounted",
 		node_box = {
 			type = "wallmounted",
-			wall_side = { -0.5, -0.5, -0.5, -7/16, 0.5, 0.5 },
-			wall_top = { -0.5, 7/16, -0.5, 0.5, 0.5, 0.5 },
-			wall_bottom = { -0.5, -0.5, -0.5, 0.5, -7/16, 0.5 },
+			wall_side = { -0.5, -0.5, -0.5, -0.5+CURTAIN_OFFSET, 0.5, 0.5 },
+			wall_top = { -0.5, 0.5-CURTAIN_OFFSET, -0.5, 0.5, 0.5, 0.5 },
+			wall_bottom = { -0.5, -0.5, -0.5, 0.5, -0.5+CURTAIN_OFFSET, 0.5 },
 		},
 		groups = {dig_immediate = 3, flammable = 3},
 		is_ground_content = false,
-		selection_box = {type = "wallmounted"},
 		on_rightclick = function(pos, node, _, itemstack)
 			minetest.set_node(pos, {name = "xdecor:curtain_open_" .. c, param2 = node.param2})
 			return itemstack
@@ -279,20 +280,26 @@ for c, info in pairs(curtain_colors) do
 
 	local open_tile = base_texture.."^xdecor_curtain_open_overlay.png^[makealpha:255,126,126"
 	xdecor.register("curtain_open_" .. c, {
-		tiles = {open_tile, "("..open_tile..")^[transformFY", "blank.png"},
+		tiles = {
+			open_tile,
+			"("..open_tile..")^[transformFY",
+			base_texture,
+			base_texture,
+			base_texture.."^xdecor_curtain_open_overlay_top.png^[makealpha:255,126,126",
+			base_texture.."^xdecor_curtain_open_overlay_bottom.png^[makealpha:255,126,126",
+		},
 		use_texture_alpha = ALPHA_CLIP,
 		drawtype = "nodebox",
 		paramtype2 = "wallmounted",
 		node_box = {
 			type = "wallmounted",
-			wall_side = { -0.5, -0.5, -0.5, -7/16, 0.5, 0.5 },
-			wall_top = { -0.5, 7/16, -0.5, 0.5, 0.5, 0.5 },
-			wall_bottom = { -0.5, -0.5, -0.5, 0.5, -7/16, 0.5 },
+			wall_side = { -0.5, -0.5, -0.5, -0.5+CURTAIN_OFFSET, 0.5, 0.5 },
+			wall_top = { -0.5, 0.5-CURTAIN_OFFSET, -0.5, 0.5, 0.5, 0.5 },
+			wall_bottom = { -0.5, -0.5, -0.5, 0.5, -0.5+CURTAIN_OFFSET, 0.5 },
 		},
 		walkable = false,
 		groups = {dig_immediate = 3, flammable = 3, not_in_creative_inventory = 1},
 		is_ground_content = false,
-		selection_box = {type="wallmounted"},
 		drop = "xdecor:curtain_" .. c,
 		on_rightclick = function(pos, node, _, itemstack)
 			minetest.set_node(pos, {name="xdecor:curtain_" .. c, param2 = node.param2})
