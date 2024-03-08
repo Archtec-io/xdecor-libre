@@ -1,6 +1,8 @@
 local rope = {}
 local S = minetest.get_translator("xdecor")
-local MAX_ROPES = 99
+
+-- Maximum length a rope can extend to
+local MAX_ROPES = 30
 
 local ropesounds = default.node_sound_leaves_defaults()
 
