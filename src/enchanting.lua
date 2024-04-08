@@ -315,6 +315,7 @@ function enchanting:register_tools(mod, def)
 				inventory_image = original_tool.inventory_image .. "^[colorize:violet:50",
 				wield_image = original_tool.wield_image,
 				groups = {not_in_creative_inventory = 1},
+				light_source = original_tool.light_source,
 				tool_capabilities = {
 					groupcaps = groupcaps, damage_groups = {fleshy = fleshy},
 					full_punch_interval = full_punch_interval,
