@@ -368,7 +368,20 @@ end
 if minetest.get_modpath("techage") and minetest.registered_items["techage:meridium_ingot"] then -- meridium is not always enabled
 	enchanting:register_tools("techage", {
 		materials = "meridium",
-		material_desc = {meridium = S("meridium")},
+		material_desc = {meridium = S("Meridium")},
+		tools = {
+			axe    = {enchants = "durable, fast", desc = S("Axe")},
+			pick   = {enchants = "durable, fast", desc = S("Pickaxe")},
+			shovel = {enchants = "durable, fast", desc = S("Shovel")},
+			sword  = {enchants = "sharp", desc = S("Sword")}
+		},
+	})
+end
+
+if minetest.get_modpath("titanium") then
+	enchanting:register_tools("titanium", {
+		materials = "titanium",
+		material_desc = {titanium = S("Titanium")},
 		tools = {
 			axe    = {enchants = "durable, fast", desc = S("Axe")},
 			pick   = {enchants = "durable, fast", desc = S("Pickaxe")},
