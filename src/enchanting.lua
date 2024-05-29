@@ -309,7 +309,8 @@ function enchanting:register_tools(mod, def)
 			local arg1 = def.material_desc[material] or cap(material)
 			local arg2 = def.tools[tool].desc or cap(tool)
 			local arg3 = self:get_tooltip(enchant, original_groupcaps[group], fleshy)
-			minetest.register_tool(":" .. mod .. ":enchanted_" .. tool .. "_" .. material .. "_" .. enchant, {
+			local enchantedTool = mod .. ":enchanted_" .. tool .. "_" .. material .. "_" .. enchant
+			minetest.register_tool(":" .. enchantedTool, {
 				description = S("Enchanted @1 @2\n@3", arg1, arg2, arg3),
 				short_description = S("Enchanted @1 @2", arg1, arg2),
 				inventory_image = original_tool.inventory_image .. "^[colorize:violet:50",
@@ -321,6 +322,9 @@ function enchanting:register_tools(mod, def)
 					max_drop_level = max_drop_level
 				}
 			})
+			if minetest.get_modpath("toolranks") then
+				toolranks.add_tool(enchantedTool)
+			end
 		end
 	end
 	end
