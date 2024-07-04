@@ -44,6 +44,10 @@ local function img_col(stack)
 	return ""
 end
 
+local function can_modify_mailbox(owner, name)
+	return owner == name or minetest.get_player_privs(name).staff
+end
+
 function mailbox:formspec(pos, owner, is_owner)
 	local spos = pos.x .. "," .. pos.y .. "," .. pos.z
 	local meta = minetest.get_meta(pos)
@@ -99,7 +103,7 @@ function mailbox.dig(pos, player)
 	local player_name = player and player:get_player_name()
 	local inv = meta:get_inventory()
 
-	return inv:is_empty("mailbox") and player_name == owner
+	return inv:is_empty("mailbox") and can_modify_mailbox(owner, player_name)
 end
 
 function mailbox.blast(pos)
@@ -122,9 +126,10 @@ function mailbox.rightclick(pos, node, clicker, itemstack, pointed_thing)
 	local meta = minetest.get_meta(pos)
 	local player = clicker:get_player_name()
 	local owner = meta:get_string("owner")
+	local has_access = player == owner or (minetest.get_player_privs(player).staff and clicker:get_player_control().aux1)
 
 	minetest.show_formspec(player, "xdecor:mailbox",
-		mailbox:formspec(pos, owner, (player == owner)))
+		mailbox:formspec(pos, owner, has_access))
 
 	return itemstack
 end
@@ -138,6 +143,8 @@ function mailbox.put(pos, listname, _, stack, player)
 			minetest.chat_send_player(player:get_player_name(),
 				S("The mailbox is full."))
 		end
+	elseif listname == "mailbox" and minetest.get_player_privs(player:get_player_name()).staff then -- staff can put things back
+		return stack:get_count()
 	end
 
 	return 0
@@ -167,7 +174,7 @@ function mailbox.allow_take(pos, listname, index, stack, player)
 	end
 	local meta = minetest.get_meta(pos)
 
-	if player:get_player_name() ~= meta:get_string("owner") then
+	if not can_modify_mailbox(meta:get_string("owner"), player:get_player_name()) then
 		return 0
 	end
 
