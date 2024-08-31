@@ -680,11 +680,12 @@ local painting_box = {
 
 xdecor.register("painting_1", {
 	description = S("Painting"),
-	tiles = {"xdecor_painting_1.png"},
+	tiles = {"xdecor_painting_1.png","xdecor_painting_1.png^[transformR180","xdecor_painting_1.png"},
 	use_texture_alpha = ALPHA_OPAQUE,
 	inventory_image = "xdecor_painting_empty.png",
 	wield_image = "xdecor_painting_empty.png",
 	paramtype2 = "wallmounted",
+	wallmounted_rotate_vertical = true,
 	sunlight_propagates = true,
 	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, attached_node = 1},
 	is_ground_content = false,
@@ -733,9 +734,10 @@ xdecor.register("painting_1", {
 
 for i = 2, 4 do
 	xdecor.register("painting_" .. i, {
-		tiles = {"xdecor_painting_" .. i .. ".png"},
+		tiles = {"xdecor_painting_"..i..".png","xdecor_painting_"..i..".png^[transformR180","xdecor_painting_"..i..".png"},
 		use_texture_alpha = ALPHA_OPAQUE,
 		paramtype2 = "wallmounted",
+		wallmounted_rotate_vertical = true,
 		drop = "xdecor:painting_1",
 		sunlight_propagates = true,
 		groups = {

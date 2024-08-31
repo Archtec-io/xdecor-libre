@@ -310,7 +310,7 @@ xdecor.register("workbench", {
 	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
 	tiles = {
-		"xdecor_workbench_top.png","xdecor_workbench_top.png",
+		"xdecor_workbench_top.png","xdecor_workbench_bottom.png",
 		"xdecor_workbench_sides.png", "xdecor_workbench_sides.png",
 		"xdecor_workbench_front.png", "xdecor_workbench_front.png"
 	},

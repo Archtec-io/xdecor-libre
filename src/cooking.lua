@@ -247,7 +247,7 @@ xdecor.register("cauldron_empty", {
 	groups = {cracky=2, oddly_breakable_by_hand=1,cauldron=1},
 	is_ground_content = false,
 	on_rotate = screwdriver.rotate_simple,
-	tiles = {"xdecor_cauldron_top_empty.png", "xdecor_cauldron_sides.png"},
+	tiles = {"xdecor_cauldron_top_empty.png", "xdecor_cauldron_bottom.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_rightclick = cauldron.filling,
@@ -264,7 +264,7 @@ xdecor.register("cauldron_idle", {
 	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1,cauldron=2},
 	is_ground_content = false,
 	on_rotate = screwdriver.rotate_simple,
-	tiles = {"xdecor_cauldron_top_idle.png", "xdecor_cauldron_sides.png"},
+	tiles = {"xdecor_cauldron_top_idle.png", "xdecor_cauldron_bottom.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
 	drop = "xdecor:cauldron_empty",
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
@@ -278,7 +278,7 @@ xdecor.register("cauldron_idle_river_water", {
 	groups = {cracky=2, oddly_breakable_by_hand=1, not_in_creative_inventory=1,cauldron=2},
 	is_ground_content = false,
 	on_rotate = screwdriver.rotate_simple,
-	tiles = {"xdecor_cauldron_top_idle_river_water.png", "xdecor_cauldron_sides.png"},
+	tiles = {"xdecor_cauldron_top_idle_river_water.png", "xdecor_cauldron_bottom.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
 	drop = "xdecor:cauldron_empty",
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
@@ -293,7 +293,7 @@ xdecor.register("cauldron_idle_soup", {
 	is_ground_content = false,
 	on_rotate = screwdriver.rotate_simple,
 	drop = "xdecor:cauldron_empty",
-	tiles = {"xdecor_cauldron_top_idle_soup.png", "xdecor_cauldron_sides.png"},
+	tiles = {"xdecor_cauldron_top_idle_soup.png", "xdecor_cauldron_bottom.png", "xdecor_cauldron_sides.png"},
 	sounds = default.node_sound_metal_defaults(),
 	collision_box = xdecor.pixelbox(16, cauldron.cbox),
 	on_construct = function(pos)
@@ -320,6 +320,7 @@ xdecor.register("cauldron_boiling", {
 			name = "xdecor_cauldron_top_anim_boiling_water.png",
 			animation = {type = "vertical_frames", length = 3.0}
 		},
+		"xdecor_cauldron_bottom.png",
 		"xdecor_cauldron_sides.png"
 	},
 	sounds = default.node_sound_metal_defaults(),
@@ -344,6 +345,7 @@ xdecor.register("cauldron_boiling_river_water", {
 			name = "xdecor_cauldron_top_anim_boiling_river_water.png",
 			animation = {type = "vertical_frames", length = 3.0}
 		},
+		"xdecor_cauldron_bottom.png",
 		"xdecor_cauldron_sides.png"
 	},
 	sounds = default.node_sound_metal_defaults(),
@@ -370,6 +372,7 @@ xdecor.register("cauldron_soup", {
 			name = "xdecor_cauldron_top_anim_soup.png",
 			animation = {type = "vertical_frames", length = 3.0}
 		},
+		"xdecor_cauldron_bottom.png",
 		"xdecor_cauldron_sides.png"
 	},
 	sounds = default.node_sound_metal_defaults(),
