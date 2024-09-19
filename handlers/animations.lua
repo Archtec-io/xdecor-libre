@@ -69,7 +69,7 @@ function xdecor.sit(pos, node, clicker, pointed_thing)
 		player_api.player_attached[player_name] = true
 		player_api.set_animation(clicker, "sit")
 		sitting[player_name] = table.copy(pos)
-		seats_occupied[hash] = true
+		seats_occupied[hash] = player_name
 		clicker:set_pos(pos)
 
 		if node.param2 == 0 then
@@ -101,6 +101,22 @@ function xdecor.sit_dig(pos, digger)
 	end
 
 	return true
+end
+
+-- To be called when a seat (sittable node) got destroyed
+-- to clean up state. Precisely, this should be used
+-- as the `after_destruct` handler.
+function xdecor.sit_destruct(pos)
+	local hash = minetest.hash_node_position(pos)
+	local occupier = seats_occupied[hash]
+	if occupier then
+		local player = minetest.get_player_by_name(occupier)
+		if player then
+			stand_up(player)
+		end
+		seats_occupied[hash] = nil
+		sitting[occupied] = nil
+	end
 end
 
 -- Automatically cause players to stand up if they pressed a control

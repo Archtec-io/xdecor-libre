@@ -212,6 +212,7 @@ xdecor.register("chair", {
 		{3,  6,  3,  10,  2, 8}
 	}),
 	can_dig = xdecor.sit_dig,
+	after_destruct = xdecor.sit_destruct,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		xdecor.sit(pos, node, clicker, pointed_thing)
 		return itemstack
@@ -324,6 +325,7 @@ xdecor.register("cushion", {
 	on_place = minetest.rotate_node,
 	node_box = xdecor.nodebox.slab_y(0.5),
 	can_dig = xdecor.sit_dig,
+	after_destruct = xdecor.sit_destruct,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		xdecor.sit(pos, node, clicker, pointed_thing)
 		return itemstack
