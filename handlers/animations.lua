@@ -22,7 +22,7 @@ local function stand_up(player_name)
 
 	local old_anim = player_api.get_animation(player)
 	if old_anim and old_anim.animation == "sit" then
-		player_api.set_animation(player, "stand", 30)
+		player_api.set_animation(player, "stand")
 	end
 
 	local hash = minetest.hash_node_position(sitting[player_name])
@@ -67,7 +67,7 @@ function xdecor.sit(pos, node, clicker, pointed_thing)
 		end
 
 		player_api.player_attached[player_name] = true
-		player_api.set_animation(clicker, "sit", 30)
+		player_api.set_animation(clicker, "sit")
 		sitting[player_name] = table.copy(pos)
 		seats_occupied[hash] = true
 		clicker:set_pos(pos)
