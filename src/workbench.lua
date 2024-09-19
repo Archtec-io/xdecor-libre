@@ -508,7 +508,9 @@ end)
 workbench:register_special_cut("xdecor:cushion_block", { slab = "xdecor:cushion" })
 workbench:register_special_cut("xdecor:cabinet", { slab = "xdecor:cabinet_half" })
 
--- Public function to register a cut
+-- EXPERIMENTAL PUBLIC FUNCTION:
+-- Register 'cut' node variants for the node with the given nodename.
+-- (thin stair, panel, etc.)
 xdecor.register_cut = function(nodename)
 	workbench:register_cut(nodename)
 end
