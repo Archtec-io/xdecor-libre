@@ -1089,7 +1089,11 @@ end
 
 local function get_figurine_id(piece_itemname)
 	local piece_s = piece_itemname:match(":(%w+_%w+)")
-	return figurines_str:match("(%d+)=chess_figurine_" .. piece_s)
+	if not piece_s then
+		return MOVES_LIST_SYMBOL_EMPTY
+	else
+		return figurines_str:match("(%d+)=chess_figurine_" .. piece_s)
+	end
 end
 
 
