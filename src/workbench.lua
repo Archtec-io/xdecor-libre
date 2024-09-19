@@ -404,7 +404,12 @@ local function register_cut_raw(node, workbench_def)
 			tiles_special_cut = tiles
 		end
 
-		minetest.register_node(":" .. node .. "_" .. cutname, {
+		local cutnodename = node .. "_" .. cutname
+		if minetest.registered_nodes[cutnodename] then
+			minetest.log("error", "[xdecor] register_cut_raw: Refusing to register node "..cutnodename.." becaut it was already registered!")
+			return false
+		end
+		minetest.register_node(":" .. cutnodename, {
 			-- @1: Base node description (e.g. "Stone"); @2: modifier (e.g. "Nanoslab")
 			description = S("@1 @2", def.description, workbench_def[4]),
 			paramtype = "light",
@@ -438,10 +443,15 @@ function workbench:register_cut(nodename, cutlist)
 		minetest.log("error", "[xdecor] Workbench: Tried to register cut for node "..node..", but it was already registered!")
 		return false
 	end
+	local ok = true
 	for _, d in ipairs(workbench.defs) do
-		register_cut_raw(nodename, d)
+		local ok = register_cut_raw(nodename, d)
+		if not ok then
+			ok = false
+		end
 	end
 	registered_cuttable_nodes[nodename] = true
+	return ok
 end
 
 function workbench:register_special_cut(nodename, cutlist)
@@ -508,9 +518,37 @@ end)
 workbench:register_special_cut("xdecor:cushion_block", { slab = "xdecor:cushion" })
 workbench:register_special_cut("xdecor:cabinet", { slab = "xdecor:cabinet_half" })
 
--- EXPERIMENTAL PUBLIC FUNCTION:
--- Register 'cut' node variants for the node with the given nodename.
--- (thin stair, panel, etc.)
+--[[ EXPERIMENTAL PUBLIC FUNCTION:
+Registers various 'cut' node variants for the node with the given nodename,
+which will be available in the workbench.
+This must only be called once per node. Calling it again is an error.
+
+The following nodes will be registered:
+
+* <nodename>_nanoslab
+* <nodename>_micropanel
+* <nodename>_microslab
+* <nodename>_thinstair
+* <nodename>_cube
+* <nodename>_panel
+* <nodename>_doublepanel
+* <nodename>_halfstair
+* <nodename>_slab
+* <nodename>_stair
+* <nodename>_stair_outer
+* <nodename>_stair_inner
+
+`<nodename>_slab`, `<nodename>_stair`, `<nodename>_stair_outer`
+and `<nodename>_stair_inner` will only be registered if the
+slab node (`<nodename>_slab`) does not exist yet. These nodes will
+be registered using the `stairs` mod.
+
+For the other nodes, you MUST make sure these names are not already
+taken before calling this function. Failing to do so is an error.
+
+Returns true if all nodes were registered successfully,
+returns false (and writes to error log) if any error occurred.
+]]
 xdecor.register_cut = function(nodename)
-	workbench:register_cut(nodename)
+	return workbench:register_cut(nodename)
 end
