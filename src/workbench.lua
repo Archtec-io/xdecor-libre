@@ -537,13 +537,10 @@ The following nodes will be registered:
 You MUST make sure these names are not already taken before
 calling this function. Failing to do so is an error.
 
-Additionally, the following nodes will be registered by using
-the `stairs` mod if `<nodename>_slab` does not exist yet:
-
-* <nodename>_slab
-* <nodename>_stair
-* <nodename>_stair_outer
-* <nodename>_stair_inner
+Additionally, a slab, stair, inner stair and outer stair
+will be registered by using the `stairs` mod if the slab
+node does not exist yet. Refer to the `stairs` mod documentation
+for details.
 
 Returns true if all nodes were registered successfully,
 returns false (and writes to error log) if any error occurred.
