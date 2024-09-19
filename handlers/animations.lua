@@ -3,11 +3,11 @@ local mod_player_api = minetest.get_modpath("player_api") ~= nil
 local sitting = {}
 local seats_occupied = {}
 
-local function top_face(pointed_thing)
+local function bottom_face(pointed_thing)
 	if not pointed_thing then
 		return
 	end
-	return pointed_thing.above.y > pointed_thing.under.y
+	return pointed_thing.above.y < pointed_thing.under.y
 end
 
 local function stand_up(player_name)
@@ -43,8 +43,8 @@ function xdecor.sit(pos, node, clicker, pointed_thing)
 	if not mod_player_api then
 		return
 	end
-	-- Must click on top face to sit down
-	if not top_face(pointed_thing) then
+	-- Can't sit down if bottom face was pointed at
+	if bottom_face(pointed_thing) then
 		return
 	end
 	local player_name = clicker:get_player_name()
