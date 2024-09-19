@@ -3,7 +3,7 @@ local chessbot = {}
 local realchess = xdecor.chess
 
 -- Delay in seconds for a bot moving a piece (excluding choosing a promotion)
-local BOT_DELAY_MOVE = 0.2
+local BOT_DELAY_MOVE = 1.0
 -- Delay in seconds for a bot promoting a piece
 local BOT_DELAY_PROMOTE = 1.0
 
