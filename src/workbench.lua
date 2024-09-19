@@ -533,18 +533,17 @@ The following nodes will be registered:
 * <nodename>_panel
 * <nodename>_doublepanel
 * <nodename>_halfstair
+
+You MUST make sure these names are not already taken before
+calling this function. Failing to do so is an error.
+
+Additionally, the following nodes will be registered by using
+the `stairs` mod if `<nodename>_slab` does not exist yet:
+
 * <nodename>_slab
 * <nodename>_stair
 * <nodename>_stair_outer
 * <nodename>_stair_inner
-
-`<nodename>_slab`, `<nodename>_stair`, `<nodename>_stair_outer`
-and `<nodename>_stair_inner` will only be registered if the
-slab node (`<nodename>_slab`) does not exist yet. These nodes will
-be registered using the `stairs` mod.
-
-For the other nodes, you MUST make sure these names are not already
-taken before calling this function. Failing to do so is an error.
 
 Returns true if all nodes were registered successfully,
 returns false (and writes to error log) if any error occurred.
