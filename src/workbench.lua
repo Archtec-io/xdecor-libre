@@ -494,7 +494,7 @@ minetest.register_craft({
 })
 
 -- Register default cuttable blocks
-minetest.register_on_mods_loaded(function()
+do
 	local cuttable_nodes = {}
 
 	-- Nodes allowed to be cut:
@@ -512,7 +512,7 @@ minetest.register_on_mods_loaded(function()
 		local node = cuttable_nodes[i]
 		workbench:register_cut(node)
 	end
-end)
+end
 
 -- Special cuts for cushion block and cabinet
 workbench:register_special_cut("xdecor:cushion_block", { slab = "xdecor:cushion" })
