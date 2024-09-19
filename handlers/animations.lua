@@ -110,12 +110,9 @@ function xdecor.sit_destruct(pos)
 	local hash = minetest.hash_node_position(pos)
 	local occupier = seats_occupied[hash]
 	if occupier then
-		local player = minetest.get_player_by_name(occupier)
-		if player then
-			stand_up(player)
-		end
+		stand_up(occupier)
 		seats_occupied[hash] = nil
-		sitting[occupied] = nil
+		sitting[occupier] = nil
 	end
 end
 
