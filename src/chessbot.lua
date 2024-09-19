@@ -80,7 +80,9 @@ function chessbot.choose_move(board_t, meta_t)
 		end
 
 		return choice_from, choice_to
-
+	else
+		minetest.log("error", "[xdecor] Chess: chessbot.choose_move was apparently called in an invalid game state!")
+		return
 	end
 end
 
@@ -122,6 +124,7 @@ chessbot.perform_move = function(choice_from, choice_to, meta)
 	end
 	local botColor = meta:get_string("botColor")
 	if botColor == "" then
+		minetest.log("error", "[xdecor] Chess: chessbot.perform_move: botColor in meta string was empty!")
 		return
 	end
 	local lastMove = meta:get_string("lastMove")
@@ -144,6 +147,8 @@ chessbot.perform_move = function(choice_from, choice_to, meta)
 		if not moveOK then
 			realchess.resign(meta, currentBotColor)
 		end
+	else
+		minetest.log("error", "[xdecor] Chess: chessbot.perform_move: No last move!")
 	end
 end
 
