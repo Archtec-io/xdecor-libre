@@ -200,7 +200,7 @@ xdecor.register("chair", {
 	description = S("Chair"),
 	tiles = {"xdecor_wood.png"},
 	sounds = default.node_sound_wood_defaults(),
-	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2},
+	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, sittable = 1},
 	is_ground_content = false,
 	on_rotate = screwdriver.rotate_simple,
 	node_box = xdecor.pixelbox(16, {
@@ -212,8 +212,8 @@ xdecor.register("chair", {
 		{3,  6,  3,  10,  2, 8}
 	}),
 	can_dig = xdecor.sit_dig,
+	after_destruct = xdecor.sit_destruct,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		pos.y = pos.y + 0  -- Sitting position
 		xdecor.sit(pos, node, clicker, pointed_thing)
 		return itemstack
 	end,
@@ -320,13 +320,13 @@ end
 xdecor.register("cushion", {
 	description = S("Cushion"),
 	tiles = {"xdecor_cushion.png"},
-	groups = {snappy = 3, flammable = 3, fall_damage_add_percent = -50},
+	groups = {snappy = 3, flammable = 3, fall_damage_add_percent = -50, sittable = 1},
 	is_ground_content = false,
 	on_place = minetest.rotate_node,
 	node_box = xdecor.nodebox.slab_y(0.5),
 	can_dig = xdecor.sit_dig,
+	after_destruct = xdecor.sit_destruct,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		pos.y = pos.y + 0  -- Sitting position
 		xdecor.sit(pos, node, clicker, pointed_thing)
 		return itemstack
 	end

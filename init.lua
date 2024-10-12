@@ -21,6 +21,7 @@ local subpart = {
 	"mailbox",
 	"mechanisms",
 	"rope",
+	-- Workbench MUST be loaded last for the default 'cut node' registrations to work
 	"workbench",
 }
 

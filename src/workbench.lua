@@ -109,11 +109,6 @@ function workbench:get_output(inv, input, name)
 	inv:set_list("forms", output)
 end
 
-function workbench:register_special_cut(nodename, cutlist)
-	registered_cuttable_nodes[nodename] = true
-	special_cuts[nodename] = cutlist
-end
-
 local main_fs = "label[0.9,1.23;"..FS("Cut").."]"
 	.."label[0.9,2.23;"..FS("Repair").."]"
 	..[[ box[-0.05,1;2.05,0.9;#555555]
@@ -328,29 +323,11 @@ xdecor.register("workbench", {
 	allow_metadata_inventory_move = workbench.allow_move
 })
 
-
-minetest.register_on_mods_loaded(function()
-local cuttable_nodes = {}
-
--- Nodes allowed to be cut:
--- Only the regular, solid blocks without metas or explosivity
--- from the xdecor or default mods.
-for nodename, def in pairs(minetest.registered_nodes) do
-	local nodenamesplit = string.split(nodename, ":")
-	local modname = nodenamesplit[1]
-	if (modname == "xdecor" or modname == "default") and xdecor.stairs_valid_def(def) then
-		cuttable_nodes[#cuttable_nodes + 1] = nodename
-		registered_cuttable_nodes[nodename] = true
-	end
-end
-
-for _, d in ipairs(workbench.defs) do
-for i = 1, #cuttable_nodes do
-	local node = cuttable_nodes[i]
+local function register_cut_raw(node, workbench_def)
 	local mod_name, item_name = node:match("^(.-):(.*)")
 	local def = minetest.registered_nodes[node]
 
-	if item_name and d[3] then
+	if item_name and workbench_def[3] then
 		local groups = {}
 		local tiles
 		groups.not_in_creative_inventory = 1
@@ -419,7 +396,7 @@ for i = 1, #cuttable_nodes do
 			end
 		end
 
-		local cutname = d[1]
+		local cutname = workbench_def[1]
 		local tiles_special_cut
 		if custom_tiles and custom_tiles[cutname] then
 			tiles_special_cut = custom_tiles[cutname]
@@ -427,9 +404,14 @@ for i = 1, #cuttable_nodes do
 			tiles_special_cut = tiles
 		end
 
-		minetest.register_node(":" .. node .. "_" .. cutname, {
+		local cutnodename = node .. "_" .. cutname
+		if minetest.registered_nodes[cutnodename] then
+			minetest.log("error", "[xdecor] register_cut_raw: Refusing to register node "..cutnodename.." becaut it was already registered!")
+			return false
+		end
+		minetest.register_node(":" .. cutnodename, {
 			-- @1: Base node description (e.g. "Stone"); @2: modifier (e.g. "Nanoslab")
-			description = S("@1 @2", def.description, d[4]),
+			description = S("@1 @2", def.description, workbench_def[4]),
 			paramtype = "light",
 			paramtype2 = "facedir",
 			drawtype = "nodebox",
@@ -438,7 +420,7 @@ for i = 1, #cuttable_nodes do
 			use_texture_alpha = def.use_texture_alpha,
 			groups = groups,
 			is_ground_content = def.is_ground_content,
-			node_box = xdecor.pixelbox(16, d[3]),
+			node_box = xdecor.pixelbox(16, workbench_def[3]),
 			sunlight_propagates = true,
 			on_place = minetest.rotate_node
 		})
@@ -453,9 +435,33 @@ for i = 1, #cuttable_nodes do
 			("stairs:stair_outer_%s"):format(item_name)
 		)
 	end
+	return true
 end
+
+function workbench:register_cut(nodename, cutlist)
+	if registered_cuttable_nodes[nodename] then
+		minetest.log("error", "[xdecor] Workbench: Tried to register cut for node "..node..", but it was already registered!")
+		return false
+	end
+	local ok = true
+	for _, d in ipairs(workbench.defs) do
+		local ok = register_cut_raw(nodename, d)
+		if not ok then
+			ok = false
+		end
+	end
+	registered_cuttable_nodes[nodename] = true
+	return ok
 end
-end)
+
+function workbench:register_special_cut(nodename, cutlist)
+	if registered_cuttable_nodes[nodename] or special_cuts[nodename] then
+		minetest.log("error", "[xdecor] Workbench: Tried to register special cut for node "..nodename..", but it was already registered!")
+		return false
+	end
+	registered_cuttable_nodes[nodename] = true
+	special_cuts[nodename] = cutlist
+end
 
 -- Craft items
 
@@ -487,6 +493,58 @@ minetest.register_craft({
 	}
 })
 
+-- Register default cuttable blocks
+do
+	local cuttable_nodes = {}
+
+	-- Nodes allowed to be cut:
+	-- Only the regular, solid blocks without metas or explosivity
+	-- from the xdecor or default mods.
+	for nodename, def in pairs(minetest.registered_nodes) do
+		local nodenamesplit = string.split(nodename, ":")
+		local modname = nodenamesplit[1]
+		if (modname == "xdecor" or modname == "default") and xdecor.stairs_valid_def(def) then
+			cuttable_nodes[#cuttable_nodes + 1] = nodename
+		end
+	end
+
+	for i = 1, #cuttable_nodes do
+		local node = cuttable_nodes[i]
+		workbench:register_cut(node)
+	end
+end
+
 -- Special cuts for cushion block and cabinet
 workbench:register_special_cut("xdecor:cushion_block", { slab = "xdecor:cushion" })
 workbench:register_special_cut("xdecor:cabinet", { slab = "xdecor:cabinet_half" })
+
+--[[ EXPERIMENTAL PUBLIC FUNCTION:
+Registers various 'cut' node variants for the node with the given nodename,
+which will be available in the workbench.
+This must only be called once per node. Calling it again is an error.
+
+The following nodes will be registered:
+
+* <nodename>_nanoslab
+* <nodename>_micropanel
+* <nodename>_microslab
+* <nodename>_thinstair
+* <nodename>_cube
+* <nodename>_panel
+* <nodename>_doublepanel
+* <nodename>_halfstair
+
+You MUST make sure these names are not already taken before
+calling this function. Failing to do so is an error.
+
+Additionally, a slab, stair, inner stair and outer stair
+will be registered by using the `stairs` mod if the slab
+node does not exist yet. Refer to the `stairs` mod documentation
+for details.
+
+Returns true if all nodes were registered successfully,
+returns false (and writes to error log) if any error occurred.
+]]
+xdecor.register_cut = function(nodename)
+	return workbench:register_cut(nodename)
+end
