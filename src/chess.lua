@@ -3289,13 +3289,13 @@ if ENABLE_CHESS_GAMES then
 		realchess.move(meta, from_list, from_index, to_list, to_index, playerName)
 		-- We always return 0 to disable all *builtin* inventory moves, since
 		-- we do it ourselves. This should be fine because there shouldn't be a
-		-- conflict between this mod and Minetest then.
+		-- conflict between this mod and Luanti then.
 		return 0
 	end
 	chessboarddef.allow_metadata_inventory_take = function() return 0 end
 	chessboarddef.allow_metadata_inventory_put = function() return 0 end
 	-- Note: There is no on_move function because we put the entire move handling
-	-- into the allow function above. The reason for this is of Minetest's
+	-- into the allow function above. The reason for this is of Luanti's
 	-- awkward behavior when swapping items.
 
 	minetest.register_lbm({

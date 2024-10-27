@@ -2,10 +2,10 @@
 
 [![ContentDB](https://content.minetest.net/packages/Wuzzy/xdecor/shields/downloads/)](https://content.minetest.net/packages/Wuzzy/xdecor/)
 
-X-Decor-libre is a libre Minetest mod which adds various decorative blocks
+X-Decor-libre is a libre Luanti mod which adds various decorative blocks
 as well as simple gimmicks.
 
-This is a libre version (free software, free media) of the X-Decor mod for Minetest.
+This is a libre version (free software, free media) of the X-Decor mod for Luanti.
 It is the same as X-Decor, except with all the non-free files replaced and with
 bugfixes. There are no new features.
 
@@ -45,7 +45,7 @@ blocks with special features:
 
 ### X-Decor-libre vs X-Decor
 
-X-Decor is a popular mod in Minetest but it is (as the time of writing this text)
+X-Decor is a popular mod in Luanti but it is (as the time of writing this text)
 non-free software, there are various files under proprietary licenses.
 
 The purpose of this repository is to provide the community a fully-free fork of
