@@ -5,26 +5,28 @@ local special_cuts = {}
 screwdriver = screwdriver or {}
 local min, ceil = math.min, math.ceil
 local S = minetest.get_translator("xdecor")
+local T = S
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 
+local GENERATE_TRANSLATABLE_STRING_LIST = true
 
 -- Nodeboxes definitions
 workbench.defs = {
 	-- Name Yield Nodeboxes (X Y Z W H L)  Description
-	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }}, S("Nanoslab")},
-	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }}, S("Micropanel")},
-	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, S("Microslab")},
+	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }}, T("Nanoslab")},
+	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }}, T("Micropanel")},
+	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, T("Microslab")},
 	{"thinstair",   8,  {{ 0, 7,  0, 16, 1, 8  },
-			{ 0, 15, 8, 16, 1, 8  }}, S("Thin Stair")},
-	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, S("Cube")},
-	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, S("Panel")},
-	{"slab",        2,  nil, S("Slab") },
+			{ 0, 15, 8, 16, 1, 8  }}, T("Thin Stair")},
+	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, T("Cube")},
+	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, T("Panel")},
+	{"slab",        2,  nil, T("Slab") },
 	{"doublepanel", 2,  {{ 0, 0,  0, 16, 8, 8  },
-			{ 0, 8,  8, 16, 8, 8  }}, S("Double Panel")},
+			{ 0, 8,  8, 16, 8, 8  }}, T("Double Panel")},
 	{"halfstair",   2,  {{ 0, 0,  0, 8,  8, 16 },
-			{ 0, 8,  8, 8,  8, 8  }}, S("Half-Stair")},
+			{ 0, 8,  8, 8,  8, 8  }}, T("Half-Stair")},
 	{"stair_outer", 1,  nil, nil},
-	{"stair",       1,  nil, S("Stair")},
+	{"stair",       1,  nil, T("Stair")},
 	{"stair_inner", 1,  nil, nil},
 }
 
@@ -373,26 +375,26 @@ local function register_cut_raw(node, workbench_def)
 			if custom_tiles and (custom_tiles.slab or custom_tiles.stair) then
 				if custom_tiles.stair then
 					stairs.register_stair(item_name, node,
-						groups, custom_tiles.stair, S("@1 Stair", def.description),
+						groups, custom_tiles.stair, T(def.description.." Stair"),
 						def.sounds)
 					stairs.register_stair_inner(item_name, node,
-						groups, custom_tiles.stair_inner, "", def.sounds, nil, S("Inner @1 Stair", def.description))
+						groups, custom_tiles.stair_inner, "", def.sounds, nil, T("Inner "..def.description.." Stair"))
 					stairs.register_stair_outer(item_name, node,
-						groups, custom_tiles.stair_outer, "", def.sounds, nil, S("Outer @1 Stair", def.description))
+						groups, custom_tiles.stair_outer, "", def.sounds, nil, T("Outer "..def.description.." Stair"))
 				end
 				if custom_tiles.slab then
 					stairs.register_slab(item_name, node,
-						groups, custom_tiles.slab, S("@1 Slab", def.description),
+						groups, custom_tiles.slab, T(def.description.." Slab"),
 						def.sounds)
 				end
 			else
 				stairs.register_stair_and_slab(item_name, node,
 					groups, tiles,
-					S("@1 Stair", def.description),
-					S("@1 Slab", def.description),
+					T(def.description.." Stair"),
+					T(def.description.." Slab"),
 					def.sounds, nil,
-					S("Inner @1 Stair", def.description),
-					S("Outer @1 Stair", def.description))
+					T("Inner "..def.description.." Stair"),
+					T("Outer "..def.description.." Stair"))
 			end
 		end
 
@@ -410,8 +412,9 @@ local function register_cut_raw(node, workbench_def)
 			return false
 		end
 		minetest.register_node(":" .. cutnodename, {
-			-- @1: Base node description (e.g. "Stone"); @2: modifier (e.g. "Nanoslab")
-			description = S("@1 @2", def.description, workbench_def[4]),
+			-- Base node description (e.g. "Stone") concatenated with a space, then a modifier (e.g. "Nanoslab"),
+			-- e.g. "Stone Nanoslab".
+			description = T(def.description .. " " .. workbench_def[4]),
 			paramtype = "light",
 			paramtype2 = "facedir",
 			drawtype = "nodebox",
@@ -424,6 +427,12 @@ local function register_cut_raw(node, workbench_def)
 			sunlight_propagates = true,
 			on_place = minetest.rotate_node
 		})
+
+		if GENERATE_TRANSLATABLE_STRING_LIST then
+			local desc = minetest.get_translated_string("de", S("Work Bench"))
+			--desc = def.description
+			print(("S(%q)"):format(tostring(desc)))
+		end
 
 	elseif item_name and mod_name then
 		minetest.register_alias_force(
