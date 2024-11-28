@@ -1,6 +1,6 @@
 ## X-Decor-libre [`xdecor`] ##
 
-[![ContentDB](https://content.minetest.net/packages/Wuzzy/xdecor/shields/downloads/)](https://content.minetest.net/packages/Wuzzy/xdecor/)
+[![ContentDB](https://content.luanti.org/packages/Wuzzy/xdecor/shields/downloads/)](https://content.luanti.org/packages/Wuzzy/xdecor/)
 
 X-Decor-libre is a libre Luanti mod which adds various decorative blocks
 as well as simple gimmicks.
