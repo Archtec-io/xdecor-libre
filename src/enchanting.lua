@@ -1,5 +1,6 @@
 screwdriver = screwdriver or {}
 local S = minetest.get_translator("xdecor")
+local NS = function(s) return s end
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 local ceil, abs, random = math.ceil, math.abs, math.random
 local reg_tools = minetest.registered_tools
@@ -39,9 +40,9 @@ function enchanting:get_tooltip(enchant, orig_caps, fleshy)
 	end
 
 	local specs = {
-		durable = {"#00baff", " (+" .. bonus.durable .. "%)"},
-		fast    = {"#74ff49", " (+" .. bonus.efficiency .. "%)"},
-		sharp   = {"#ffff00", " (+" .. bonus.damages .. "%)"},
+		durable = {"#00baff", bonus.durable},
+		fast    = {"#74ff49", bonus.efficiency},
+		sharp   = {"#ffff00", bonus.damages},
 	}
 
 	local enchant_loc = {
@@ -50,9 +51,12 @@ function enchanting:get_tooltip(enchant, orig_caps, fleshy)
 		sharp = S("Sharpness"),
 	}
 
-	return minetest.colorize and minetest.colorize(specs[enchant][1],
-			enchant_loc[enchant] .. specs[enchant][2]) or
-			enchant_loc[enchant] .. specs[enchant][2]
+	if minetest.colorize then
+		--~ Tooltip in format "<enchantment name> (+<bonus>%)", e.g. "Efficiency (+5%)"
+		return minetest.colorize(specs[enchant][1], S("@1 (+@2%)", enchant_loc[enchant], specs[enchant][2]))
+	else
+		return S("@1 (+@2%", enchant_loc[enchant], specs[enchant][2])
+	end
 end
 
 local enchant_buttons = {
