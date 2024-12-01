@@ -21,8 +21,12 @@ local subpart = {
 	"mailbox",
 	"mechanisms",
 	"rope",
-	-- Workbench MUST be loaded last for the default 'cut node' registrations to work
+	-- Workbench MUST be loaded after all other subparts that register nodes
+	-- last for the default 'cut node' registrations to work
 	"workbench",
+	-- Enchanted tools registered last because they depend on previous
+	-- subparts
+	"enchanted_tools",
 }
 
 for _, name in ipairs(subpart) do
