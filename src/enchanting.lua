@@ -369,10 +369,6 @@ for m=1, #materials do
 	enchanting:register_tool("default:"..tooltype.."_"..material, {
 		enchants = enchants,
 		dig_group = dig_group,
-
-		-- dummy
-		material_desc = material,
-		desc = tooltype,
 	})
 end
 end
