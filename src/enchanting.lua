@@ -394,27 +394,6 @@ function enchanting:register_custom_tool(original_tool_name, enchanted_tools)
 	reg_enchantable_tools[original_tool_name] = true
 end
 
--- Register enchantments for default tools from Minetest Game
-local materials = {"steel", "bronze", "mese", "diamond"}
-local tooltypes = {
-	{ "axe", { "durable", "fast" }, "choppy" },
-	{ "pick", { "durable", "fast" }, "cracky" },
-	{ "shovel", { "durable", "fast" }, "crumbly" },
-	{ "sword", { "sharp" }, nil },
-}
-for t=1, #tooltypes do
-for m=1, #materials do
-	local tooltype = tooltypes[t][1]
-	local enchants = tooltypes[t][2]
-	local dig_group = tooltypes[t][3]
-	local material = materials[m]
-	enchanting:register_tool("default:"..tooltype.."_"..material, {
-		enchants = enchants,
-		dig_group = dig_group,
-	})
-end
-end
-
 -- Recipes
 
 minetest.register_craft({
@@ -516,6 +495,26 @@ end
 
 --[[ END OF API ]]
 
+-- Register enchantments for default tools from Minetest Game
+local materials = {"steel", "bronze", "mese", "diamond"}
+local tooltypes = {
+	{ "axe", { "durable", "fast" }, "choppy" },
+	{ "pick", { "durable", "fast" }, "cracky" },
+	{ "shovel", { "durable", "fast" }, "crumbly" },
+	{ "sword", { "sharp" }, nil },
+}
+for t=1, #tooltypes do
+for m=1, #materials do
+	local tooltype = tooltypes[t][1]
+	local enchants = tooltypes[t][2]
+	local dig_group = tooltypes[t][3]
+	local material = materials[m]
+	enchanting:register_tool("default:"..tooltype.."_"..material, {
+		enchants = enchants,
+		dig_group = dig_group,
+	})
+end
+end
 
 -- Register enchanted steel hoe (more durability)
 if farming.register_hoe then
