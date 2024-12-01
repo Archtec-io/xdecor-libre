@@ -82,7 +82,7 @@ function enchanting.formspec(pos, enchants)
 			listring[context;mese]
 			image[2,2.9;1,1;mese_layout.png]
 			]]
-			.."tooltip[sharp;"..FS("Your weapon inflicts more damages").."]"
+			.."tooltip[sharp;"..FS("Your weapon inflicts more damage").."]"
 			.."tooltip[durable;"..FS("Your tool lasts longer").."]"
 			.."tooltip[fast;"..FS("Your tool digs faster").."]"
 			..default.gui_slots .. default.get_hotbar_bg(0.55, 4.5)
