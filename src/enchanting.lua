@@ -21,22 +21,22 @@ local function to_percent(orig_value, final_value)
 	return abs(ceil(((final_value - orig_value) / orig_value) * 100))
 end
 
-function enchanting:get_tooltip(enchant, orig_caps, fleshy)
+function enchanting:get_tooltip(enchant, orig_caps, fleshy, bonus_defs)
 	local bonus = {durable = 0, efficiency = 0, damages = 0}
 
 	if orig_caps then
-		bonus.durable = to_percent(orig_caps.uses, orig_caps.uses * DEFAULT_ENCHANTING_USES)
+		bonus.durable = to_percent(orig_caps.uses, orig_caps.uses * bonus_defs.uses)
 		local sum_caps_times = 0
 		for i=1, #orig_caps.times do
 			sum_caps_times = sum_caps_times + orig_caps.times[i]
 		end
 		local average_caps_time = sum_caps_times / #orig_caps.times
 		bonus.efficiency = to_percent(average_caps_time, average_caps_time -
-					      DEFAULT_ENCHANTING_TIMES)
+					      bonus_defs.times)
 	end
 
 	if fleshy then
-		bonus.damages = to_percent(fleshy, fleshy + DEFAULT_ENCHANTING_DAMAGES)
+		bonus.damages = to_percent(fleshy, fleshy + bonus_defs.damages)
 	end
 
 	local specs = {
@@ -302,22 +302,31 @@ function enchanting:register_tool(original_tool_name, def)
 		local max_drop_level = original_toolcaps.max_drop_level
 		local dig_group = def.dig_group
 
+		if not def.bonuses then
+			def.bonuses = {}
+		end
+		local bonus_defs = {
+			uses = def.bonuses.uses or DEFAULT_ENCHANTING_USES,
+			times = def.bonuses.times or DEFAULT_ENCHANTING_TIMES,
+			damages = def.bonuses.damages or DEFAULT_ENCHANTING_DAMAGES,
+		}
+
 		if enchant == "durable" then
 			groupcaps[dig_group].uses = ceil(original_groupcaps[dig_group].uses *
-						     DEFAULT_ENCHANTING_USES)
+						     bonus_defs.uses)
 		elseif enchant == "fast" then
 			for i, time in pairs(original_groupcaps[dig_group].times) do
-				groupcaps[dig_group].times[i] = time - DEFAULT_ENCHANTING_TIMES
+				groupcaps[dig_group].times[i] = time - bonus_defs.times
 			end
 		elseif enchant == "sharp" then
-			fleshy = fleshy + DEFAULT_ENCHANTING_DAMAGES
+			fleshy = fleshy + bonus_defs.damages
 		else
 			minetest.log("error", "[xdecor] Called enchanting:register_tool with unsupported enchant: "..tostring(enchant))
 			return
 		end
 
 		local arg1 = original_desc
-		local arg2 = self:get_tooltip(enchant, original_groupcaps[dig_group], fleshy)
+		local arg2 = self:get_tooltip(enchant, original_groupcaps[dig_group], fleshy, bonus_defs)
 		local enchantedTool = original_tool.mod_origin .. ":enchanted_" .. original_basename .. "_" .. enchant
 
 		local invimg = original_tool.inventory_image
@@ -418,8 +427,10 @@ Arguments:
       * "sharp": Sharpness (more damage using the damage group "fleshy")
     * dig_group: Must be specified if Durability or Efficiency is used.
       This defines the tool's digging group that enchantment will improve.
-
-The enchantment "strengths" are hardcoded.
+    * bonuses: optional table to customize the enchantment "strengths":
+      * uses: multiplies number of uses (Durability) (default: 1.2)
+      * times: subtracts from digging time; higher = faster (Efficiency) (default: 0.1)
+      * damages: adds to damage (Sharpness) (default: 1)
 ]]
 xdecor.register_enchantable_tool = function(toolname, def)
 	enchanting:register_tool(toolname, def)
