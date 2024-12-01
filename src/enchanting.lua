@@ -21,6 +21,27 @@ local function to_percent(orig_value, final_value)
 	return abs(ceil(((final_value - orig_value) / orig_value) * 100))
 end
 
+function enchanting:get_tooltip_raw(enchant, percent)
+	local specs = {
+		durable = "#00baff",
+		fast    = "#74ff49",
+		sharp   = "#ffff00",
+	}
+	local enchant_loc = {
+		fast = S("Efficiency"),
+		durable = S("Durability"),
+		sharp = S("Sharpness"),
+	}
+
+	if minetest.colorize then
+		--~ Tooltip in format "<enchantment name> (+<bonus>%)", e.g. "Efficiency (+5%)"
+		return minetest.colorize(specs[enchant], S("@1 (+@2%)", enchant_loc[enchant], percent))
+	else
+		return S("@1 (+@2%", enchant_loc[enchant], percent)
+	end
+
+end
+
 function enchanting:get_tooltip(enchant, orig_caps, fleshy, bonus_defs)
 	local bonus = {durable = 0, efficiency = 0, damages = 0}
 
@@ -40,23 +61,12 @@ function enchanting:get_tooltip(enchant, orig_caps, fleshy, bonus_defs)
 	end
 
 	local specs = {
-		durable = {"#00baff", bonus.durable},
-		fast    = {"#74ff49", bonus.efficiency},
-		sharp   = {"#ffff00", bonus.damages},
+		durable = bonus.durable,
+		fast    = bonus.efficiency,
+		sharp   = bonus.damages,
 	}
-
-	local enchant_loc = {
-		fast = S("Efficiency"),
-		durable = S("Durability"),
-		sharp = S("Sharpness"),
-	}
-
-	if minetest.colorize then
-		--~ Tooltip in format "<enchantment name> (+<bonus>%)", e.g. "Efficiency (+5%)"
-		return minetest.colorize(specs[enchant][1], S("@1 (+@2%)", enchant_loc[enchant], specs[enchant][2]))
-	else
-		return S("@1 (+@2%", enchant_loc[enchant], specs[enchant][2])
-	end
+	local percent = specs[enchant]
+	return enchanting:get_tooltip_raw(enchant, percent)
 end
 
 local enchant_buttons = {
@@ -279,6 +289,14 @@ minetest.register_lbm({
 	end,
 })
 
+function enchanting:enchant_texture(img)
+	if img == nil or img == "" or type(img) ~= "string" then
+		return "no_texture.png"
+	else
+		return "("..img.. ")^[colorize:violet:50"
+	end
+end
+
 function enchanting:register_tool(original_tool_name, def)
 	local original_tool = reg_tools[original_tool_name]
 	if not original_tool then
@@ -330,11 +348,7 @@ function enchanting:register_tool(original_tool_name, def)
 		local enchantedTool = original_tool.mod_origin .. ":enchanted_" .. original_basename .. "_" .. enchant
 
 		local invimg = original_tool.inventory_image
-		if invimg == nil or invimg == "" then
-			invimg = "no_texture.png"
-		else
-			invimg = "("..invimg.. ")^[colorize:violet:50"
-		end
+		invimg = enchanting:enchant_texture(invimg)
 		local wieldimg = original_tool.wield_image
 		if wieldimg == nil or wieldimg == "" then
 			wieldimg = invimg
@@ -358,6 +372,16 @@ function enchanting:register_tool(original_tool_name, def)
 		end
 	end
 	available_tool_enchants[original_tool_name] = table.copy(def.enchants)
+	reg_enchantable_tools[original_tool_name] = true
+end
+
+function enchanting:register_custom_tool(original_tool_name, enchanted_tools)
+	if not available_tool_enchants[original_tool_name] then
+		available_tool_enchants[original_tool_name] = {}
+	end
+	for enchant, v in pairs(enchanted_tools) do
+		table.insert(available_tool_enchants[original_tool_name], enchant)
+	end
 	reg_enchantable_tools[original_tool_name] = true
 end
 
@@ -435,3 +459,52 @@ Arguments:
 xdecor.register_enchantable_tool = function(toolname, def)
 	enchanting:register_tool(toolname, def)
 end
+
+--[[ Registers a custom tool enchantment.
+Here, you are fully free to design the tool yourself.
+
+The enchanted tools should follow these guidelines:
+
+1) Use xdecor.enchant_description to generate the description and short_description
+2) Use xdecor.enchant_texture to generate the inventory_image and wield_image
+3) Set groups to { not_in_creative_inventory = 1 }
+
+Arguments:
+* toolname: Itemstring of original tool to enchant
+* enchanted_tools: Table of enchanted tools.
+    * The keys are enchantment names from "enchants" in xdecor.register_enchantable_tool
+    * The values are the itemstrings of the enchanted tools for those
+      enchantments
+]]
+xdecor.register_custom_enchantable_tool = function(toolname, enchanted_tools)
+	enchanting:register_custom_tool(toolname, enchanted_tools)
+end
+
+-- Takes a texture (string) and applies an "enchanting" modifier on it.
+-- Useful when you want to register custom tool enchantments.
+xdecor.enchant_texture = function(texture)
+	return enchanting:enchant_texture(texture)
+end
+
+--[[
+Takes a description of a normal tool and modifies it for the enchanted tool variant.
+Arguments:
+* description: Original description to modify
+* enchant: Enchantment type. One of the enchantment names from "enchants" in xdecor.register_enchantable_tool
+* percent: Percentage to display
+
+Returns: <description>, <short_description>
+
+-- Useful when you want to register custom tool enchantments.
+]]
+xdecor.enchant_description = function(description, enchant, percent)
+	local append = enchanting:get_tooltip_raw(enchant, percent)
+	local desc = S("Enchanted @1\n@2", description, append)
+	local short_desc S("Enchanted @1", description)
+	return desc, short_desc
+end
+
+
+--[[ END OF API ]]
+
+
