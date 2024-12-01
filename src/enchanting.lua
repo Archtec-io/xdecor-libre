@@ -17,6 +17,15 @@ local DEFAULT_ENCHANTING_USES = 1.2 -- Durability
 local DEFAULT_ENCHANTING_TIMES = 0.1 -- Efficiency
 local DEFAULT_ENCHANTING_DAMAGES = 1 -- Sharpness
 
+-- Number of uses for the (normal) steel hoe from Minetest Game (as of 01/12/20224)
+-- This is technically redundant because we cannot access that number
+-- directly, but it's unlikely to change in future because Minetest Game is
+-- unlikely to change.
+local STEEL_HOE_USES = 500
+
+-- Modifier of the steel hoe uses for the enchanted steel hoe
+local STEEL_HOE_USES_MODIFIER = 3
+
 local function to_percent(orig_value, final_value)
 	return abs(ceil(((final_value - orig_value) / orig_value) * 100))
 end
@@ -508,3 +517,21 @@ end
 --[[ END OF API ]]
 
 
+-- Register enchanted steel hoe (more durability)
+if farming.register_hoe then
+	local percent = math.round((STEEL_HOE_USES_MODIFIER - 1) * 100)
+	local hitem = ItemStack("farming:hoe_steel")
+	local hdesc = hitem:get_short_description() or "farming:hoe_steel"
+	local ehdesc, ehsdesc = xdecor.enchant_description(hdesc, "durable", percent)
+	farming.register_hoe(":farming:enchanted_hoe_steel_durable", {
+		description = ehdesc,
+		short_description = ehsdesc,
+		inventory_image = enchanting:enchant_texture("farming_tool_steelhoe.png"),
+		max_uses = STEEL_HOE_USES * STEEL_HOE_USES_MODIFIER,
+		groups = {hoe = 1, not_in_creative_inventory = 1}
+	})
+
+	enchanting:register_custom_tool("farming:hoe_steel", {
+		durable = "farming:enchanted_hoe_steel_durable",
+	})
+end
