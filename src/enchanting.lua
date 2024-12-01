@@ -1,3 +1,5 @@
+local enchanting = {}
+
 screwdriver = screwdriver or {}
 local S = minetest.get_translator("xdecor")
 local NS = function(s) return s end
@@ -8,14 +10,12 @@ local reg_enchantable_tools = {}
 local available_tool_enchants = {}
 
 -- Cost in Mese crystal(s) for enchanting.
-local mese_cost = 1
+local MESE_COST = 1
 
--- Force of the enchantments.
-local enchanting = {
-	uses     = 1.2,  -- Durability
-	times    = 0.1,  -- Efficiency
-	damages  = 1,    -- Sharpness
-}
+-- Default strenth of the enchantments
+local DEFAULT_ENCHANTING_USES = 1.2 -- Durability
+local DEFAULT_ENCHANTING_TIMES = 0.1 -- Efficiency
+local DEFAULT_ENCHANTING_DAMAGES = 1 -- Sharpness
 
 local function to_percent(orig_value, final_value)
 	return abs(ceil(((final_value - orig_value) / orig_value) * 100))
@@ -25,18 +25,18 @@ function enchanting:get_tooltip(enchant, orig_caps, fleshy)
 	local bonus = {durable = 0, efficiency = 0, damages = 0}
 
 	if orig_caps then
-		bonus.durable = to_percent(orig_caps.uses, orig_caps.uses * enchanting.uses)
+		bonus.durable = to_percent(orig_caps.uses, orig_caps.uses * DEFAULT_ENCHANTING_USES)
 		local sum_caps_times = 0
 		for i=1, #orig_caps.times do
 			sum_caps_times = sum_caps_times + orig_caps.times[i]
 		end
 		local average_caps_time = sum_caps_times / #orig_caps.times
 		bonus.efficiency = to_percent(average_caps_time, average_caps_time -
-					      enchanting.times)
+					      DEFAULT_ENCHANTING_TIMES)
 	end
 
 	if fleshy then
-		bonus.damages = to_percent(fleshy, fleshy + enchanting.damages)
+		bonus.damages = to_percent(fleshy, fleshy + DEFAULT_ENCHANTING_DAMAGES)
 	end
 
 	local specs = {
@@ -114,7 +114,7 @@ function enchanting.fields(pos, _, fields, sender)
 	local mod, name = tool:get_name():match("(.*):(.*)")
 	local enchanted_tool = (mod or "") .. ":enchanted_" .. (name or "") .. "_" .. next(fields)
 
-	if mese:get_count() >= mese_cost and reg_tools[enchanted_tool] then
+	if mese:get_count() >= MESE_COST and reg_tools[enchanted_tool] then
 		minetest.sound_play("xdecor_enchanting", {
 			to_player = sender:get_player_name(),
 			gain = 0.8
@@ -122,7 +122,7 @@ function enchanting.fields(pos, _, fields, sender)
 
 		tool:replace(enchanted_tool)
 		tool:add_wear(orig_wear)
-		mese:take_item(mese_cost)
+		mese:take_item(MESE_COST)
 		inv:set_stack("mese", 1, mese)
 		inv:set_stack("tool", 1, tool)
 	end
@@ -304,13 +304,13 @@ function enchanting:register_tool(original_tool_name, def)
 
 		if enchant == "durable" then
 			groupcaps[dig_group].uses = ceil(original_groupcaps[dig_group].uses *
-						     enchanting.uses)
+						     DEFAULT_ENCHANTING_USES)
 		elseif enchant == "fast" then
 			for i, time in pairs(original_groupcaps[dig_group].times) do
-				groupcaps[dig_group].times[i] = time - enchanting.times
+				groupcaps[dig_group].times[i] = time - DEFAULT_ENCHANTING_TIMES
 			end
 		elseif enchant == "sharp" then
-			fleshy = fleshy + enchanting.damages
+			fleshy = fleshy + DEFAULT_ENCHANTING_DAMAGES
 		else
 			minetest.log("error", "[xdecor] Called enchanting:register_tool with unsupported enchant: "..tostring(enchant))
 			return
