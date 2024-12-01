@@ -293,6 +293,8 @@ function enchanting:register_tool(original_tool_name, def)
 	local original_damage_groups = original_toolcaps.damage_groups
 	local original_groupcaps = original_toolcaps.groupcaps
 	local original_basename = original_tool_name:match(".*:(.*)")
+	local toolitem = ItemStack(original_tool_name)
+	local original_desc = toolitem:get_short_description() or original_tool_name
 	for _, enchant in ipairs(def.enchants) do
 		local groupcaps = table.copy(original_groupcaps)
 		local fleshy = original_damage_groups.fleshy
@@ -314,9 +316,8 @@ function enchanting:register_tool(original_tool_name, def)
 			return
 		end
 
-		local arg1 = def.material_desc
-		local arg2 = def.desc
-		local arg3 = self:get_tooltip(enchant, original_groupcaps[dig_group], fleshy)
+		local arg1 = original_desc
+		local arg2 = self:get_tooltip(enchant, original_groupcaps[dig_group], fleshy)
 		local enchantedTool = original_tool.mod_origin .. ":enchanted_" .. original_basename .. "_" .. enchant
 
 		local invimg = original_tool.inventory_image
@@ -330,8 +331,10 @@ function enchanting:register_tool(original_tool_name, def)
 			wieldimg = invimg
 		end
 		minetest.register_tool(":" .. enchantedTool, {
-			description = S("Enchanted @1 @2\n@3", arg1, arg2, arg3),
-			short_description = S("Enchanted @1 @2", arg1, arg2),
+			--~ Enchanted tool description, e.g. "Enchanted Diamond Sword". @1 is the original tool name, @2 is the enchantment text, e.g. "Durability (+20%)"
+			description = S("Enchanted @1\n@2", arg1, arg2),
+			--~ Enchanted tool description, e.g. "Enchanted Diamond Sword"
+			short_description = S("Enchanted @1", arg1),
 			inventory_image = invimg,
 			wield_image = wieldimg,
 			groups = {not_in_creative_inventory = 1},
