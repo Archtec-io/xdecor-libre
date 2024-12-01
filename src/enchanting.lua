@@ -352,7 +352,7 @@ function enchanting:register_tool(original_tool_name, def)
 	reg_enchantable_tools[original_tool_name] = true
 end
 
--- Register enchantments for default tools
+-- Register enchantments for default tools from Minetest Game
 local materials = {"steel", "bronze", "mese", "diamond"}
 local tooltypes = {
 	{ "axe", { "durable", "fast" }, "choppy" },
@@ -383,3 +383,44 @@ minetest.register_craft({
 		{"default:obsidian", "default:obsidian", "default:obsidian"}
 	}
 })
+
+--[[ Enchanting API ]]
+
+--[[
+Register one or more enchantments for an already defined tool.
+This will register a new tool for each enchantment. The new tools will
+have the following changes over the original:
+* New description and short_description
+* Apply a purple glow on wield_image and inventory_image using
+  "(<original_texture_string>)^[colorize:purple"
+* Change tool_capabilities and damage_groups, depending on
+  enchantments.
+* Have groups set to { not_in_creative_inventory = 1 }
+
+The new tools will follow this naming scheme:
+
+    <original_mod>:enchanted_<original_basename>_<enchantment>
+
+e.g. example:sword_diamond with the enchantment "sharp" will
+have "example:enchanted_sword_diamond_sharp" added.
+
+You must make sure this name is available before calling this
+function.
+
+Arguments:
+* toolname: Itemstring of original tool to enchant
+* def: Definition table with the following fields:
+    * enchants: a list of strings, one for each enchantment to add.
+      there must be at least one enchantment.
+      Available enchantments:
+      * "durable": Durability (tool lasts longer)
+      * "fast": Efficiency (tool digs faster)
+      * "sharp": Sharpness (more damage using the damage group "fleshy")
+    * dig_group: Must be specified if Durability or Efficiency is used.
+      This defines the tool's digging group that enchantment will improve.
+
+The enchantment "strengths" are hardcoded.
+]]
+xdecor.register_enchantable_tool = function(toolname, def)
+	enchanting:register_tool(toolname, def)
+end
