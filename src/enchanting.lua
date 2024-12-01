@@ -3,6 +3,8 @@ local S = minetest.get_translator("xdecor")
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 local ceil, abs, random = math.ceil, math.abs, math.random
 local reg_tools = minetest.registered_tools
+local reg_enchantable_tools = {}
+local available_tool_enchants = {}
 
 -- Cost in Mese crystal(s) for enchanting.
 local mese_cost = 1
@@ -13,10 +15,6 @@ local enchanting = {
 	times    = 0.1,  -- Efficiency
 	damages  = 1,    -- Sharpness
 }
-
-local function cap(str) return
-	str:gsub("^%l", string.upper)
-end
 
 local function to_percent(orig_value, final_value)
 	return abs(ceil(((final_value - orig_value) / orig_value) * 100))
@@ -40,7 +38,7 @@ function enchanting:get_tooltip(enchant, orig_caps, fleshy)
 		bonus.damages = to_percent(fleshy, fleshy + enchanting.damages)
 	end
 
-	local specs = { -- not finished, to complete
+	local specs = {
 		durable = {"#00baff", " (+" .. bonus.durable .. "%)"},
 		fast    = {"#74ff49", " (+" .. bonus.efficiency .. "%)"},
 		sharp   = {"#ffff00", " (+" .. bonus.damages .. "%)"},
@@ -58,12 +56,12 @@ function enchanting:get_tooltip(enchant, orig_caps, fleshy)
 end
 
 local enchant_buttons = {
-	"image_button[3.6,0.67;4.75,0.85;bg_btn.png;fast;"..FS("Efficiency").."]" ..
-	"image_button[3.6,1.65;4.75,1.05;bg_btn.png;durable;"..FS("Durability").."]",
-	"image_button[3.6,2.8;4.75,0.85;bg_btn.png;sharp;"..FS("Sharpness").."]",
+	fast = "image_button[3.6,0.67;4.75,0.85;bg_btn.png;fast;"..FS("Efficiency").."]",
+	durable = "image_button[3.6,1.65;4.75,1.05;bg_btn.png;durable;"..FS("Durability").."]",
+	sharp = "image_button[3.6,2.8;4.75,0.85;bg_btn.png;sharp;"..FS("Sharpness").."]",
 }
 
-function enchanting.formspec(pos, num)
+function enchanting.formspec(pos, enchants)
 	local meta = minetest.get_meta(pos)
 	local formspec = [[
 			size[9,8.6;]
@@ -85,22 +83,20 @@ function enchanting.formspec(pos, num)
 			.."tooltip[fast;"..FS("Your tool digs faster").."]"
 			..default.gui_slots .. default.get_hotbar_bg(0.55, 4.5)
 
-	formspec = formspec .. (enchant_buttons[num] or "")
+	if enchants then
+		for e=1, #enchants do
+			formspec = formspec .. enchant_buttons[enchants[e]]
+		end
+	end
 	meta:set_string("formspec", formspec)
 end
 
 function enchanting.on_put(pos, listname, _, stack)
 	if listname == "tool" then
 		local stackname = stack:get_name()
-		local tool_groups = {
-			"axe, pick, shovel",
-			"sword",
-		}
-
-		for idx, tools in ipairs(tool_groups) do
-			if tools:find(stackname:match(":(%w+)")) then
-				enchanting.formspec(pos, idx)
-			end
+		local enchants = available_tool_enchants[stackname]
+		if enchants then
+			enchanting.formspec(pos, enchants)
 		end
 	end
 end
@@ -140,12 +136,13 @@ function enchanting.blast(pos)
 end
 
 local function allowed(tool)
-	if not tool then return end
-
-	for item in pairs(reg_tools) do
-		if item:find("enchanted_" .. tool) then
-			return true
-		end
+	if not tool then
+		return false
+	end
+	if reg_enchantable_tools[tool] then
+		return true
+	else
+		return false
 	end
 end
 
@@ -154,7 +151,7 @@ function enchanting.put(_, listname, _, stack)
 	if listname == "mese" and (stackname == "default:mese_crystal" or
 			stackname == "imese:industrial_mese_crystal") then
 		return stack:get_count()
-	elseif listname == "tool" and allowed(stackname:match("[^:]+$")) then
+	elseif listname == "tool" and allowed(stackname) then
 		return 1
 	end
 
@@ -278,69 +275,100 @@ minetest.register_lbm({
 	end,
 })
 
-function enchanting:register_tools(mod, def)
-	for tool in pairs(def.tools) do
-	for material in def.materials:gmatch("[%w_]+") do
-	for enchant in def.tools[tool].enchants:gmatch("[%w_]+") do
-		local original_tool = reg_tools[mod .. ":" .. tool .. "_" .. material]
-		if not original_tool then break end
-		local original_toolcaps = original_tool.tool_capabilities
+function enchanting:register_tool(original_tool_name, def)
+	local original_tool = reg_tools[original_tool_name]
+	if not original_tool then
+		minetest.log("error", "[xdecor] Called enchanting:register_tool for non-existing tool: "..original_too_name)
+		return
+	end
+	local original_toolcaps = original_tool.tool_capabilities
+	if not original_toolcaps then
+		minetest.log("error", "[xdecor] Called enchanting:register_tool for tool without tool_capabilities: "..original_too_name)
+		return
+	end
+	local original_damage_groups = original_toolcaps.damage_groups
+	local original_groupcaps = original_toolcaps.groupcaps
+	local original_basename = original_tool_name:match(".*:(.*)")
+	for _, enchant in ipairs(def.enchants) do
+		local groupcaps = table.copy(original_groupcaps)
+		local fleshy = original_damage_groups.fleshy
+		local full_punch_interval = original_toolcaps.full_punch_interval
+		local max_drop_level = original_toolcaps.max_drop_level
+		local dig_group = def.dig_group
 
-		if original_toolcaps then
-			local original_damage_groups = original_toolcaps.damage_groups
-			local original_groupcaps = original_toolcaps.groupcaps
-			local groupcaps = table.copy(original_groupcaps)
-			local fleshy = original_damage_groups.fleshy
-			local full_punch_interval = original_toolcaps.full_punch_interval
-			local max_drop_level = original_toolcaps.max_drop_level
-			local group = next(original_groupcaps)
-
-			if enchant == "durable" then
-				groupcaps[group].uses = ceil(original_groupcaps[group].uses *
-							     enchanting.uses)
-			elseif enchant == "fast" then
-				for i, time in pairs(original_groupcaps[group].times) do
-					groupcaps[group].times[i] = time - enchanting.times
-				end
-			elseif enchant == "sharp" then
-				fleshy = fleshy + enchanting.damages
+		if enchant == "durable" then
+			groupcaps[dig_group].uses = ceil(original_groupcaps[dig_group].uses *
+						     enchanting.uses)
+		elseif enchant == "fast" then
+			for i, time in pairs(original_groupcaps[dig_group].times) do
+				groupcaps[dig_group].times[i] = time - enchanting.times
 			end
+		elseif enchant == "sharp" then
+			fleshy = fleshy + enchanting.damages
+		else
+			minetest.log("error", "[xdecor] Called enchanting:register_tool with unsupported enchant: "..tostring(enchant))
+			return
+		end
 
-			local arg1 = def.material_desc[material] or cap(material)
-			local arg2 = def.tools[tool].desc or cap(tool)
-			local arg3 = self:get_tooltip(enchant, original_groupcaps[group], fleshy)
-			local enchantedTool = mod .. ":enchanted_" .. tool .. "_" .. material .. "_" .. enchant
-			minetest.register_tool(":" .. enchantedTool, {
-				description = S("Enchanted @1 @2\n@3", arg1, arg2, arg3),
-				short_description = S("Enchanted @1 @2", arg1, arg2),
-				inventory_image = original_tool.inventory_image .. "^[colorize:violet:50",
-				wield_image = original_tool.wield_image,
-				groups = {not_in_creative_inventory = 1},
-				tool_capabilities = {
-					groupcaps = groupcaps, damage_groups = {fleshy = fleshy},
-					full_punch_interval = full_punch_interval,
-					max_drop_level = max_drop_level
-				}
-			})
-			if minetest.get_modpath("toolranks") then
-				toolranks.add_tool(enchantedTool)
-			end
+		local arg1 = def.material_desc
+		local arg2 = def.desc
+		local arg3 = self:get_tooltip(enchant, original_groupcaps[dig_group], fleshy)
+		local enchantedTool = original_tool.mod_origin .. ":enchanted_" .. original_basename .. "_" .. enchant
+
+		local invimg = original_tool.inventory_image
+		if invimg == nil or invimg == "" then
+			invimg = "no_texture.png"
+		else
+			invimg = "("..invimg.. ")^[colorize:violet:50"
+		end
+		local wieldimg = original_tool.wield_image
+		if wieldimg == nil or wieldimg == "" then
+			wieldimg = invimg
+		end
+		minetest.register_tool(":" .. enchantedTool, {
+			description = S("Enchanted @1 @2\n@3", arg1, arg2, arg3),
+			short_description = S("Enchanted @1 @2", arg1, arg2),
+			inventory_image = invimg,
+			wield_image = wieldimg,
+			groups = {not_in_creative_inventory = 1},
+			tool_capabilities = {
+				groupcaps = groupcaps, damage_groups = {fleshy = fleshy},
+				full_punch_interval = full_punch_interval,
+				max_drop_level = max_drop_level
+			}
+		})
+		if minetest.get_modpath("toolranks") then
+			toolranks.add_tool(enchantedTool)
 		end
 	end
-	end
-	end
+	available_tool_enchants[original_tool_name] = table.copy(def.enchants)
+	reg_enchantable_tools[original_tool_name] = true
 end
 
-enchanting:register_tools("default", {
-	materials = "steel, bronze, mese, diamond",
-	material_desc = {steel = S("Steel"), bronze = S("Bronze"), mese = S("Mese"), diamond = S("Diamond")},
-	tools = {
-		axe    = {enchants = "durable, fast", desc = S("Axe")},
-		pick   = {enchants = "durable, fast", desc = S("Pickaxe")},
-		shovel = {enchants = "durable, fast", desc = S("Shovel")},
-		sword  = {enchants = "sharp", desc = S("Sword")}
-	},
-})
+-- Register enchantments for default tools
+local materials = {"steel", "bronze", "mese", "diamond"}
+local tooltypes = {
+	{ "axe", { "durable", "fast" }, "choppy" },
+	{ "pick", { "durable", "fast" }, "cracky" },
+	{ "shovel", { "durable", "fast" }, "crumbly" },
+	{ "sword", { "sharp" }, nil },
+}
+for t=1, #tooltypes do
+for m=1, #materials do
+	local tooltype = tooltypes[t][1]
+	local enchants = tooltypes[t][2]
+	local dig_group = tooltypes[t][3]
+	local material = materials[m]
+	enchanting:register_tool("default:"..tooltype.."_"..material, {
+		enchants = enchants,
+		dig_group = dig_group,
+
+		-- dummy
+		material_desc = material,
+		desc = tooltype,
+	})
+end
+end
 
 -- Recipes
 
