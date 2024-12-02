@@ -468,26 +468,7 @@ function workbench:register_special_cut(nodename, cutlist)
 	special_cuts[nodename] = cutlist
 end
 
--- Register hammer
-
-xdecor.register_hammer("xdecor:hammer", {
-	description = S("Hammer"),
-	image = "xdecor_hammer.png",
-	groups = { repair_hammer = 1 },
-	repair = DEFAULT_HAMMER_REPAIR,
-	repair_cost = DEFAULT_HAMMER_REPAIR_COST,
-})
-
--- Recipes
-
-minetest.register_craft({
-	output = "xdecor:hammer",
-	recipe = {
-		{"default:steel_ingot", "group:stick", "default:steel_ingot"},
-		{"", "group:stick", ""}
-	}
-})
-
+-- Workbench craft
 minetest.register_craft({
 	output = "xdecor:workbench",
 	recipe = {
@@ -592,3 +573,25 @@ returns false (and writes to error log) if any error occurred.
 xdecor.register_cut = function(nodename)
 	return workbench:register_cut(nodename)
 end
+
+
+--[[ END OF API FUNCTIONS ]]
+
+
+-- Register xdecor's built-in hammer
+xdecor.register_hammer("xdecor:hammer", {
+	description = S("Hammer"),
+	image = "xdecor_hammer.png",
+	groups = { repair_hammer = 1 },
+	repair = DEFAULT_HAMMER_REPAIR,
+	repair_cost = DEFAULT_HAMMER_REPAIR_COST,
+})
+
+-- Hammer recipes
+minetest.register_craft({
+	output = "xdecor:hammer",
+	recipe = {
+		{"default:steel_ingot", "group:stick", "default:steel_ingot"},
+		{"", "group:stick", ""}
+	}
+})
