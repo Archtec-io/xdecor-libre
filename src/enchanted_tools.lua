@@ -9,7 +9,7 @@ local S = minetest.get_translator("xdecor")
 local STEEL_HOE_USES = 500
 
 -- Modifier of the steel hoe uses for the enchanted steel hoe
-local STEEL_HOE_USES_MODIFIER = 3
+local STEEL_HOE_USES_MODIFIER = 2.2
 
 -- Multiplies by much faster the fast hammer repairs
 local HAMMER_FAST_MODIFIER = 1.3
