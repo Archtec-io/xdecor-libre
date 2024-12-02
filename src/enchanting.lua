@@ -313,6 +313,15 @@ function enchanting:register_tool(original_tool_name, def)
 	local original_basename = original_tool_name:match(".*:(.*)")
 	local toolitem = ItemStack(original_tool_name)
 	local original_desc = toolitem:get_short_description() or original_tool_name
+	local groups
+	if def.groups then
+		groups = table.copy(def.groups)
+	elseif original_tool.groups then
+		groups = table.copy(original_tool.groups)
+	else
+		groups = {}
+	end
+	groups.not_in_creative_inventory = 1
 	for _, enchant in ipairs(def.enchants) do
 		local groupcaps = table.copy(original_groupcaps)
 		local full_punch_interval = original_toolcaps.full_punch_interval
@@ -361,7 +370,7 @@ function enchanting:register_tool(original_tool_name, def)
 			short_description = S("Enchanted @1", arg1),
 			inventory_image = invimg,
 			wield_image = wieldimg,
-			groups = {not_in_creative_inventory = 1},
+			groups = groups,
 			tool_capabilities = {
 				groupcaps = groupcaps, damage_groups = {fleshy = fleshy},
 				full_punch_interval = full_punch_interval,
@@ -436,6 +445,10 @@ Arguments:
       * uses: multiplies number of uses (Durability) (default: 1.2)
       * times: subtracts from digging time; higher = faster (Efficiency) (default: 0.1)
       * damages: adds to damage (Sharpness) (default: 1)
+    * groups: optional table specifying all item groups. If specified,
+      this should at least contain `not_in_creative_inventory=1`.
+      If unspecified (recommended), the enchanted tools will inherit all
+      groups from the original tool, plus they receive `not_in_creative_inventory=1`
 ]]
 xdecor.register_enchantable_tool = function(toolname, def)
 	enchanting:register_tool(toolname, def)
