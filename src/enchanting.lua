@@ -37,7 +37,7 @@ function enchanting:get_tooltip_raw(enchant, percent)
 		--~ Tooltip in format "<enchantment name> (+<bonus>%)", e.g. "Efficiency (+5%)"
 		return minetest.colorize(specs[enchant], S("@1 (+@2%)", enchant_loc[enchant], percent))
 	else
-		return S("@1 (+@2%", enchant_loc[enchant], percent)
+		return S("@1 (+@2%)", enchant_loc[enchant], percent)
 	end
 
 end
