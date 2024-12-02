@@ -4,8 +4,11 @@ local S = minetest.get_translator("xdecor")
 -- Set to true to print soup ingredients and fire nodes to console
 local DEBUG_RECOGNIZED_ITEMS = false
 
+--~ cauldron hint
 local hint_fire = S("Light a fire below to heat it up")
+--~ cauldron hint
 local hint_eat = S("Use a bowl to eat the soup")
+--~ cauldron hint
 local hint_recipe = S("Drop foods inside to make a soup")
 
 local infotexts = {

@@ -38,7 +38,7 @@ end
 
 -- Tools allowed to be repaired
 function workbench:repairable(stack)
-	-- Explicitly registeded as repairable: Overrides everything else
+	-- Explicitly registered as repairable: Overrides everything else
 	if custom_repairable[stack] then
 		return true
 	end
@@ -112,11 +112,16 @@ function workbench:get_output(inv, input, name)
 	inv:set_list("forms", output)
 end
 
-local main_fs = "label[0.9,1.23;"..FS("Cut").."]"
+local main_fs = ""..
+	--~ Verb shown in workbench form where you can cut a node
+	"label[0.9,1.23;"..FS("Cut").."]"
+	--~ Verb shown in workbench form where you can repair an item
 	.."label[0.9,2.23;"..FS("Repair").."]"
 	..[[ box[-0.05,1;2.05,0.9;#555555]
 	box[-0.05,2;2.05,0.9;#555555] ]]
+	--~ Button in workbench form
 	.."button[0,0;2,1;craft;"..FS("Crafting").."]"
+	--~ Button in workbench form
 	.."button[2,0;2,1;storage;"..FS("Storage").."]"
 	..[[ image[3,1;1,1;gui_arrow.png]
 	image[0,1;1,1;worktable_saw.png]
@@ -415,7 +420,7 @@ local function register_cut_raw(node, workbench_def)
 			return false
 		end
 		minetest.register_node(":" .. cutnodename, {
-			-- @1: Base node description (e.g. "Stone"); @2: modifier (e.g. "Nanoslab")
+			--~ Format of the description of a cut node. @1: Base node description (e.g. "Stone"); @2: modifier (e.g. "Nanoslab")
 			description = S("@1 @2", def.description, workbench_def[4]),
 			paramtype = "light",
 			paramtype2 = "facedir",

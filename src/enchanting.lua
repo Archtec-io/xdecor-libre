@@ -28,8 +28,11 @@ function enchanting:get_tooltip_raw(enchant, percent)
 		sharp   = "#ffff00",
 	}
 	local enchant_loc = {
+		--~ Enchantment
 		fast = S("Efficiency"),
+		--~ Enchantment
 		durable = S("Durability"),
+		--~ Enchantment
 		sharp = S("Sharpness"),
 	}
 
@@ -92,8 +95,11 @@ function enchanting.formspec(pos, enchants)
 			listring[context;mese]
 			image[2,2.9;1,1;mese_layout.png]
 			]]
+			--~ Sharpness enchantment
 			.."tooltip[sharp;"..FS("Your weapon inflicts more damage").."]"
+			--~ Durability enchantment
 			.."tooltip[durable;"..FS("Your tool lasts longer").."]"
+			--~ Efficiency enchantment
 			.."tooltip[fast;"..FS("Your tool digs faster").."]"
 			..default.gui_slots .. default.get_hotbar_bg(0.55, 4.5)
 
