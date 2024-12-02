@@ -7,6 +7,9 @@ local min, ceil = math.min, math.ceil
 local S = minetest.get_translator("xdecor")
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 
+local DEFAULT_HAMMER_REPAIR = 500
+local DEFAULT_HAMMER_REPAIR_COST = 700
+
 
 -- Nodeboxes definitions
 workbench.defs = {
@@ -211,9 +214,11 @@ function workbench.timer(pos)
 		return
 	end
 
+	local hammerdef = hammer:get_definition()
+
 	-- Tool's wearing range: 0-65535; 0 = new condition
-	tool:add_wear(-500)
-	hammer:add_wear(700)
+	tool:add_wear(-hammerdef._xdecor_hammer_repair or DEFAULT_HAMMER_REPAIR)
+	hammer:add_wear(hammerdef._xdecor_hammer_repair_cost or DEFAULT_HAMMER_REPAIR_COST)
 
 	inv:set_stack("tool", 1, tool)
 	inv:set_stack("hammer", 1, hammer)
@@ -225,7 +230,7 @@ function workbench.allow_put(pos, listname, index, stack, player)
 	local stackname = stack:get_name()
 	if (listname == "tool" and workbench:repairable(stackname)) or
 	   (listname == "input" and workbench:cuttable(stackname)) or
-	   (listname == "hammer" and stackname == "xdecor:hammer") or
+	   (listname == "hammer" and minetest.get_item_group(stackname, "repair_hammer") == 1) or
 	    listname == "storage" then
 		return stack:get_count()
 	end
@@ -250,7 +255,7 @@ function workbench.allow_move(pos, from_list, from_index, to_list, to_index, cou
 	elseif (to_list == "hammer" and from_list == "tool") or (to_list == "tool" and from_list == "hammer") then
 		local inv = minetest.get_inventory({type="node", pos=pos})
 		local stack = inv:get_stack(from_list, from_index)
-		if stack:get_name() == "xdecor:hammer" then
+		if minetest.get_item_group(stack:get_name(), "repair_hammer") == 1 then
 			return count
 		end
 	end
@@ -463,16 +468,29 @@ function workbench:register_special_cut(nodename, cutlist)
 	special_cuts[nodename] = cutlist
 end
 
--- Craft items
+-- Register hammer
 
-minetest.register_tool("xdecor:hammer", {
+function xdecor.register_hammer(name, def)
+	minetest.register_tool(name, {
+		description = def.description,
+		_tt_help = S("Repairs tools at the work bench"),
+		inventory_image = def.image,
+		wield_image = def.image,
+		on_use = function() do
+			return end
+		end,
+		groups = def.groups,
+		_xdecor_hammer_repair = def.repair or DEFAULT_HAMMER_REPAIR,
+		_xdecor_hammer_repair_cost = def.repair_cost or DEFAULT_HAMMER_REPAIR_COST,
+	})
+end
+
+xdecor.register_hammer("xdecor:hammer", {
 	description = S("Hammer"),
-	_tt_help = S("Repairs tools at the work bench"),
-	inventory_image = "xdecor_hammer.png",
-	wield_image = "xdecor_hammer.png",
-	on_use = function() do
-		return end
-	end
+	image = "xdecor_hammer.png",
+	groups = { repair_hammer = 1 },
+	repair = DEFAULT_HAMMER_REPAIR,
+	repair_cost = DEFAULT_HAMMER_REPAIR_COST,
 })
 
 -- Recipes

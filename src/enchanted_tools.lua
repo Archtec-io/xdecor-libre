@@ -1,5 +1,7 @@
 -- Register enchanted tools.
 
+local S = minetest.get_translator("xdecor")
+
 -- Number of uses for the (normal) steel hoe from Minetest Game (as of 01/12/20224)
 -- This is technically redundant because we cannot access that number
 -- directly, but it's unlikely to change in future because Minetest Game is
@@ -8,6 +10,13 @@ local STEEL_HOE_USES = 500
 
 -- Modifier of the steel hoe uses for the enchanted steel hoe
 local STEEL_HOE_USES_MODIFIER = 3
+
+-- Multiplies by much faster the fast hammer repairs
+local HAMMER_FAST_MODIFIER = 1.3
+
+-- Reduces the wear taken by the hammer for a single repair step
+-- (absolute value)
+local HAMMER_DURABLE_MODIFIER = 100
 
 -- Register enchantments for default tools from Minetest Game
 local materials = {"steel", "bronze", "mese", "diamond"}
@@ -46,5 +55,49 @@ if farming.register_hoe then
 
 	xdecor.register_custom_enchantable_tool("farming:hoe_steel", {
 		durable = "farming:enchanted_hoe_steel_durable",
+	})
+end
+
+-- Register enchanted hammer (more durbility and efficiency)
+local hammerdef = minetest.registered_items["xdecor:hammer"]
+if hammerdef then
+	local hitem = ItemStack("xdecor:hammer")
+	local hdesc = hitem:get_short_description() or "xdecor:hammer"
+	local repair = hammerdef._xdecor_hammer_repair
+	local repair_cost = hammerdef._xdecor_hammer_repair_cost
+
+	-- Durable hammer (reduces wear taken by each repair step)
+	local d_repair_cost_modified = repair_cost - HAMMER_DURABLE_MODIFIER
+	local d_percent = math.round(100 - d_repair_cost_modified/repair_cost * 100)
+	local d_ehdesc, d_ehsdesc = xdecor.enchant_description(hdesc, "durable", d_percent)
+
+	xdecor.register_hammer("xdecor:enchanted_hammer_durable", {
+		description = d_ehdesc,
+		short_description = d_ehsdesc,
+		image = xdecor.enchant_texture("xdecor_hammer.png"),
+		repair_cost = d_repair_cost_modified,
+		groups = {repair_hammer = 1, not_in_creative_inventory = 1}
+	})
+
+	-- Fast hammer (increases both repair amount and repair cost per
+	-- repair step by an equal amount)
+	local f_repair_modified = math.round(repair * HAMMER_FAST_MODIFIER)
+	local repair_diff = f_repair_modified - repair
+	local f_repair_cost_modified = repair_cost + repair_diff
+	local f_percent = math.round(HAMMER_FAST_MODIFIER * 100 - 100)
+	local f_ehdesc, f_ehsdesc = xdecor.enchant_description(hdesc, "fast", f_percent)
+
+	xdecor.register_hammer("xdecor:enchanted_hammer_fast", {
+		description = f_ehdesc,
+		short_description = f_ehsdesc,
+		image = xdecor.enchant_texture("xdecor_hammer.png"),
+		repair = f_repair_modified,
+		repair_cost = f_repair_cost_modified,
+		groups = {repair_hammer = 1, not_in_creative_inventory = 1}
+	})
+
+	xdecor.register_custom_enchantable_tool("xdecor:hammer", {
+		durable = "xdecor:enchanted_hammer_durable",
+		fast = "xdecor:enchanted_hammer_fast",
 	})
 end
