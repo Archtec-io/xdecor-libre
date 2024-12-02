@@ -470,21 +470,6 @@ end
 
 -- Register hammer
 
-function xdecor.register_hammer(name, def)
-	minetest.register_tool(name, {
-		description = def.description,
-		_tt_help = S("Repairs tools at the work bench"),
-		inventory_image = def.image,
-		wield_image = def.image,
-		on_use = function() do
-			return end
-		end,
-		groups = def.groups,
-		_xdecor_hammer_repair = def.repair or DEFAULT_HAMMER_REPAIR,
-		_xdecor_hammer_repair_cost = def.repair_cost or DEFAULT_HAMMER_REPAIR_COST,
-	})
-end
-
 xdecor.register_hammer("xdecor:hammer", {
 	description = S("Hammer"),
 	image = "xdecor_hammer.png",
@@ -536,7 +521,48 @@ end
 workbench:register_special_cut("xdecor:cushion_block", { slab = "xdecor:cushion" })
 workbench:register_special_cut("xdecor:cabinet", { slab = "xdecor:cabinet_half" })
 
---[[ EXPERIMENTAL PUBLIC FUNCTION:
+--[[ API FUNCTIONS ]]
+
+--[[ Register a custom hammer (for repairing).
+A hammer repair items at the work bench. The workbench repeatedly
+checks if a hammer and a repairable tool are in the slots. The hammer
+will repair the tool in regular intervals. This is called a "step".
+In each step, the hammer reduces the wear of the repairable
+tool but increases its own wear, each by a fixed amount.
+
+This function allows you to register a custom hammer with custom
+name, item image and wear stats.
+
+Arguments:
+* name: Internal itemname
+* def: Definition table:
+    * description: Item `description`
+    * image: Inventory image and wield image
+    * groups: Item groups (MUST contain at least `repair_hammer = 1`)
+    * repair: How much item wear the hammer repairs per step
+    * repair_cost: How much item wear the hammer takes itself per step
+
+Note: Mind the implication of repair_cost! If repair_cost is lower than
+repair, this means practically infinite durability if you have two
+hammers that repair each other. If repair_cost is higher than repair,
+then hammers will break eventually.
+]]
+function xdecor.register_hammer(name, def)
+	minetest.register_tool(name, {
+		description = def.description,
+		_tt_help = S("Repairs tools at the work bench"),
+		inventory_image = def.image,
+		wield_image = def.image,
+		on_use = function() do
+			return end
+		end,
+		groups = def.groups,
+		_xdecor_hammer_repair = def.repair or DEFAULT_HAMMER_REPAIR,
+		_xdecor_hammer_repair_cost = def.repair_cost or DEFAULT_HAMMER_REPAIR_COST,
+	})
+end
+
+--[[ EXPERIMENTAL FUNCTION:
 Registers various 'cut' node variants for the node with the given nodename,
 which will be available in the workbench.
 This must only be called once per node. Calling it again is an error.

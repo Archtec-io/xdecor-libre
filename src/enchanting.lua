@@ -398,7 +398,7 @@ minetest.register_craft({
 	}
 })
 
---[[ Enchanting API ]]
+--[[ API FUNCTIONS ]]
 
 --[[
 Register one or more enchantments for an already defined tool.

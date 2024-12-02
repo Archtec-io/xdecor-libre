@@ -43,6 +43,10 @@ blocks with special features:
 * Pressure Plate: Step on it to activate doors next to it
 * Chessboard: Play Chess against a player or the computer (see `CHESS_README.md`)
 
+## For developers
+
+X-Decor-libre can be extended in a limited fashion. See `API.md` for details.
+
 ### X-Decor-libre vs X-Decor
 
 X-Decor is a popular mod in Luanti but it is (as the time of writing this text)
