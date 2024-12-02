@@ -11,6 +11,9 @@ local STEEL_HOE_USES = 500
 -- Modifier of the steel hoe uses for the enchanted steel hoe
 local STEEL_HOE_USES_MODIFIER = 3
 
+-- Modifier of the bug net uses for the enchanted bug net
+local BUG_NET_USES_MODIFIER = 5
+
 -- Multiplies by much faster the fast hammer repairs
 local HAMMER_FAST_MODIFIER = 1.3
 
@@ -38,6 +41,15 @@ for m=1, #materials do
 	})
 end
 end
+
+-- Register enchantment for bug net
+xdecor.register_enchantable_tool("fireflies:bug_net", {
+	enchants = { "durable" },
+	dig_group = "catchable",
+	bonuses = {
+		uses = BUG_NET_USES_MODIFIER,
+	}
+})
 
 -- Register enchanted steel hoe (more durability)
 if farming.register_hoe then
