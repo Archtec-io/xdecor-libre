@@ -24,12 +24,27 @@ local function set_infotext(meta, node)
 	end
 end
 
--- Add more ingredients here that make a soup.
+-- HACKY list of soup ingredients.
+-- The cauldron will check if any of these strings are contained in the itemname
+-- after the ":".
 local ingredients_list = {
 	"apple", "mushroom", "honey", "pumpkin", "egg", "bread", "meat",
 	"chicken", "carrot", "potato", "melon", "rhubarb", "cucumber",
 	"corn", "beans", "berries", "grapes", "tomato", "wheat"
 }
+
+-- List of items that can never be soup ingredients. Overwrites anything else.
+local non_ingredients = {
+	-- xdecor
+	"xdecor:bowl_soup",
+	-- Minetest Game: default
+	"default:apple_mark", "default:blueberry_bush_leaves_with_berries",
+	-- Minetest Game: farming
+	"farming:seed_wheat",
+	"farming:wheat_1", "farming:wheat_2", "farming:wheat_3", "farming:wheat_4",
+	"farming:wheat_5", "farming:wheat_6", "farming:wheat_7", "farming:wheat_8",
+}
+local non_ingredients_keyed = table.key_value_swap(non_ingredients)
 
 cauldron.cbox = {
 	{0,  0, 0,  16, 16, 0},
@@ -169,6 +184,9 @@ end
 
 -- Checks if the given item can be used as ingredient for the soup
 local function is_ingredient(itemstring)
+	if non_ingredients_keyed[itemstring] then
+		return false
+	end
 	local basename = itemstring:match(":([%w_]+)")
 	if not basename then
 		return false
