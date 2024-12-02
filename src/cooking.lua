@@ -1,6 +1,9 @@
 local cauldron, sounds = {}, {}
 local S = minetest.get_translator("xdecor")
 
+-- Set to true to print soup ingredients and fire nodes to console
+local DEBUG_RECOGNIZED_ITEMS = false
+
 local hint_fire = S("Light a fire below to heat it up")
 local hint_eat = S("Use a bowl to eat the soup")
 local hint_recipe = S("Drop foods inside to make a soup")
@@ -36,12 +39,17 @@ cauldron.cbox = {
 	{0,  0, 0,  16, 8,  16}
 }
 
+-- Returns true is given item is a fire
+local function is_fire(itemstring)
+	return minetest.get_item_group(itemstring, "fire") ~= 0
+end
+
 -- Returns true if the node at pos is above fire
 local function is_heated(pos)
 	local below_node = {x = pos.x, y = pos.y - 1, z = pos.z}
 	local nn = minetest.get_node(below_node).name
 	-- Check fire group
-	if minetest.get_item_group(nn, "fire") ~= 0 then
+	if is_fire(nn) then
 		return true
 	else
 		return false
@@ -159,6 +167,20 @@ local function eatable(itemstring)
 	return string.format("%q", string.dump(on_use_def)):find("item_eat")
 end
 
+-- Checks if the given item can be used as ingredient for the soup
+local function is_ingredient(itemstring)
+	local basename = itemstring:match(":([%w_]+)")
+	if not basename then
+		return false
+	end
+	for _, ingredient in ipairs(ingredients_list) do
+		if eatable(itemstring) or basename:find(ingredient) then
+			return true
+		end
+	end
+	return false
+end
+
 function cauldron.boiling_timer(pos)
 	-- Cool down cauldron if there is no fire
 	local node = minetest.get_node(pos)
@@ -192,13 +214,12 @@ function cauldron.boiling_timer(pos)
 	for _, obj in pairs(objs) do
 		if obj and not obj:is_player() and obj:get_luaentity().itemstring then
 			local itemstring = obj:get_luaentity().itemstring
-			local food = itemstring:match(":([%w_]+)")
+			local item = ItemStack(itemstring)
+			local itemname = item:get_name()
 
-			for _, ingredient in ipairs(ingredients_list) do
-				if food and (eatable(itemstring) or food:find(ingredient)) then
-					ingredients[#ingredients + 1] = food
-					break
-				end
+			if is_ingredient(itemname) then
+				local basename = itemstring:match(":([%w_]+)")
+				table.insert(ingredients, basename)
 			end
 		end
 	end
@@ -450,3 +471,26 @@ minetest.register_lbm({
 		set_infotext(meta, node)
 	end,
 })
+
+if DEBUG_RECOGNIZED_ITEMS then
+	-- Print all soup ingredients and fire nodes
+	-- in console
+	minetest.register_on_mods_loaded(function()
+		local ingredients = {}
+		local fires = {}
+		for k,v in pairs(minetest.registered_items) do
+			if is_ingredient(k) then
+				table.insert(ingredients, k)
+			end
+			if is_fire(k) then
+				table.insert(fires, k)
+			end
+		end
+		table.sort(ingredients)
+		table.sort(fires)
+		local str_i = table.concat(ingredients, ", ")
+		local str_f = table.concat(fires, ", ")
+		print("[xdecor] List of ingredients for soup: "..str_i)
+		print("[xdecor] List of nodes that can heat cauldron: "..str_f)
+	end)
+end
