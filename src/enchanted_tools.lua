@@ -12,7 +12,7 @@ local STEEL_HOE_USES = 500
 local STEEL_HOE_USES_MODIFIER = 2.2
 
 -- Modifier of the bug net uses for the enchanted bug net
-local BUG_NET_USES_MODIFIER = 5
+local BUG_NET_USES_MODIFIER = 4
 
 -- Multiplies by much faster the fast hammer repairs
 local HAMMER_FAST_MODIFIER = 1.3
