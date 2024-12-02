@@ -315,10 +315,10 @@ function enchanting:register_tool(original_tool_name, def)
 	local original_desc = toolitem:get_short_description() or original_tool_name
 	for _, enchant in ipairs(def.enchants) do
 		local groupcaps = table.copy(original_groupcaps)
-		local fleshy = original_damage_groups.fleshy
 		local full_punch_interval = original_toolcaps.full_punch_interval
 		local max_drop_level = original_toolcaps.max_drop_level
 		local dig_group = def.dig_group
+		local fleshy
 
 		if not def.bonuses then
 			def.bonuses = {}
@@ -337,6 +337,7 @@ function enchanting:register_tool(original_tool_name, def)
 				groupcaps[dig_group].times[i] = time - bonus_defs.times
 			end
 		elseif enchant == "sharp" then
+			fleshy = original_damage_groups.fleshy
 			fleshy = fleshy + bonus_defs.damages
 		else
 			minetest.log("error", "[xdecor] Called enchanting:register_tool with unsupported enchant: "..tostring(enchant))
@@ -365,7 +366,8 @@ function enchanting:register_tool(original_tool_name, def)
 				groupcaps = groupcaps, damage_groups = {fleshy = fleshy},
 				full_punch_interval = full_punch_interval,
 				max_drop_level = max_drop_level
-			}
+			},
+			pointabilities = original_tool.pointabilities,
 		})
 		if minetest.get_modpath("toolranks") then
 			toolranks.add_tool(enchantedTool)
