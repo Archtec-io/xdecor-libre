@@ -1,6 +1,6 @@
 ## X-Decor-libre [`xdecor`] ##
 
-[![ContentDB](https://content.minetest.net/packages/Wuzzy/xdecor/shields/downloads/)](https://content.minetest.net/packages/Wuzzy/xdecor/)
+[![ContentDB](https://content.luanti.org/packages/Wuzzy/xdecor/shields/downloads/)](https://content.luanti.org/packages/Wuzzy/xdecor/)
 
 X-Decor-libre is a libre Luanti mod which adds various decorative blocks
 as well as simple gimmicks.
@@ -42,6 +42,10 @@ blocks with special features:
 * Lever: Pull the lever to activate doors next to it
 * Pressure Plate: Step on it to activate doors next to it
 * Chessboard: Play Chess against a player or the computer (see `CHESS_README.md`)
+
+## For developers
+
+X-Decor-libre can be extended in a limited fashion. See `API.md` for details.
 
 ### X-Decor-libre vs X-Decor
 

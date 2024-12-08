@@ -1680,17 +1680,17 @@ local function update_formspec(meta)
 	local turnWhite = minetest.colorize("#000001", playerWhiteDisplay)
 
 	-- several status words for the player
-	-- player is in check
+	--~ Chess: player is in check
 	local check_s   = minetest.colorize("#FF8000", "["..S("check").."]")
-	-- player has been checkmated
+	--~ Chess: player has been checkmated
 	local mate_s    = minetest.colorize("#FF0000", "["..S("checkmate").."]")
-	-- player has resigned
+	--~ Chess: player has resigned
 	local resign_s    = minetest.colorize("#FF0000", "["..S("resigned").."]")
-	-- player has won
+	--~ Chess: player has won
 	local win_s     = minetest.colorize("#26AB2B", "["..S("winner").."]")
-	-- player has lost
+	--~ Chess: player has lost
 	local lose_s     = minetest.colorize("#FF0000", "["..S("loser").."]")
-	-- player has a draw
+	--~ Chess: player has a draw
 	local draw_s    = minetest.colorize("#FF00FF", "["..S("draw").."]")
 
 	local status_black = ""
@@ -1735,6 +1735,7 @@ local function update_formspec(meta)
 	if promotion == "black" then
 		eaten_img = ""
 		promotion_formstring =
+			--~ Chess: Shown when black player can promote a pawn. Space for text is limited.
 			"label[10.1,6.35;"..FS("PROMOTION\nFOR BLACK!").."]" ..
 			"animated_image[10.05,7.2;2,2;p_img_white;pawn_black_promo_anim.png;5;100]"
 		if botColor ~= "black" and botColor ~= "both" then
@@ -1750,6 +1751,7 @@ local function update_formspec(meta)
 	elseif promotion == "white" then
 		eaten_img = ""
 		promotion_formstring =
+			--~ Chess: Shown when white player can promote a pawn. Space for text is limited.
 			"label[10.1,6.35;"..FS("PROMOTION\nFOR WHITE!").."]" ..
 			"animated_image[10.05,7.2;2,2;p_img_white;pawn_white_promo_anim.png;5;100]"
 		if botColor ~= "white" and botColor ~= "both" then
@@ -1767,8 +1769,10 @@ local function update_formspec(meta)
 	local draw_claim_formstring = ""
 	if drawClaim ~= "" and gameResult == "" then
 		if lastMove == "black" or lastMove == "" then
+			--~ Chess: Shown when white player wants to claim a draw. Space for text is limited.
 			draw_claim_formstring = "label[10.1,6.35;"..FS("DRAW CLAIM\nBY WHITE!").."]"
 		else
+			--~ Chess: Shown when black player wants to claim a draw. Space for text is limited.
 			draw_claim_formstring = "label[10.1,6.35;"..FS("DRAW CLAIM\nBY BLACK!").."]"
 		end
 		if drawClaim == "50_move_rule" then
@@ -1792,6 +1796,7 @@ local function update_formspec(meta)
 
 	if playerActionsAvailable and (playerWhite ~= "" and playerBlack ~= "") then
 		game_buttons = game_buttons .. "image_button[14.56,9.7;0.8,0.8;chess_resign.png;resign;]" ..
+			--~ Resign in Chess
 			"tooltip[resign;"..FS("Resign").."]"
 	end
 
@@ -1812,12 +1817,14 @@ local function update_formspec(meta)
 			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw
 			game_buttons = game_buttons .. "image_button[13.36,9.7;0.8,0.8;chess_draw_50move_next.png;draw_50_moves;]"..
 				"tooltip[draw_50_moves;"..
+				--~ Chess
 				FS("Invoke the 50-move rule for your next move").."]"
 		elseif halfmoveClock >= DRAWCLAIM_LONGGAME_PLAYER then
 			-- When the 50 moves without capture / pawn move have occured occur.
 			-- Will insta-draw.
 			game_buttons = game_buttons .. "image_button[13.36,9.7;0.8,0.8;chess_draw_50move.png;draw_50_moves;]"..
 				"tooltip[draw_50_moves;"..
+				--~ Chess
 				FS("Invoke the 50-move rule and draw the game").."]"
 		end
 
@@ -1830,12 +1837,14 @@ local function update_formspec(meta)
 			-- Will insta-draw.
 			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3.png;draw_repeat_3;]"..
 				"tooltip[draw_repeat_3;"..
+				--~ Chess
 				FS("Invoke the threefold repetition rule and draw the game").."]"
 		elseif maxRepeatedPositions >= 2 then
 			-- If the same position may be about to occur 3 times.
 			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw.
 			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3_next.png;draw_repeat_3;]"..
 				"tooltip[draw_repeat_3;"..
+				--~ Chess
 				FS("Invoke the threefold repetition rule for your next move").."]"
 		end
 	end
@@ -1974,6 +1983,7 @@ local function update_game_result(meta, lastMove)
 			meta:set_string("gameResult", "draw")
 			meta:set_string("gameResultReason", "stalemate")
 			add_special_to_moves_list(meta, "draw")
+			--~ Chess message
 			send_message_2(playerWhite, playerBlack, S("The game ended up in a stalemate! It's a draw!"), botColor)
 			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by stalemate")
 			return
@@ -1994,6 +2004,7 @@ local function update_game_result(meta, lastMove)
 			meta:set_string("gameResult", "draw")
 			meta:set_string("gameResultReason", "stalemate")
 			add_special_to_moves_list(meta, "draw")
+			--~ Chess message
 			send_message_2(playerWhite, playerBlack, S("The game ended up in a stalemate! It's a draw!"), botColor)
 			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by stalemate")
 			return
@@ -2005,6 +2016,7 @@ local function update_game_result(meta, lastMove)
 		meta:set_string("gameResult", "draw")
 		meta:set_string("gameResultReason", "dead_position")
 		add_special_to_moves_list(meta, "draw")
+		--~ Chess message
 		send_message_2(playerWhite, playerBlack, S("The game ended up in a dead position! It's a draw!"), botColor)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw by dead position")
 	end
@@ -2120,6 +2132,7 @@ local function update_game_result(meta, lastMove)
 		meta:set_string("gameResult", "draw")
 		meta:set_string("gameResultReason", "same_position_5")
 		add_special_to_moves_list(meta, "draw")
+		--~ Chess message when the fivefold repetition has happened
 		local msg = S("The exact same position has occured 5 times. It's a draw!")
 		send_message_2(playerWhite, playerBlack, msg, botColor)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because the same position has appeared 5 times")
@@ -2814,11 +2827,11 @@ local function timeout_format(timeout_limit)
 	local seconds        = time_remaining % 60
 
 	if minutes == 0 then
-		-- number of seconds
+		--~ number of seconds
 		return S("@1 s", seconds)
 	end
 
-	-- number of minutes and seconds
+	--~ number of minutes and seconds
 	return S("@1 min @2 s", minutes, seconds)
 end
 
@@ -2900,6 +2913,7 @@ function realchess.fields(pos, _, fields, sender)
 		local lastMove = meta:get_string("lastMove")
 		if (playerName == playerWhite and playerWhite == "") or (playerName == playerBlack and playerBlack == "") then
 			-- Can't resign before the player name has been recorded
+			--~ Chess message when player tried to resign too early
 			send_message(playerName, S("Resigning is not possible yet."))
 			return
 		end
@@ -3050,9 +3064,11 @@ function realchess.fields(pos, _, fields, sender)
 			local pcolor = promo:sub(-5)
 			local activePromo = meta:get_string("promotionActive")
 			if activePromo == "" then
+				--~ Chess message
 				send_message(playerName, S("This isn't the time for promotion."))
 				return
 			elseif activePromo ~= pcolor then
+				--~ Chess message
 				send_message(playerName, S("It's not your turn! This promotion is meant for the other player."))
 				return
 			end
@@ -3060,6 +3076,7 @@ function realchess.fields(pos, _, fields, sender)
 				realchess.promote_pawn(meta, pcolor, promo:sub(1, -7))
 				return
 			else
+				--~ Chess message
 				send_message(playerName, S("It's not your turn! This promotion is meant for the other player."))
 				return
 			end

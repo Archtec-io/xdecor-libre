@@ -7,6 +7,9 @@ local min, ceil = math.min, math.ceil
 local S = minetest.get_translator("xdecor")
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 
+local DEFAULT_HAMMER_REPAIR = 500
+local DEFAULT_HAMMER_REPAIR_COST = 700
+
 
 -- Nodeboxes definitions
 workbench.defs = {
@@ -35,7 +38,7 @@ end
 
 -- Tools allowed to be repaired
 function workbench:repairable(stack)
-	-- Explicitly registeded as repairable: Overrides everything else
+	-- Explicitly registered as repairable: Overrides everything else
 	if custom_repairable[stack] then
 		return true
 	end
@@ -109,11 +112,16 @@ function workbench:get_output(inv, input, name)
 	inv:set_list("forms", output)
 end
 
-local main_fs = "label[0.9,1.23;"..FS("Cut").."]"
+local main_fs = ""..
+	--~ Verb shown in workbench form where you can cut a node
+	"label[0.9,1.23;"..FS("Cut").."]"
+	--~ Verb shown in workbench form where you can repair an item
 	.."label[0.9,2.23;"..FS("Repair").."]"
 	..[[ box[-0.05,1;2.05,0.9;#555555]
 	box[-0.05,2;2.05,0.9;#555555] ]]
+	--~ Button in workbench form
 	.."button[0,0;2,1;craft;"..FS("Crafting").."]"
+	--~ Button in workbench form
 	.."button[2,0;2,1;storage;"..FS("Storage").."]"
 	..[[ image[3,1;1,1;gui_arrow.png]
 	image[0,1;1,1;worktable_saw.png]
@@ -211,9 +219,11 @@ function workbench.timer(pos)
 		return
 	end
 
+	local hammerdef = hammer:get_definition()
+
 	-- Tool's wearing range: 0-65535; 0 = new condition
-	tool:add_wear(-500)
-	hammer:add_wear(700)
+	tool:add_wear(-hammerdef._xdecor_hammer_repair or DEFAULT_HAMMER_REPAIR)
+	hammer:add_wear(hammerdef._xdecor_hammer_repair_cost or DEFAULT_HAMMER_REPAIR_COST)
 
 	inv:set_stack("tool", 1, tool)
 	inv:set_stack("hammer", 1, hammer)
@@ -225,7 +235,7 @@ function workbench.allow_put(pos, listname, index, stack, player)
 	local stackname = stack:get_name()
 	if (listname == "tool" and workbench:repairable(stackname)) or
 	   (listname == "input" and workbench:cuttable(stackname)) or
-	   (listname == "hammer" and stackname == "xdecor:hammer") or
+	   (listname == "hammer" and minetest.get_item_group(stackname, "repair_hammer") == 1) or
 	    listname == "storage" then
 		return stack:get_count()
 	end
@@ -250,7 +260,7 @@ function workbench.allow_move(pos, from_list, from_index, to_list, to_index, cou
 	elseif (to_list == "hammer" and from_list == "tool") or (to_list == "tool" and from_list == "hammer") then
 		local inv = minetest.get_inventory({type="node", pos=pos})
 		local stack = inv:get_stack(from_list, from_index)
-		if stack:get_name() == "xdecor:hammer" then
+		if minetest.get_item_group(stack:get_name(), "repair_hammer") == 1 then
 			return count
 		end
 	end
@@ -410,7 +420,7 @@ local function register_cut_raw(node, workbench_def)
 			return false
 		end
 		minetest.register_node(":" .. cutnodename, {
-			-- @1: Base node description (e.g. "Stone"); @2: modifier (e.g. "Nanoslab")
+			--~ Format of the description of a cut node. @1: Base node description (e.g. "Stone"); @2: modifier (e.g. "Nanoslab")
 			description = S("@1 @2", def.description, workbench_def[4]),
 			paramtype = "light",
 			paramtype2 = "facedir",
@@ -463,28 +473,7 @@ function workbench:register_special_cut(nodename, cutlist)
 	special_cuts[nodename] = cutlist
 end
 
--- Craft items
-
-minetest.register_tool("xdecor:hammer", {
-	description = S("Hammer"),
-	_tt_help = S("Repairs tools at the work bench"),
-	inventory_image = "xdecor_hammer.png",
-	wield_image = "xdecor_hammer.png",
-	on_use = function() do
-		return end
-	end
-})
-
--- Recipes
-
-minetest.register_craft({
-	output = "xdecor:hammer",
-	recipe = {
-		{"default:steel_ingot", "group:stick", "default:steel_ingot"},
-		{"", "group:stick", ""}
-	}
-})
-
+-- Workbench craft
 minetest.register_craft({
 	output = "xdecor:workbench",
 	recipe = {
@@ -518,7 +507,48 @@ end
 workbench:register_special_cut("xdecor:cushion_block", { slab = "xdecor:cushion" })
 workbench:register_special_cut("xdecor:cabinet", { slab = "xdecor:cabinet_half" })
 
---[[ EXPERIMENTAL PUBLIC FUNCTION:
+--[[ API FUNCTIONS ]]
+
+--[[ Register a custom hammer (for repairing).
+A hammer repair items at the work bench. The workbench repeatedly
+checks if a hammer and a repairable tool are in the slots. The hammer
+will repair the tool in regular intervals. This is called a "step".
+In each step, the hammer reduces the wear of the repairable
+tool but increases its own wear, each by a fixed amount.
+
+This function allows you to register a custom hammer with custom
+name, item image and wear stats.
+
+Arguments:
+* name: Internal itemname
+* def: Definition table:
+    * description: Item `description`
+    * image: Inventory image and wield image
+    * groups: Item groups (MUST contain at least `repair_hammer = 1`)
+    * repair: How much item wear the hammer repairs per step
+    * repair_cost: How much item wear the hammer takes itself per step
+
+Note: Mind the implication of repair_cost! If repair_cost is lower than
+repair, this means practically infinite durability if you have two
+hammers that repair each other. If repair_cost is higher than repair,
+then hammers will break eventually.
+]]
+function xdecor.register_hammer(name, def)
+	minetest.register_tool(name, {
+		description = def.description,
+		_tt_help = S("Repairs tools at the work bench"),
+		inventory_image = def.image,
+		wield_image = def.image,
+		on_use = function() do
+			return end
+		end,
+		groups = def.groups,
+		_xdecor_hammer_repair = def.repair or DEFAULT_HAMMER_REPAIR,
+		_xdecor_hammer_repair_cost = def.repair_cost or DEFAULT_HAMMER_REPAIR_COST,
+	})
+end
+
+--[[ EXPERIMENTAL FUNCTION:
 Registers various 'cut' node variants for the node with the given nodename,
 which will be available in the workbench.
 This must only be called once per node. Calling it again is an error.
@@ -548,3 +578,25 @@ returns false (and writes to error log) if any error occurred.
 xdecor.register_cut = function(nodename)
 	return workbench:register_cut(nodename)
 end
+
+
+--[[ END OF API FUNCTIONS ]]
+
+
+-- Register xdecor's built-in hammer
+xdecor.register_hammer("xdecor:hammer", {
+	description = S("Hammer"),
+	image = "xdecor_hammer.png",
+	groups = { repair_hammer = 1 },
+	repair = DEFAULT_HAMMER_REPAIR,
+	repair_cost = DEFAULT_HAMMER_REPAIR_COST,
+})
+
+-- Hammer recipes
+minetest.register_craft({
+	output = "xdecor:hammer",
+	recipe = {
+		{"default:steel_ingot", "group:stick", "default:steel_ingot"},
+		{"", "group:stick", ""}
+	}
+})

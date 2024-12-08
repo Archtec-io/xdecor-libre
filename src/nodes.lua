@@ -940,6 +940,7 @@ xdecor.register("woodframed_glass", {
 
 local devices = {
 	{ "radio", S("Radio"), default.node_sound_metal_defaults() },
+	--~ as in "loudspeaker"
 	{ "speaker", S("Speaker"), default.node_sound_metal_defaults() },
 }
 for _, v in pairs(devices) do
