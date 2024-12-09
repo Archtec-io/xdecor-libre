@@ -377,6 +377,7 @@ function enchanting:register_tool(original_tool_name, def)
 			inventory_image = invimg,
 			wield_image = wieldimg,
 			groups = groups,
+			light_source = original_tool.light_source, -- Required for wield light
 			tool_capabilities = {
 				groupcaps = groupcaps, damage_groups = {fleshy = fleshy},
 				full_punch_interval = full_punch_interval,
