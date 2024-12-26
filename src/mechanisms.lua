@@ -260,6 +260,27 @@ xdecor.register("lever_on", {
 	_xdecor_actuator_on = "xdecor:lever_on",
 })
 
+-- Make sure the node timers of active actuators are still
+-- active when these nodes load again. If not, start them
+-- again to trigger their timer action, which is expected
+-- to turn off the actuator soon.
+minetest.register_lbm({
+	label = "Restart actuator timers (X-Decor-libre)",
+	name = "xdecor:restart_actuator_timers",
+	nodename = { "group:xdecor_actuator" },
+	run_at_every_load = true,
+	action = function(pos, node)
+		local g = minetest.get_item_group(node.name, "xdecor_actuator")
+		if g ~= 2 then
+			return
+		end
+		local timer = minetest.get_node_timer(pos)
+		if not timer:is_started() then
+			timer:start(DISABLE_ACTUATOR_AFTER)
+		end
+	end,
+})
+
 -- Recipes
 
 minetest.register_craft({
