@@ -10,14 +10,17 @@ local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaqu
 -- After this time, it will return to the disabled state again.
 local DISABLE_ACTUATOR_AFTER = 2.0
 
+-- Effect area of pressure plates and levers. Doors within this area
+-- can be affected.
 local PRESSURE_PLATE_AREA_MIN = {x = -2, y = 0, z = -2}
 local PRESSURE_PLATE_AREA_MAX = {x = 2, y = 0, z = 2}
 local LEVER_AREA_MIN = {x = -2, y = -1, z = -2}
 local LEVER_AREA_MAX = {x = 2, y = 1, z = 2}
 
+-- Pressure plates check for players within this radius
 local PRESSURE_PLATE_PLAYER_RADIUS = 0.8
-
-
+-- Interval in seconds that pressure plates check for players
+local PRESSURE_PLATE_CHECK_TIMER = 0.1
 
 local function door_open(pos_door, player)
 	local door = doors.get(pos_door)
@@ -103,7 +106,7 @@ end
 
 function plate.construct(pos)
 	local timer = minetest.get_node_timer(pos)
-	timer:start(0.1)
+	timer:start(PRESSURE_PLATE_CHECK_TIMER)
 end
 
 function plate.has_player_standing_on(pos)
@@ -123,6 +126,7 @@ function plate.timer(pos)
 	local ok, player = plate.has_player_standing_on(pos)
 	if ok then
 		actuator_activate(pos, PRESSURE_PLATE_AREA_MIN, PRESSURE_PLATE_AREA_MAX, player)
+		return false
 	end
 
 	return true
