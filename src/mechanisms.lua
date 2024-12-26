@@ -136,6 +136,12 @@ xdecor.register("lever_on", {
 	sounds = default.node_sound_stone_defaults(),
 	sunlight_propagates = true,
 	on_rotate = screwdriver.rotate_simple,
+	on_rightclick = function(pos, node, clicker, itemstack)
+		-- Prevent placing nodes on activated lever with the place key
+		-- for consistent behavior with the lever in "off" state.
+		-- The player may still place nodes using [Sneak].
+		return itemstack
+	end,
 	drop = "xdecor:lever_off"
 })
 
