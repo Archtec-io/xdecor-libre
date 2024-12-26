@@ -10,6 +10,11 @@ local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaqu
 -- After this time, it will return to the disabled state again.
 local DISABLE_ACTUATOR_AFTER = 2.0
 
+local PRESSURE_PLATE_AREA_MIN = {x = -2, y = 0, z = -2}
+local PRESSURE_PLATE_AREA_MAX = {x = 2, y = 0, z = 2}
+local LEVER_AREA_MIN = {x = -2, y = -1, z = -2}
+local LEVER_AREA_MAX = {x = 2, y = 1, z = 2}
+
 local function door_toggle(pos_actuator, pos_door, player)
 	local player_name = player:get_player_name()
 	local actuator = minetest.get_node(pos_actuator)
@@ -32,9 +37,40 @@ local function door_toggle(pos_actuator, pos_door, player)
 				minetest.set_node(pos_actuator, { name = def._xdecor_actuator_off, param2 = actuator_new.param2 })
 			end
 		end
-		-- Re-get player object (or nil) because 'player' could
-		-- be an invalid object at this time (player left)
-		door:close(minetest.get_player_by_name(player_name))
+
+		-- Check if *all* actuator nodes around the door are inactive.
+		-- Only then will the door close. If there's still an active actuator,
+		-- the door stays open.
+		local active_actuator_in_area = false
+		local minp = vector.add(LEVER_AREA_MIN, pos_door)
+		local maxp = vector.add(LEVER_AREA_MAX, pos_door)
+		local levers = minetest.find_nodes_in_area(minp, maxp, "group:lever")
+		for l=1, #levers do
+			local lnode = minetest.get_node(levers[l])
+			if minetest.get_item_group(lnode.name, "xdecor_actuator") == 2 then
+				active_actuator_in_area = true
+				break
+			end
+		end
+		if not active_actuator_in_area then
+			minp = vector.add(PRESSURE_PLATE_AREA_MIN, pos_door)
+			maxp = vector.add(PRESSURE_PLATE_AREA_MAX, pos_door)
+			local pressure_plates = minetest.find_nodes_in_area(minp, maxp, "group:pressure_plate")
+			for p=1, #pressure_plates do
+				local pnode = minetest.get_node(pressure_plates[p])
+				if minetest.get_item_group(pnode.name, "xdecor_actuator") == 2 then
+					active_actuator_in_area = true
+					break
+				end
+			end
+		end
+
+		if not active_actuator_in_area then
+			-- Re-get player object (or nil) because 'player' could
+			-- be an invalid object at this time (player left)
+			local player_new = minetest.get_player_by_name(player_name)
+			door:close(minetest.get_player_by_name(player_name))
+		end
 	end)
 end
 
@@ -47,8 +83,8 @@ function plate.timer(pos)
 	local objs = minetest.get_objects_inside_radius(pos, 0.8)
 	if not next(objs) or not doors.get then return true end
 
-	local minp = {x = pos.x - 2, y = pos.y, z = pos.z - 2}
-	local maxp = {x = pos.x + 2, y = pos.y, z = pos.z + 2}
+	local minp = vector.add(PRESSURE_PLATE_AREA_MIN, pos)
+	local maxp = vector.add(PRESSURE_PLATE_AREA_MAX, pos)
 	local doors = minetest.find_nodes_in_area(minp, maxp, "group:door")
 
 	for _, player in pairs(objs) do
@@ -137,8 +173,8 @@ xdecor.register("lever_off", {
 
 	on_rightclick = function(pos, node, clicker, itemstack)
 		if not doors.get then return itemstack end
-		local minp = {x = pos.x - 2, y = pos.y - 1, z = pos.z - 2}
-		local maxp = {x = pos.x + 2, y = pos.y + 1, z = pos.z + 2}
+		local minp = vector.add(LEVER_AREA_MIN, pos)
+		local maxp = vector.add(LEVER_AREA_MAX, pos)
 		local doors = minetest.find_nodes_in_area(minp, maxp, "group:door")
 
 		for i = 1, #doors do
