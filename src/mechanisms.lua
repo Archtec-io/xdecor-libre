@@ -6,22 +6,31 @@ screwdriver = screwdriver or {}
 local S = minetest.get_translator("xdecor")
 local ALPHA_OPAQUE = minetest.features.use_texture_alpha_string_modes and "opaque" or false
 
+-- Number of seconds an actuator (pressure plate, lever) stays active.
+-- After this time, it will return to the disabled state again.
+local DISABLE_ACTUATOR_AFTER = 2.0
+
 local function door_toggle(pos_actuator, pos_door, player)
 	local player_name = player:get_player_name()
 	local actuator = minetest.get_node(pos_actuator)
 	local door = doors.get(pos_door)
 	if not door then return end
 
-	if actuator.name:sub(-4) == "_off" then
-		minetest.set_node(pos_actuator,
-			{name = actuator.name:gsub("_off", "_on"), param2 = actuator.param2})
+	if minetest.get_item_group(actuator.name, "xdecor_actuator") == 1 then
+		local def = minetest.registered_nodes[actuator.name]
+		if def._xdecor_actuator_on then
+			minetest.set_node(pos_actuator, { name = def._xdecor_actuator_on, param2 = actuator.param2 })
+		end
 	end
 	door:open(player)
 
-	minetest.after(2, function()
-		if minetest.get_node(pos_actuator).name:sub(-3) == "_on" then
-			minetest.set_node(pos_actuator,
-				{name = actuator.name, param2 = actuator.param2})
+	minetest.after(DISABLE_ACTUATOR_AFTER, function()
+		local actuator_new = minetest.get_node(pos_actuator)
+		if minetest.get_item_group(actuator_new.name, "xdecor_actuator") == 2 then
+			local def = minetest.registered_nodes[actuator_new.name]
+			if def._xdecor_actuator_off then
+				minetest.set_node(pos_actuator, { name = def._xdecor_actuator_off, param2 = actuator_new.param2 })
+			end
 		end
 		-- Re-get player object (or nil) because 'player' could
 		-- be an invalid object at this time (player left)
@@ -55,6 +64,14 @@ function plate.timer(pos)
 end
 
 function plate.register(material, desc, def)
+	local groups
+	if def.groups then
+		groups = table.copy(def.groups)
+	else
+		groups = {}
+	end
+	groups.pressure_plate = 1
+	groups.xdecor_actuator = 1
 	xdecor.register("pressure_" .. material .. "_off", {
 		description = def.description or (desc .. " Pressure Plate"),
 		--~ Pressure plate tooltip
@@ -63,25 +80,32 @@ function plate.register(material, desc, def)
 		use_texture_alpha = ALPHA_OPAQUE,
 		drawtype = "nodebox",
 		node_box = xdecor.pixelbox(16, {{1, 0, 1, 14, 1, 14}}),
-		groups = def.groups,
+		groups = groups,
 		is_ground_content = false,
 		sounds = def.sounds,
 		sunlight_propagates = true,
 		on_rotate = screwdriver.rotate_simple,
 		on_construct = plate.construct,
-		on_timer = plate.timer
+		on_timer = plate.timer,
+		_xdecor_actuator_off = "xdecor:pressure_"..material.."_off",
+		_xdecor_actuator_on = "xdecor:pressure_"..material.."_on",
 	})
+	local groups_on = table.copy(groups)
+	groups_on.xdecor_actuator = 2
+	groups_on.pressure_plate = 2
 	xdecor.register("pressure_" .. material .. "_on", {
 		tiles = {"xdecor_pressure_" .. material .. ".png"},
 		use_texture_alpha = ALPHA_OPAQUE,
 		drawtype = "nodebox",
 		node_box = xdecor.pixelbox(16, {{1, 0, 1, 14, 0.4, 14}}),
-		groups = def.groups,
+		groups = groups_on,
 		is_ground_content = false,
 		sounds = def.sounds,
 		drop = "xdecor:pressure_" .. material .. "_off",
 		sunlight_propagates = true,
-		on_rotate = screwdriver.rotate_simple
+		on_rotate = screwdriver.rotate_simple,
+		_xdecor_actuator_off = "xdecor:pressure_"..material.."_off",
+		_xdecor_actuator_on = "xdecor:pressure_"..material.."_on",
 	})
 end
 
@@ -105,7 +129,7 @@ xdecor.register("lever_off", {
 	use_texture_alpha = ALPHA_OPAQUE,
 	drawtype = "nodebox",
 	node_box = xdecor.pixelbox(16, {{2, 1, 15, 12, 14, 1}}),
-	groups = {cracky = 3, oddly_breakable_by_hand = 2},
+	groups = {cracky = 3, oddly_breakable_by_hand = 2, lever = 1, xdecor_actuator = 1},
 	is_ground_content = false,
 	sounds = default.node_sound_stone_defaults(),
 	sunlight_propagates = true,
@@ -124,6 +148,8 @@ xdecor.register("lever_off", {
 		return itemstack
 	end,
 	_xdecor_itemframe_offset = -3.5,
+	_xdecor_actuator_off = "xdecor:lever_off",
+	_xdecor_actuator_on = "xdecor:lever_on",
 })
 
 xdecor.register("lever_on", {
@@ -131,7 +157,7 @@ xdecor.register("lever_on", {
 	use_texture_alpha = ALPHA_OPAQUE,
 	drawtype = "nodebox",
 	node_box = xdecor.pixelbox(16, {{2, 1, 15, 12, 14, 1}}),
-	groups = {cracky = 3, oddly_breakable_by_hand = 2, not_in_creative_inventory = 1},
+	groups = {cracky = 3, oddly_breakable_by_hand = 2, lever = 2, xdecor_actuator = 2, not_in_creative_inventory = 1},
 	is_ground_content = false,
 	sounds = default.node_sound_stone_defaults(),
 	sunlight_propagates = true,
@@ -142,7 +168,10 @@ xdecor.register("lever_on", {
 		-- The player may still place nodes using [Sneak].
 		return itemstack
 	end,
-	drop = "xdecor:lever_off"
+	drop = "xdecor:lever_off",
+	_xdecor_itemframe_offset = -3.5,
+	_xdecor_actuator_off = "xdecor:lever_off",
+	_xdecor_actuator_on = "xdecor:lever_on",
 })
 
 -- Recipes
