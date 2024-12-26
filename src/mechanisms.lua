@@ -64,6 +64,12 @@ end
 
 local function actuator_timeout(pos_actuator, actuator_area_min, actuator_area_max)
 	local actuator = minetest.get_node(pos_actuator)
+
+	-- Get name of last player that triggered the actuator
+	local meta = minetest.get_meta(pos_actuator)
+	local last_triggerer_str = meta:get_string("last_triggerer")
+	local last_triggerer_obj = minetest.get_player_by_name(last_triggerer_str)
+
 	-- Turn off actuator
 	if minetest.get_item_group(actuator.name, "xdecor_actuator") == 2 then
 		local def = minetest.registered_nodes[actuator.name]
@@ -78,7 +84,11 @@ local function actuator_timeout(pos_actuator, actuator_area_min, actuator_area_m
 	local doors = minetest.find_nodes_in_area(minp, maxp, "group:door")
 	for d=1, #doors do
 		if not door_is_actuatored(doors[d]) then
-			door_close(doors[d])
+			local dnode = minetest.get_node(doors[d])
+			local ddef = minetest.registered_nodes[dnode.name]
+			if (ddef.protected and last_triggerer_obj) or (not ddef.protected) then
+				door_close(doors[d], last_triggerer_obj)
+			end
 		end
 	end
 end
@@ -92,10 +102,17 @@ local function actuator_activate(pos_actuator, actuator_area_min, actuator_area_
 		return
 	elseif ga == 1 then
 		local def = minetest.registered_nodes[actuator.name]
+		-- Turn actuator on
 		if def._xdecor_actuator_on then
 			minetest.set_node(pos_actuator, { name = def._xdecor_actuator_on, param2 = actuator.param2 })
+
+			-- Store name of last player that triggered the actuator
+			local meta = minetest.get_meta(pos_actuator)
+			meta:set_string("last_triggerer", player_name)
 		end
 	end
+
+	-- Turn on neighboring doors
 	local minp = vector.add(actuator_area_min, pos_actuator)
 	local maxp = vector.add(actuator_area_max, pos_actuator)
 	local doors = minetest.find_nodes_in_area(minp, maxp, "group:door")
@@ -271,7 +288,7 @@ xdecor.register("lever_on", {
 minetest.register_lbm({
 	label = "Restart actuator timers (X-Decor-libre)",
 	name = "xdecor:restart_actuator_timers",
-	nodename = { "group:xdecor_actuator" },
+	nodenames = { "group:xdecor_actuator" },
 	run_at_every_load = true,
 	action = function(pos, node)
 		local g = minetest.get_item_group(node.name, "xdecor_actuator")
