@@ -306,12 +306,12 @@ end
 function enchanting:register_tool(original_tool_name, def)
 	local original_tool = reg_tools[original_tool_name]
 	if not original_tool then
-		minetest.log("error", "[xdecor] Called enchanting:register_tool for non-existing tool: "..original_too_name)
+		minetest.log("error", "[xdecor] Called enchanting:register_tool for non-existing tool: "..original_tool_name)
 		return
 	end
 	local original_toolcaps = original_tool.tool_capabilities
 	if not original_toolcaps then
-		minetest.log("error", "[xdecor] Called enchanting:register_tool for tool without tool_capabilities: "..original_too_name)
+		minetest.log("error", "[xdecor] Called enchanting:register_tool for tool without tool_capabilities: "..original_tool_name)
 		return
 	end
 	local original_damage_groups = original_toolcaps.damage_groups
