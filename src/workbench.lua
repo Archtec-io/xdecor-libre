@@ -5,6 +5,7 @@ local special_cuts = {}
 screwdriver = screwdriver or {}
 local min, ceil = math.min, math.ceil
 local S = minetest.get_translator("xdecor")
+local NS = function(s) return s end
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 
 local DEFAULT_HAMMER_REPAIR = 500
@@ -14,20 +15,30 @@ local DEFAULT_HAMMER_REPAIR_COST = 700
 -- Nodeboxes definitions
 workbench.defs = {
 	-- Name Yield Nodeboxes (X Y Z W H L)  Description
-	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }}, S("Nanoslab")},
-	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }}, S("Micropanel")},
-	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, S("Microslab")},
+	--~ Name of a nanoslab, a workbench-cut block. @1 = original node name (e.g. "Stone")
+	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }}, NS("@1 Nanoslab")},
+	--~ Name of a micropanel, a workbench-cut block. @1 = original node name (e.g. "Stone")
+	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }}, NS("@1 Micropanel")},
+	--~ Name of a microslab, a workbench-cut block. @1 = original node name (e.g. "Stone")
+	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, NS("@1 Microslab")},
 	{"thinstair",   8,  {{ 0, 7,  0, 16, 1, 8  },
-			{ 0, 15, 8, 16, 1, 8  }}, S("Thin Stair")},
-	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, S("Cube")},
-	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, S("Panel")},
-	{"slab",        2,  nil, S("Slab") },
+	--~ Name of a thin stair, a workbench-cut block. @1 = original node name (e.g. "Stone")
+			{ 0, 15, 8, 16, 1, 8  }}, NS("@1 Thin Stair")},
+	--~ Name of a 'cube', a small workbench-cut block. @1 = original node name (e.g. "Stone")
+	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, NS("@1 Cube")},
+	--~ Name of a panel, a workbench-cut block. @1 = original node name (e.g. "Stone")
+	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, NS("@1 Panel")},
+	--~ Name of a slab. @1 = original node name (e.g. "Stone")
+	{"slab",        2,  nil, NS("@1 Slab") },
 	{"doublepanel", 2,  {{ 0, 0,  0, 16, 8, 8  },
-			{ 0, 8,  8, 16, 8, 8  }}, S("Double Panel")},
+	--~ Name of a double panel, a workbench-cut block. @1 = original node name (e.g. "Stone")
+			{ 0, 8,  8, 16, 8, 8  }}, NS("@1 Double Panel")},
 	{"halfstair",   2,  {{ 0, 0,  0, 8,  8, 16 },
-			{ 0, 8,  8, 8,  8, 8  }}, S("Half-Stair")},
+	--~ Name of a half stair, a workbench-cut block. @1 = original node name (e.g. "Stone")
+			{ 0, 8,  8, 8,  8, 8  }}, NS("@1 Half-Stair")},
 	{"stair_outer", 1,  nil, nil},
-	{"stair",       1,  nil, S("Stair")},
+	--~ Name of a stair. @1 = original node name (e.g. "Stone")
+	{"stair",       1,  nil, NS("@1 Stair")},
 	{"stair_inner", 1,  nil, nil},
 }
 
@@ -420,8 +431,7 @@ local function register_cut_raw(node, workbench_def)
 			return false
 		end
 		minetest.register_node(":" .. cutnodename, {
-			--~ Format of the description of a cut node. @1: Base node description (e.g. "Stone"); @2: modifier (e.g. "Nanoslab")
-			description = S("@1 @2", def.description, workbench_def[4]),
+			description = S(workbench_def[4], def.description),
 			paramtype = "light",
 			paramtype2 = "facedir",
 			drawtype = "nodebox",
