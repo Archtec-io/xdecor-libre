@@ -1,7 +1,7 @@
 local cauldron, sounds = {}, {}
 local S = minetest.get_translator("xdecor")
 
--- Set to true to print soup ingredients and fire nodes to console
+-- Set to true to print soup ingredients, fire nodes and bowls to console
 local DEBUG_RECOGNIZED_ITEMS = false
 
 --~ cauldron hint
@@ -60,6 +60,14 @@ cauldron.cbox = {
 -- Returns true is given item is a fire
 local function is_fire(itemstring)
 	return minetest.get_item_group(itemstring, "fire") ~= 0
+end
+
+-- Returns true if given item is a bowl that is compatible with taking soup from
+-- the cauldron
+local function is_bowl(itemstring)
+	return minetest.get_item_group(itemstring, "xdecor_soup_bowl") == 1
+		-- Two items are hardcoded
+		or itemstring == "farming:bowl" or itemstring == "x_farming:bowl"
 end
 
 -- Returns true if the node at pos is above fire
@@ -263,7 +271,7 @@ function cauldron.take_soup(pos, node, clicker, itemstack)
 	local wield_item = clicker:get_wielded_item()
 	local item_name = wield_item:get_name()
 
-	if item_name == "xdecor:bowl" or item_name == "farming:bowl" then
+	if is_bowl(item_name) then
 		if wield_item:get_count() > 1 then
 			if inv:room_for_item("main", "xdecor:bowl_soup 1") then
 				itemstack:take_item()
@@ -441,7 +449,7 @@ minetest.register_craftitem("xdecor:bowl", {
 	description = S("Bowl"),
 	inventory_image = "xdecor_bowl.png",
 	wield_image = "xdecor_bowl.png",
-	groups = {food_bowl = 1, flammable = 2},
+	groups = {food_bowl = 1, xdecor_soup_bowl = 1, flammable = 2},
 })
 
 minetest.register_craftitem("xdecor:bowl_soup", {
@@ -499,6 +507,7 @@ if DEBUG_RECOGNIZED_ITEMS then
 	minetest.register_on_mods_loaded(function()
 		local ingredients = {}
 		local fires = {}
+		local bowls = {}
 		for k,v in pairs(minetest.registered_items) do
 			if is_ingredient(k) then
 				table.insert(ingredients, k)
@@ -506,12 +515,18 @@ if DEBUG_RECOGNIZED_ITEMS then
 			if is_fire(k) then
 				table.insert(fires, k)
 			end
+			if is_bowl(k) then
+				table.insert(bowls, k)
+			end
 		end
 		table.sort(ingredients)
 		table.sort(fires)
+		table.sort(bowls)
 		local str_i = table.concat(ingredients, ", ")
 		local str_f = table.concat(fires, ", ")
-		print("[xdecor] List of ingredients for soup: "..str_i)
-		print("[xdecor] List of nodes that can heat cauldron: "..str_f)
+		local str_b = table.concat(bowls, ", ")
+		minetest.log("action", "[xdecor] List of ingredients for soup: "..str_i)
+		minetest.log("action", "[xdecor] List of nodes that can heat cauldron: "..str_f)
+		minetest.log("action", "[xdecor] List of bowls able to take soup from cauldron: "..str_b)
 	end)
 end
