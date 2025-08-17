@@ -149,9 +149,9 @@ function cauldron.filling(pos, node, clicker, itemstack)
 					itemstack:take_item()
 					inv:add_item("main", bucket_item)
 				else
-					minetest.chat_send_player(clicker:get_player_name(),
-						S("No room in your inventory to add a bucket of water."))
-					return itemstack
+					-- No space: Drop bucket on ground
+					itemstack:take_item()
+					minetest.add_item(clicker:get_pos(), bucket_item)
 				end
 			else
 				itemstack:replace(bucket_item)
@@ -315,9 +315,9 @@ function cauldron.take_soup(pos, node, clicker, itemstack)
 				itemstack:take_item()
 				inv:add_item("main", soup_bowl)
 			else
-				minetest.chat_send_player(clicker:get_player_name(),
-					S("No room in your inventory to add a bowl of soup."))
-				return itemstack
+				-- No space: Drop soup bowl on ground
+				itemstack:take_item()
+				minetest.add_item(clicker:get_pos(), soup_bowl)
 			end
 		else
 			itemstack:replace(soup_bowl)
