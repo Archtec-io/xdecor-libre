@@ -28,18 +28,20 @@ local function set_infotext(meta, node)
 end
 
 -- HACKY list of soup ingredients.
--- The cauldron will check if any of these strings are contained in the itemname
--- after the ":".
+-- For items without a valid 'xdecor_soup_ingredient' group present, the cauldron
+-- will check part of the itemname after the ':' contains any of those words.
+-- If it does, the item counts as an ingredient, UNLESS the item is in the
+-- non_ingredients blacklist below.
 local ingredients_list = {
 	"apple", "mushroom", "honey", "pumpkin", "egg", "bread", "meat",
 	"chicken", "carrot", "potato", "melon", "rhubarb", "cucumber",
 	"corn", "beans", "berries", "grapes", "tomato", "wheat"
 }
 
--- List of items that can never be soup ingredients. Overwrites anything else.
+-- Blacklist of items that cannot be soup ingredients, in case they
+-- would otherwise match the ingredients_list above.
+-- Note the group 'xdecor_soup_ingredient' still takes precedence.
 local non_ingredients = {
-	-- xdecor
-	"xdecor:bowl_soup",
 	-- Minetest Game: default
 	"default:apple_mark", "default:blueberry_bush_leaves_with_berries",
 	-- Minetest Game: farming
@@ -68,7 +70,7 @@ end
 -- Returns true if given item is a bowl that is compatible with taking soup from
 -- the cauldron
 local function is_bowl(itemstring)
-	-- Recommended: The item has the this group
+	-- Recommended: The item has this group
 	return minetest.get_item_group(itemstring, "xdecor_soup_bowl") == 1
 		-- Two items are hardcoded
 		or itemstring == "farming:bowl" or itemstring == "x_farming:bowl"
@@ -199,9 +201,29 @@ end
 
 -- Checks if the given item can be used as ingredient for the soup
 local function is_ingredient(itemstring)
+	-- This group takes precedence over everything else, allowing
+	-- mods to explicitly mark items as soup ingredient or not.
+	local gval = minetest.get_item_group(itemstring, "xdecor_soup_ingredient")
+	-- 1: This item is a soup ingredient
+	if gval == 1 then
+		return true
+	-- -1: This item is NOT a soup ingredient
+	-- This should be used in case the heuristic below fails.
+	elseif gval == -1 then
+		return false
+	end
+
+	-- Otherwise, we determine on whether this item is a soup ingredient
+	-- based on its itemstring (admittedly kinda hacky ...)
+
+	-- But first check if our item is in the blacklist
 	if non_ingredients_keyed[itemstring] then
 		return false
 	end
+
+	-- We check if the part of the itemstring after the colon
+	-- contains one of the words in ingredients_list.
+	-- If yes, this is an ingredient. Otherwise it isn't.
 	local basename = itemstring:match(":([%w_]+)")
 	if not basename then
 		return false
@@ -460,7 +482,10 @@ minetest.register_craftitem("xdecor:bowl_soup", {
 	description = S("Bowl of soup"),
 	inventory_image = "xdecor_bowl_soup.png",
 	wield_image = "xdecor_bowl_soup.png",
-	groups = {},
+	groups = {
+		-- The soup itself is NOT an ingredient for the soup
+		xdecor_soup_ingredient = -1,
+	},
 	stack_max = 1,
 	on_use = minetest.item_eat(30, "xdecor:bowl")
 })

@@ -172,6 +172,7 @@ minetest.register_craftitem("xdecor:honey", {
 		food_honey = 1,
 		food_sugar = 1,
 		flammable = 2,
+		xdecor_soup_ingredient = 1,
 	},
 })
 
