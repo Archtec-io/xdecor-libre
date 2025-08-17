@@ -41,17 +41,32 @@ is relevant for you.
 ### Soup ingredients
 
 The cauldron soup accepts a variety of food items as ingredients for the soup.
-It uses a heuristic to determine which items it accepts.
-
-It scans the part of the technical itemname after the colon for certain keywords
-like 'apple', 'meat', 'potato' etc (for the full list, see `ingredients_list`
-in `src/cooking.lua`).
+It uses a heuristic to determine which items it accepts as ingredient.
 
 This heuristic may sometimes fail and recognize strange items as ingredient.
 To explicitly mark any item as a soup ingredient for xdecor, add the group
 `xdecor_soup_ingredient = 1` to it. To explicitly tell xdecor that an item
 is NOT a soup ingredient, use `xdecor_soup_ingredient = -1` instead.
 The `-1` should only be used if actually necessary.
+
+#### Information about the heuristic
+
+Any item without a valid `xdecor_soup_ingredient` group will be checked
+by against a heuristic to determine if it counts as a soup
+ingredient or not. Items that do have this group with a valid
+value are not subject to the heuristic.
+
+First, the heuristic checks if the item is 'eatable'. This basically
+checks if the function `core.item_eat` or (`minetest.item_eat`) is called.
+If the item is eatable, it counts as ingredient.
+
+If not, then the heuristic looks at the part of the technical itemname after
+the colon for certain keywords like 'apple', 'meat', 'potato' etc.
+(for the full list, see `ingredients_list` in `src/cooking.lua`).
+If a keyword was found, the item counts as an ingredient, otherwise not.
+
+There is also a small blacklist that disqualifies a few items
+from Minetest Game.
 
 ### Heater nodes
 
