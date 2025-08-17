@@ -1,7 +1,7 @@
 local cauldron, sounds = {}, {}
 local S = minetest.get_translator("xdecor")
 
--- Set to true to print soup ingredients, fire nodes and bowls to console
+-- Set to true to print soup ingredients, heater nodes and bowls to console
 local DEBUG_RECOGNIZED_ITEMS = false
 
 --~ cauldron hint
@@ -57,25 +57,29 @@ cauldron.cbox = {
 	{0,  0, 0,  16, 8,  16}
 }
 
--- Returns true is given item is a fire
-local function is_fire(itemstring)
-	return minetest.get_item_group(itemstring, "fire") ~= 0
+-- Returns true is given item is a node that can heat fire and can heat up the cauldron
+local function is_heater(itemstring)
+	-- Dedicated group to add custom cauldron-heating nodes
+	return minetest.get_item_group(itemstring, "xdecor_cauldron_heater") == 1 or
+		-- Also, all fire nodes count as heaters
+		minetest.get_item_group(itemstring, "fire") ~= 0
 end
 
 -- Returns true if given item is a bowl that is compatible with taking soup from
 -- the cauldron
 local function is_bowl(itemstring)
+	-- Recommended: The item has the this group
 	return minetest.get_item_group(itemstring, "xdecor_soup_bowl") == 1
 		-- Two items are hardcoded
 		or itemstring == "farming:bowl" or itemstring == "x_farming:bowl"
 end
 
--- Returns true if the node at pos is above fire
+-- Returns true if the node at pos is above heater
 local function is_heated(pos)
 	local below_node = {x = pos.x, y = pos.y - 1, z = pos.z}
 	local nn = minetest.get_node(below_node).name
-	-- Check fire group
-	if is_fire(nn) then
+	-- Check heater status
+	if is_heater(nn) then
 		return true
 	else
 		return false
@@ -502,31 +506,31 @@ minetest.register_lbm({
 })
 
 if DEBUG_RECOGNIZED_ITEMS then
-	-- Print all soup ingredients and fire nodes
+	-- Print all soup ingredients, heater nodes and bowls
 	-- in console
 	minetest.register_on_mods_loaded(function()
 		local ingredients = {}
-		local fires = {}
+		local heaters = {}
 		local bowls = {}
 		for k,v in pairs(minetest.registered_items) do
 			if is_ingredient(k) then
 				table.insert(ingredients, k)
 			end
-			if is_fire(k) then
-				table.insert(fires, k)
+			if is_heater(k) then
+				table.insert(heaters, k)
 			end
 			if is_bowl(k) then
 				table.insert(bowls, k)
 			end
 		end
 		table.sort(ingredients)
-		table.sort(fires)
+		table.sort(heaters)
 		table.sort(bowls)
 		local str_i = table.concat(ingredients, ", ")
-		local str_f = table.concat(fires, ", ")
+		local str_h = table.concat(heaters, ", ")
 		local str_b = table.concat(bowls, ", ")
 		minetest.log("action", "[xdecor] List of ingredients for soup: "..str_i)
-		minetest.log("action", "[xdecor] List of nodes that can heat cauldron: "..str_f)
+		minetest.log("action", "[xdecor] List of nodes that can heat cauldron: "..str_h)
 		minetest.log("action", "[xdecor] List of bowls able to take soup from cauldron: "..str_b)
 	end)
 end
