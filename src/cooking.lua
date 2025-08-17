@@ -221,6 +221,10 @@ local function is_ingredient(itemstring)
 		return false
 	end
 
+	-- Eatable items count as ingredient by default
+	if eatable(itemstring) then
+		return true
+	end
 	-- We check if the part of the itemstring after the colon
 	-- contains one of the words in ingredients_list.
 	-- If yes, this is an ingredient. Otherwise it isn't.
@@ -229,7 +233,7 @@ local function is_ingredient(itemstring)
 		return false
 	end
 	for _, ingredient in ipairs(ingredients_list) do
-		if eatable(itemstring) or basename:find(ingredient) then
+		if basename:find(ingredient) then
 			return true
 		end
 	end
