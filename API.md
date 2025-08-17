@@ -92,5 +92,11 @@ If you want to make your bowl compatible with the cauldron, add the group
 
 **Please test your bowl!**
 
-When any such bowl is used at the cauldron, it turns into `xdecor:bowl_soup`.
-If the soup is eaten, it turns into `xdecor:bowl`.
+When any valid bowl is used at the cauldron, it turns into `xdecor:bowl_soup`.
+If the soup is eaten, the item will become the original bowl again, even
+if it was a custom bowl.
+For custom bowls (not from X-Decor-libre), the `xdecor:bowl_soup` item
+remembers the name of the original bowl in the metadata under
+`original_bowl`. If `original_bowl` is the empty string, or contains the
+name of an unknown item, `xdecor:bowl` is the assumed default.
+(However, an unknown item in `original_bowl` will trigger a warning.)

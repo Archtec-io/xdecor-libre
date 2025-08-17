@@ -302,20 +302,30 @@ function cauldron.take_soup(pos, node, clicker, itemstack)
 	local item_name = wield_item:get_name()
 
 	if is_bowl(item_name) then
+		local soup_bowl = ItemStack("xdecor:bowl_soup 1")
+		-- For bowls from other mods, remember the original bowl name
+		-- to restore it after eating the soup.
+		if item_name ~= "xdecor:bowl" then
+			local imeta = soup_bowl:get_meta()
+			imeta:set_string("original_bowl", item_name)
+		end
+		-- Add item to inventory, if possible
 		if wield_item:get_count() > 1 then
-			if inv:room_for_item("main", "xdecor:bowl_soup 1") then
+			if inv:room_for_item("main", soup_bowl) then
 				itemstack:take_item()
-				inv:add_item("main", "xdecor:bowl_soup 1")
+				inv:add_item("main", soup_bowl)
 			else
 				minetest.chat_send_player(clicker:get_player_name(),
 					S("No room in your inventory to add a bowl of soup."))
 				return itemstack
 			end
 		else
-			itemstack:replace("xdecor:bowl_soup 1")
+			itemstack:replace(soup_bowl)
 		end
 
 		minetest.set_node(pos, {name = "xdecor:cauldron_empty", param2 = node.param2})
+
+		minetest.log("action", "[xdecor] "..clicker:get_player_name().." fills their bowl ("..item_name..") with soup from the cauldron at "..minetest.pos_to_string(pos))
 	end
 
 	return itemstack
@@ -491,7 +501,20 @@ minetest.register_craftitem("xdecor:bowl_soup", {
 		xdecor_soup_ingredient = -1,
 	},
 	stack_max = 1,
-	on_use = minetest.item_eat(30, "xdecor:bowl")
+	on_use = function(itemstack, user, pointed_thing)
+		-- Eat the soup and replace item with the original bowl item
+		-- (`xdecor:bowl` by default)
+		local imeta = itemstack:get_meta()
+		local empty_bowl = imeta:get_string("original_bowl")
+		if empty_bowl == "" then
+			empty_bowl = "xdecor:bowl"
+		end
+		if not minetest.registered_items[empty_bowl] then
+			minetest.log("warning", "[xdecor] original_bowl of xdecor:bowl_soup was '"..empty_bowl.."', an unknown item. Falling back to xdecor:bowl")
+			empty_bowl = "xdecor:bowl"
+		end
+		return minetest.do_item_eat(30, empty_bowl, itemstack, user, pointed_thing)
+	end,
 })
 
 -- Recipes
