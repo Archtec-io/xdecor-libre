@@ -208,6 +208,5 @@ Storage=
 Back=
 Work Bench=
 For cutting blocks, repairing tools with a hammer, crafting and storing items=
-@1 @2=
 Repairs tools at the work bench=
 Hammer=
