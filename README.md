@@ -43,9 +43,11 @@ blocks with special features:
 * Pressure Plate: Step on it to activate doors next to it
 * Chessboard: Play Chess against a player or the computer (see `CHESS_README.md`)
 
-## For developers
+## For developers and translators
 
 X-Decor-libre can be extended in a limited fashion. See `API.md` for details.
+
+This mod can also be translated. See `TRANSLATING.md` for details.
 
 ### X-Decor-libre vs X-Decor
 

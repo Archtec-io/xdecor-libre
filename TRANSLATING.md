@@ -1,0 +1,22 @@
+# Translating X-Decor-libre
+
+This mod wants to be translated in many languages.
+
+The translations are provided in the gettext PO format (supported since
+Luanti 5.10.0); they can be edited with programs like Poedit.
+
+Many strings are commented, so read the comments to understand the context
+of each string.
+
+## Special symbols
+
+The strings may contain some symbols with special meaning:
+
+`@1`, `@2`, `@3`, etc. are placeholders, they will be replaced with some other
+text. The translation *MUST* include all placeholders of the original string,
+but you can change the order as you wish.
+
+`@n` represents a new line.
+
+Refer to `lua_api.md` of the Luanti documentation for more information about
+the translation system.
