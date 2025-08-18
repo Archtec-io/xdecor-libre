@@ -2220,6 +2220,9 @@ function realchess.init(pos)
 	meta:set_string("whiteAttacked", "")
 	meta:set_string("promotionActive", "")
 
+	-- Records the world gametime (in seconds) at which the last move
+	-- was made, or, if none was made, the gametime of the start of the game.
+	-- If no game is ongoing, this is 0.
 	meta:set_int("lastMoveTime",   0)
 	meta:set_int("castlingBlackL", 1)
 	meta:set_int("castlingBlackR", 1)
@@ -2878,6 +2881,7 @@ function realchess.fields(pos, _, fields, sender)
 
 	if fields.single or fields.multi or fields.bot_vs_bot then
 		if fields.bot_vs_bot then
+			meta:set_string("lastMoveTime", minetest.get_gametime())
 			if not CHESS_DEBUG then
 				-- Bot vs Bot only allowed in Chess Debug Mode
 				return
@@ -2893,6 +2897,7 @@ function realchess.fields(pos, _, fields, sender)
 		elseif fields.single then
 			meta:set_string("mode", "single")
 		elseif fields.multi then
+			meta:set_string("lastMoveTime", minetest.get_gametime())
 			meta:set_string("mode", "multi")
 		end
 		update_formspec(meta)
@@ -2902,6 +2907,7 @@ function realchess.fields(pos, _, fields, sender)
 	local mode = meta:get_string("mode")
 	-- "Play as White/Black" button in Singleplayer when nobody has moved yet
 	if (fields.single_black or fields.single_white) and mode == "single" and meta:get_string("gameResult") == "" and meta:get_string("lastMove") == "" then
+		meta:set_string("lastMoveTime", minetest.get_gametime())
 		if fields.single_white then
 			meta:set_string("botColor", "black")
 			meta:set_string("playerWhite", playerName)
