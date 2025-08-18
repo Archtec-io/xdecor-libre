@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Luanti textdomain xdecor\n"
 "Report-Msgid-Bugs-To: Wuzzy@disroot.org\n"
-"POT-Creation-Date: 2025-08-18 06:11+0200\n"
+"POT-Creation-Date: 2025-08-18 07:05+0200\n"
 "PO-Revision-Date: 2025-08-18 06:34+0200\n"
 "Last-Translator: Zughy\n"
 "Language-Team: \n"
@@ -14,84 +14,85 @@ msgstr ""
 "X-Generator: Poedit 3.6\n"
 
 #. ~ Name of computer player in Chess
-#: mods/xdecor/src/chess.lua:41
+#: src/chess.lua:41
 msgid "Weak Computer"
 msgstr "Computer facile"
 
 #. ~ Name of computer player in Chess
-#: mods/xdecor/src/chess.lua:44
+#: src/chess.lua:44
 msgid "Weak Computer 1"
 msgstr "Computer facile 1"
 
 #. ~ Name of computer player in Chess
-#: mods/xdecor/src/chess.lua:46
+#: src/chess.lua:46
 msgid "Weak Computer 2"
 msgstr "Computer facile 2"
 
-#: mods/xdecor/src/chess.lua:122
+#: src/chess.lua:122
 msgid "Chess"
 msgstr "Scacchi"
 
-#: mods/xdecor/src/chess.lua:123
+#: src/chess.lua:123
 msgid "Chess Debug"
 msgstr "Debug scacchi"
 
 #. ~ Chess: Game mode selection prompt
-#: mods/xdecor/src/chess.lua:1117 mods/xdecor/src/chess.lua:1118
+#: src/chess.lua:1117 src/chess.lua:1118
 msgid "Select a game mode"
 msgstr "Seleziona modalità di gioco"
 
-#: mods/xdecor/src/chess.lua:1119
+#. ~ Chess: Game mode selection prompt
+#: src/chess.lua:1120
 msgid "Select a mode:"
 msgstr "Seleziona una modalità:"
 
 #. ~ Chess game mode (player vs bot)
-#: mods/xdecor/src/chess.lua:1121
+#: src/chess.lua:1122
 msgid "Singleplayer"
 msgstr "Giocante singolə"
 
 #. ~ Chess game mode (player vs player)
-#: mods/xdecor/src/chess.lua:1123
+#: src/chess.lua:1124
 msgid "Multiplayer"
 msgstr "Multigiocante"
 
 #. ~ Chess game mode
-#: mods/xdecor/src/chess.lua:1126
+#: src/chess.lua:1127
 msgid "Bot vs Bot"
 msgstr "Bot contro Bot"
 
 #. ~ Chess: player is in check
-#: mods/xdecor/src/chess.lua:1691
+#: src/chess.lua:1692
 msgid "check"
 msgstr "scacco"
 
 #. ~ Chess: player has been checkmated
-#: mods/xdecor/src/chess.lua:1693
+#: src/chess.lua:1694
 msgid "checkmate"
 msgstr "scacco matto"
 
 #. ~ Chess: player has resigned
-#: mods/xdecor/src/chess.lua:1695
+#: src/chess.lua:1696
 msgid "resigned"
 msgstr "arresə"
 
 #. ~ Chess: player has won
-#: mods/xdecor/src/chess.lua:1697
+#: src/chess.lua:1698
 msgid "winner"
 msgstr "vince"
 
 #. ~ Chess: player has lost
-#: mods/xdecor/src/chess.lua:1699
+#: src/chess.lua:1700
 msgid "loser"
 msgstr "perde"
 
 #. ~ Chess: player has a draw
-#: mods/xdecor/src/chess.lua:1701
+#: src/chess.lua:1702
 msgid "draw"
 msgstr "patta"
 
 #. ~ Chess: Shown when black player can promote a pawn. Space for text is limited.
-#: mods/xdecor/src/chess.lua:1746
+#: src/chess.lua:1747
 msgid ""
 "PROMOTION\n"
 "FOR BLACK!"
@@ -99,12 +100,13 @@ msgstr ""
 "PROMOZIONE\n"
 "PER IL NERO!"
 
-#: mods/xdecor/src/chess.lua:1751 mods/xdecor/src/chess.lua:1767
+#. ~ Chess: Prompt for player who must select to which piece to promote their pawn. Space for text is limited.
+#: src/chess.lua:1753 src/chess.lua:1769
 msgid "Promote pawn to:"
 msgstr "Promuovi pedone a:"
 
 #. ~ Chess: Shown when white player can promote a pawn. Space for text is limited.
-#: mods/xdecor/src/chess.lua:1762
+#: src/chess.lua:1764
 msgid ""
 "PROMOTION\n"
 "FOR WHITE!"
@@ -113,7 +115,7 @@ msgstr ""
 "PER IL BIANCO!"
 
 #. ~ Chess: Shown when white player wants to use the 50-move rule or threefold-repetition rule to claim a draw. Space for text is limited.
-#: mods/xdecor/src/chess.lua:1780
+#: src/chess.lua:1782
 msgid ""
 "DRAW CLAIM\n"
 "BY WHITE!"
@@ -122,7 +124,7 @@ msgstr ""
 "DAL BIANCO!"
 
 #. ~ Chess: Shown when black player wants to use the 50-move rule or threefold-repetition rule to claim a draw. Space for text is limited.
-#: mods/xdecor/src/chess.lua:1783
+#: src/chess.lua:1785
 msgid ""
 "DRAW CLAIM\n"
 "BY BLACK!"
@@ -131,7 +133,7 @@ msgstr ""
 "DAL NERO!"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:1790
+#: src/chess.lua:1792
 msgid ""
 "The player has invoked the 50-move rule for the next move. The next move "
 "might draw the game."
@@ -140,7 +142,7 @@ msgstr ""
 "Quest'ultima potrebbe portare a una patta."
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:1796
+#: src/chess.lua:1798
 msgid ""
 "The player has invoked the threefold-repetition rule for the next move. The "
 "next move might draw the game."
@@ -149,72 +151,72 @@ msgstr ""
 "mossa. Quest'ultima potrebbe portare a una patta"
 
 #. ~ Chess button
-#: mods/xdecor/src/chess.lua:1803
+#: src/chess.lua:1805
 msgid "New game"
 msgstr "Nuova partita"
 
 #. ~ Resign (give up) in Chess
-#: mods/xdecor/src/chess.lua:1810
+#: src/chess.lua:1812
 msgid "Resign"
 msgstr "Arrenditi"
 
 #. ~ Chess: Prompt to select a player color
-#: mods/xdecor/src/chess.lua:1816
+#: src/chess.lua:1818
 msgid "Select a color:"
 msgstr "Seleziona un colore:"
 
 #. ~ White Chess player
-#: mods/xdecor/src/chess.lua:1820
+#: src/chess.lua:1822
 msgid "White"
 msgstr "Bianco"
 
 #. ~ Black Chess player
-#: mods/xdecor/src/chess.lua:1822
+#: src/chess.lua:1824
 msgid "Black"
 msgstr "Nero"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:1834
+#: src/chess.lua:1836
 msgid "Invoke the 50-move rule for your next move"
 msgstr "Invoca la regola delle 50 mosse per la tua prossima mossa"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:1841
+#: src/chess.lua:1843
 msgid "Invoke the 50-move rule and draw the game"
 msgstr "Invoca la regola delle 50 mosse e chiudi in patta"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:1854
+#: src/chess.lua:1856
 msgid "Invoke the threefold repetition rule and draw the game"
 msgstr "Invoca la regola della tripla ripetizione e chiudi in patta"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:1861
+#: src/chess.lua:1863
 msgid "Invoke the threefold repetition rule for your next move"
 msgstr "Invoca la regola della tripla ripetizione per la tua prossima mossa"
 
 #. ~ Chess message. @1 = opponent name
-#: mods/xdecor/src/chess.lua:1991 mods/xdecor/src/chess.lua:2014
+#: src/chess.lua:1993 src/chess.lua:2016
 msgid "You have checkmated @1. You win!"
 msgstr "Scacco matto a @1. Hai vinto!"
 
 #. ~ Chess message. @1 = opponent name
-#: mods/xdecor/src/chess.lua:1993 mods/xdecor/src/chess.lua:2016
+#: src/chess.lua:1995 src/chess.lua:2018
 msgid "You were checkmated by @1. You lose!"
 msgstr "Scacco matto da @1. Hai perso!"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:2002 mods/xdecor/src/chess.lua:2025
+#: src/chess.lua:2004 src/chess.lua:2027
 msgid "The game ended up in a stalemate! It's a draw!"
 msgstr "È uno stallo! Patta!"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:2037
+#: src/chess.lua:2039
 msgid "The game ended up in a dead position! It's a draw!"
 msgstr "È una posizione morta! Patta!"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:2050
+#: src/chess.lua:2052
 msgid ""
 "No piece was captured and no pawn was moved for 75 consecutive moves of each "
 "player. It's a draw!"
@@ -223,24 +225,24 @@ msgstr ""
 "Patta!"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:2070 mods/xdecor/src/chess.lua:3025
+#: src/chess.lua:2072 src/chess.lua:3027
 msgid "You have drawn the game by invoking the 50-move rule."
 msgstr "Hai chiuso in patta con l'invocazione della regola delle 50 mosse."
 
 #. ~ Chess message. @1 = player name
-#: mods/xdecor/src/chess.lua:2073 mods/xdecor/src/chess.lua:3028
+#: src/chess.lua:2075 src/chess.lua:3030
 msgid "@1 has drawn the game by invoking the 50-move rule."
 msgstr "@1 ha chiuso in patta con l'invocazione della regola delle 50 mosse."
 
 #. ~ Chess message shown when player has invoked a rule to claim a draw and had to make a game-drawing move but instead made a different move
-#: mods/xdecor/src/chess.lua:2086 mods/xdecor/src/chess.lua:2193
+#: src/chess.lua:2088 src/chess.lua:2195
 msgid "You have failed to make a game-drawing move. The game continues."
 msgstr ""
 "Non sei riuscitə a fare una mossa che portasse a una patta. Il gioco "
 "continua."
 
 #. ~ Chess message shown when player (name = @1) has invoked the 50-move rule to claim a draw and had to make a game-drawing move but instead made a different move
-#: mods/xdecor/src/chess.lua:2089
+#: src/chess.lua:2091
 msgid ""
 "@1 made a draw claim using the 50-move rule but it was false. The game "
 "continues."
@@ -249,25 +251,25 @@ msgstr ""
 "partita continua."
 
 #. ~ Chess message when a fivefold repetition has happened
-#: mods/xdecor/src/chess.lua:2158
+#: src/chess.lua:2160
 msgid "The exact same position has occured 5 times. It's a draw!"
 msgstr "La stessa identica mossa si è ripetuta per 5 volte. Patta!"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:2178 mods/xdecor/src/chess.lua:3073
+#: src/chess.lua:2180 src/chess.lua:3075
 msgid "You have drawn the game by invoking the threefold repetition rule."
 msgstr ""
 "Hai chiuso in patta con l'invocazione della regola della tripla ripetizione."
 
 #. ~ Chess message. @1 = player name
-#: mods/xdecor/src/chess.lua:2181 mods/xdecor/src/chess.lua:3076
+#: src/chess.lua:2183 src/chess.lua:3078
 msgid "@1 has drawn the game by invoking the threefold repetition rule."
 msgstr ""
 "@1 ha chiuso in patta con l'invocazione della regola della tripla "
 "ripetizione."
 
 #. ~ Chess message shown when player (name = @1) has invoked the threefold repetition rule to claim a draw and had to make a game-drawing move but instead made a different move
-#: mods/xdecor/src/chess.lua:2196
+#: src/chess.lua:2198
 msgid ""
 "@1 made a draw claim using the threefold repetition rule but it was false. "
 "The game continues."
@@ -275,41 +277,41 @@ msgstr ""
 "@1 ha tentato la patta con la regola della tripla ripetizione ma ha fallito. "
 "La partita continua."
 
-#: mods/xdecor/src/chess.lua:2209 mods/xdecor/src/chess.lua:3307
+#: src/chess.lua:2211 src/chess.lua:3309
 msgid "Chess Board"
 msgstr "Scacchiera"
 
 #. ~ Chess message when player tries to move with someone else's pieces
-#: mods/xdecor/src/chess.lua:2287
+#: src/chess.lua:2289
 msgid "Someone else plays white pieces!"
 msgstr "Qualcun`altrə sta già giocando con il bianco!"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:2298 mods/xdecor/src/chess.lua:2318
+#: src/chess.lua:2300 src/chess.lua:2320
 msgid "It's not your turn!"
 msgstr "Non è il tuo turno!"
 
 #. ~ Chess message when player tries to move with someone else's pieces
-#: mods/xdecor/src/chess.lua:2308
+#: src/chess.lua:2310
 msgid "Someone else plays black pieces!"
 msgstr "Qualcun`altrə sta già giocando con il nero!"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:2325
+#: src/chess.lua:2327
 msgid "Black cannot move first!"
 msgstr "Il nero non può muovere per primo!"
 
 #. ~ number of seconds
-#: mods/xdecor/src/chess.lua:2860
+#: src/chess.lua:2862
 msgid "@1 s"
 msgstr "@1 s"
 
 #. ~ number of minutes and seconds
-#: mods/xdecor/src/chess.lua:2864
+#: src/chess.lua:2866
 msgid "@1 min @2 s"
 msgstr "@1 min @2 s"
 
-#: mods/xdecor/src/chess.lua:2934
+#: src/chess.lua:2936
 msgid ""
 "You can't reset the chessboard, a game has been started. Try again in @1."
 msgstr ""
@@ -317,46 +319,46 @@ msgstr ""
 "@1."
 
 #. ~ Chess message when player tried to resign too early
-#: mods/xdecor/src/chess.lua:2946
+#: src/chess.lua:2948
 msgid "Resigning is not possible yet."
 msgstr "Non ci si può ancora arrendere."
 
 #. ~ Chess message when player resigned (gave up)
-#: mods/xdecor/src/chess.lua:2977
+#: src/chess.lua:2979
 msgid "You have resigned."
 msgstr "Ti sei arresə."
 
 #. ~ Chess message when player resigned (gave up). @1 = opponent name
-#: mods/xdecor/src/chess.lua:2980
+#: src/chess.lua:2982
 msgid "@1 has resigned. You win!"
 msgstr "@1 si è arresə. Hai vinto!"
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:2986
+#: src/chess.lua:2988
 msgid "You can't resign, you're not playing in this game."
 msgstr "Non ti puoi arrendere, non stai giocando in questa partita."
 
 #. ~ Chess message
-#: mods/xdecor/src/chess.lua:3014 mods/xdecor/src/chess.lua:3061
+#: src/chess.lua:3016 src/chess.lua:3063
 msgid "You can't claim a draw, it's not your turn!"
 msgstr "Non puoi chiamare patta, non è il tuo turno!"
 
-#: mods/xdecor/src/chess.lua:3098
+#: src/chess.lua:3100
 msgid "You're only a spectator in this game of Chess."
 msgstr "Sei solo un`osservante in questa partita di scacchi."
 
 #. ~ Chess message when player tried to promote a pawn when it's not legal
-#: mods/xdecor/src/chess.lua:3105
+#: src/chess.lua:3107
 msgid "This isn't the time for promotion."
 msgstr "Non è il momento per una promozione."
 
 #. ~ Chess message when player tried to promote a pawn when it's not their turn
-#: mods/xdecor/src/chess.lua:3109 mods/xdecor/src/chess.lua:3116
+#: src/chess.lua:3111 src/chess.lua:3118
 msgid "It's not your turn! This promotion is meant for the other player."
 msgstr "Non è il tuo turno! Questa promozione spetta all'altrə giocante."
 
 #. ~ Shown when player tried to dig a chessboard but is not allowed to. @1 = time
-#: mods/xdecor/src/chess.lua:3154
+#: src/chess.lua:3156
 msgid ""
 "You can't dig the chessboard, a game has been started. Reset it first or dig "
 "it again in @1."
@@ -365,287 +367,288 @@ msgstr ""
 "prima, o riprova a rimuoverla in @1."
 
 #. ~ Shown when player tried to dig a chessboard but is not allowed to. @1 = time
-#: mods/xdecor/src/chess.lua:3160
+#: src/chess.lua:3162
 msgid ""
 "You can't dig the chessboard, a game has been started. Try it again in @1."
 msgstr ""
 "Non puoi rimuovere la scacchiera, c'è una partita in corso. Riprova tra @1."
 
 #. ~ Chess board tooltip
-#: mods/xdecor/src/chess.lua:3325
+#: src/chess.lua:3327
 msgid "Play a game of Chess against another player or the computer"
 msgstr ""
 "Gioca una partita a scacchi contro un`altrə giocante o contro il computer"
 
 #. ~ chess piece
-#: mods/xdecor/src/chess.lua:3411
+#: src/chess.lua:3413
 msgid "White Pawn"
 msgstr "Pedone bianco"
 
 #. ~ chess piece
-#: mods/xdecor/src/chess.lua:3413
+#: src/chess.lua:3415
 msgid "Black Pawn"
 msgstr "Pedone nero"
 
 #. ~ chess piece
-#: mods/xdecor/src/chess.lua:3416
+#: src/chess.lua:3418
 msgid "White Rook"
 msgstr "Torre bianca"
 
 #. ~ chess piece
-#: mods/xdecor/src/chess.lua:3418
+#: src/chess.lua:3420
 msgid "Black Rook"
 msgstr "Torre nera"
 
 #. ~ chess piece
-#: mods/xdecor/src/chess.lua:3421
+#: src/chess.lua:3423
 msgid "White Knight"
 msgstr "Cavallo bianco"
 
 #. ~ chess piece
-#: mods/xdecor/src/chess.lua:3423
+#: src/chess.lua:3425
 msgid "Black Knight"
 msgstr "Cavallo nero"
 
 #. ~ chess piece
-#: mods/xdecor/src/chess.lua:3426
+#: src/chess.lua:3428
 msgid "White Bishop"
 msgstr "Alfiere bianco"
 
 #. ~ chess piece
-#: mods/xdecor/src/chess.lua:3428
+#: src/chess.lua:3430
 msgid "Black Bishop"
 msgstr "Alfiere nero"
 
 #. ~ chess piece
-#: mods/xdecor/src/chess.lua:3431
+#: src/chess.lua:3433
 msgid "White Queen"
 msgstr "Regina bianca"
 
 #. ~ chess piece
-#: mods/xdecor/src/chess.lua:3433
+#: src/chess.lua:3435
 msgid "Black Queen"
 msgstr "Regina nera"
 
 #. ~ chess piece
-#: mods/xdecor/src/chess.lua:3436
+#: src/chess.lua:3438
 msgid "White King"
 msgstr "Re bianco"
 
 #. ~ chess piece
-#: mods/xdecor/src/chess.lua:3438
+#: src/chess.lua:3440
 msgid "Black King"
 msgstr "Re nero"
 
 #. ~ cauldron hint
-#: mods/xdecor/src/cooking.lua:8
+#: src/cooking.lua:8
 msgid "Light a fire below to heat it up"
 msgstr ""
 
 #. ~ cauldron hint
-#: mods/xdecor/src/cooking.lua:10
+#: src/cooking.lua:10
 msgid "Use a bowl to eat the soup"
 msgstr "Utilizzare una ciotola per mangiare la zuppa"
 
 #. ~ cauldron hint
-#: mods/xdecor/src/cooking.lua:12
+#: src/cooking.lua:12
 msgid "Drop foods inside to make a soup"
 msgstr "Mettere gli ingredienti all'interno per fare una zuppa"
 
-#: mods/xdecor/src/cooking.lua:15
+#: src/cooking.lua:15
 msgid "Cauldron (empty)"
 msgstr "Calderone (vuoto)"
 
-#: mods/xdecor/src/cooking.lua:16
+#: src/cooking.lua:16
 msgid "Cauldron (cold water)"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:17
+#: src/cooking.lua:17
 msgid "Cauldron (cold river water)"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:18
+#: src/cooking.lua:18
 msgid "Cauldron (cold soup)"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:19
+#: src/cooking.lua:19
 msgid "Cauldron (boiling water)"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:20
+#: src/cooking.lua:20
 msgid "Cauldron (boiling river water)"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:21
+#: src/cooking.lua:21
 msgid "Cauldron (boiling soup)"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:335
+#: src/cooking.lua:335
 msgid "Cauldron"
 msgstr "Calderone"
 
-#: mods/xdecor/src/cooking.lua:336
+#. ~ Cauldron tooltip
+#: src/cooking.lua:337
 msgid "For storing water and cooking soup"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:353
+#: src/cooking.lua:354
 msgid "Cauldron with Water (cold)"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:367
+#: src/cooking.lua:368
 msgid "Cauldron with River Water (cold)"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:381
+#: src/cooking.lua:382
 msgid "Cauldron with Soup (cold)"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:402
+#: src/cooking.lua:403
 msgid "Cauldron with Water (boiling)"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:427
+#: src/cooking.lua:428
 msgid "Cauldron with River Water (boiling)"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:454
+#: src/cooking.lua:455
 msgid "Cauldron with Soup (boiling)"
 msgstr ""
 
-#: mods/xdecor/src/cooking.lua:489
+#. ~ Item that can hold soup
+#: src/cooking.lua:491
 msgid "Bowl"
 msgstr "Ciotola"
 
-#: mods/xdecor/src/cooking.lua:496
+#: src/cooking.lua:498
 msgid "Bowl of soup"
 msgstr "Ciotola di zuppa"
 
 #. ~ Enchantment
-#: mods/xdecor/src/enchanting.lua:32 mods/xdecor/src/enchanting.lua:76
+#: src/enchanting.lua:32 src/enchanting.lua:76
 msgid "Efficiency"
 msgstr "Efficacia"
 
 #. ~ Enchantment
-#: mods/xdecor/src/enchanting.lua:34 mods/xdecor/src/enchanting.lua:77
+#: src/enchanting.lua:34 src/enchanting.lua:77
 msgid "Durability"
 msgstr "Durabilità"
 
 #. ~ Enchantment
-#: mods/xdecor/src/enchanting.lua:36 mods/xdecor/src/enchanting.lua:78
+#: src/enchanting.lua:36 src/enchanting.lua:78
 msgid "Sharpness"
 msgstr "Affilatezza"
 
 #. ~ Tooltip for enchantment, in format "<enchantment name> (+<bonus>%)", e.g. "Efficiency (+5%)"
-#: mods/xdecor/src/enchanting.lua:41 mods/xdecor/src/enchanting.lua:43
+#: src/enchanting.lua:41 src/enchanting.lua:43
 msgid "@1 (+@2%)"
 msgstr ""
 
 #. ~ Sharpness enchantment
-#: mods/xdecor/src/enchanting.lua:99
+#: src/enchanting.lua:99
 msgid "Your weapon inflicts more damage"
 msgstr "La tua arma infligge più danno"
 
 #. ~ Durability enchantment
-#: mods/xdecor/src/enchanting.lua:101
+#: src/enchanting.lua:101
 msgid "Your tool lasts longer"
 msgstr "Il tuo utensile dura di più"
 
 #. ~ Efficiency enchantment
-#: mods/xdecor/src/enchanting.lua:103
+#: src/enchanting.lua:103
 msgid "Your tool digs faster"
 msgstr "Il tuo utensile scava più rapidamente"
 
-#: mods/xdecor/src/enchanting.lua:189 mods/xdecor/src/enchanting.lua:241
+#: src/enchanting.lua:189 src/enchanting.lua:241
 msgid "Enchantment Table"
 msgstr "Tavolo per migliorie"
 
 #. ~ Enchantment table tooltip
-#: mods/xdecor/src/enchanting.lua:243
+#: src/enchanting.lua:243
 msgid "Enchant your tools with mese crystals"
 msgstr ""
 
 #. ~ Enchanted tool description, e.g. "Enchanted Diamond Sword". @1 is the original tool name, @2 is the enchantment text, e.g. "Durability (+20%)"
-#: mods/xdecor/src/enchanting.lua:375 mods/xdecor/src/enchanting.lua:503
+#: src/enchanting.lua:375 src/enchanting.lua:503
 msgid ""
 "Enchanted @1\n"
 "@2"
 msgstr ""
 
 #. ~ Enchanted tool description, e.g. "Enchanted Diamond Sword"
-#: mods/xdecor/src/enchanting.lua:377 mods/xdecor/src/enchanting.lua:504
+#: src/enchanting.lua:377 src/enchanting.lua:504
 msgid "Enchanted @1"
 msgstr ""
 
-#: mods/xdecor/src/hive.lua:9
+#: src/hive.lua:9
 msgid "The bees are busy making honey."
 msgstr ""
 
-#: mods/xdecor/src/hive.lua:10
+#: src/hive.lua:10
 msgid "The bees are looking for flowers."
 msgstr ""
 
-#: mods/xdecor/src/hive.lua:11
+#: src/hive.lua:11
 msgid "The bees want to pollinate more flowers."
 msgstr ""
 
-#: mods/xdecor/src/hive.lua:12
+#: src/hive.lua:12
 msgid "The bees are idle."
 msgstr ""
 
-#: mods/xdecor/src/hive.lua:13
+#: src/hive.lua:13
 msgid "The bees are resting."
 msgstr ""
 
 #. ~ Beehive
-#: mods/xdecor/src/hive.lua:74 mods/xdecor/src/hive.lua:124
+#: src/hive.lua:74 src/hive.lua:124
 msgid "Artificial Hive"
 msgstr "Favo artificiale"
 
 #. ~ Tooltip of artificial hive
-#: mods/xdecor/src/hive.lua:126
+#: src/hive.lua:126
 msgid "Bees live here and produce honey"
 msgstr ""
 
-#: mods/xdecor/src/hive.lua:168
+#: src/hive.lua:168
 msgid "Honey"
 msgstr "Miele"
 
 #. ~ Tooltip for honey in crafting guide of the Unified Inventory mod
-#: mods/xdecor/src/hive.lua:194
+#: src/hive.lua:194
 msgid "Made by bees"
 msgstr ""
 
-#. ~ Item frame infotext. @1 = item frame name, @2 = owner name (player)
-#: mods/xdecor/src/itemframe.lua:78 mods/xdecor/src/itemframe.lua:80
-#: mods/xdecor/src/itemframe.lua:89 mods/xdecor/src/itemframe.lua:162
+#: src/itemframe.lua:13
 msgid "Item Frame"
 msgstr "Teca"
 
 #. ~ Item frame infotext. @1 = item frame name, @2 = owner name (player)
-#: mods/xdecor/src/itemframe.lua:77 mods/xdecor/src/itemframe.lua:92
+#: src/itemframe.lua:81 src/itemframe.lua:97
 msgid "@1 (owned by @2)"
 msgstr "@1 (proprietà di @2)"
 
 #. ~ Item frame tooltip
-#: mods/xdecor/src/itemframe.lua:164
+#: src/itemframe.lua:169
 msgid "For presenting a single item"
 msgstr ""
 
 #. ~ Used in the mailbox donor list. Will be displayed as item icon followed by this string. @1 = item count
-#: mods/xdecor/src/mailbox.lua:65
+#: src/mailbox.lua:65
 msgid "× @1"
 msgstr ""
 
-#: mods/xdecor/src/mailbox.lua:73 mods/xdecor/src/mailbox.lua:183
+#: src/mailbox.lua:73 src/mailbox.lua:185
 msgid "Mailbox"
 msgstr "Cassetta delle lettere"
 
-#: mods/xdecor/src/mailbox.lua:74
+#. ~ Caption of the list of players who gave items in a mailbox
+#: src/mailbox.lua:75
 msgid "Last donators"
 msgstr "Ultimi donatori"
 
 #. ~ Mailbox menu title. @1 = player name
-#: mods/xdecor/src/mailbox.lua:89
+#: src/mailbox.lua:90
 msgid ""
 "Send your goods to\n"
 "@1"
@@ -653,383 +656,383 @@ msgstr ""
 "Invia i tuoi item a\n"
 "@1"
 
-#: mods/xdecor/src/mailbox.lua:115
+#. ~ Mailbox infotext. @1 = owner name
+#: src/mailbox.lua:117
 msgid "@1's Mailbox"
 msgstr "Cassetta delle lettere di @1"
 
-#: mods/xdecor/src/mailbox.lua:140
+#: src/mailbox.lua:142
 msgid "The mailbox is full."
 msgstr "La cassetta delle lettere è piena"
 
 #. ~ Mailbox tooltip
-#: mods/xdecor/src/mailbox.lua:185
+#: src/mailbox.lua:187
 msgid "Lets other players give you things"
 msgstr ""
 
 #. ~ Pressure plate tooltip
-#: mods/xdecor/src/mechanisms.lua:180
+#: src/mechanisms.lua:180
 msgid "Opens doors when stepped on"
 msgstr ""
 
-#: mods/xdecor/src/mechanisms.lua:219
+#: src/mechanisms.lua:219
 msgid "Wooden Pressure Plate"
 msgstr "Placca di pressione di legno"
 
-#: mods/xdecor/src/mechanisms.lua:225
+#: src/mechanisms.lua:225
 msgid "Stone Pressure Plate"
 msgstr "Placca di pressione di pietra"
 
-#: mods/xdecor/src/mechanisms.lua:229
+#: src/mechanisms.lua:229
 msgid "Lever"
 msgstr "Leva"
 
 #. ~ Lever tooltip
-#: mods/xdecor/src/mechanisms.lua:231
+#: src/mechanisms.lua:231
 msgid "Opens doors when pulled"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:21
+#: src/nodes.lua:21
 msgid "Bamboo Frame"
 msgstr "Cornice di bambù"
 
-#: mods/xdecor/src/nodes.lua:31
+#: src/nodes.lua:31
 msgid "Chainlink"
 msgstr "Cotta di maglia"
 
-#: mods/xdecor/src/nodes.lua:40
+#: src/nodes.lua:40
 msgid "Rusty Iron Bars"
 msgstr "Sbarre di prigione arrugginite"
 
-#: mods/xdecor/src/nodes.lua:52
+#: src/nodes.lua:52
 msgid "Wood Frame"
 msgstr "Cornice in legno"
 
-#: mods/xdecor/src/nodes.lua:64
+#: src/nodes.lua:64
 msgid "Barricade"
 msgstr "Barricata"
 
-#: mods/xdecor/src/nodes.lua:77
+#: src/nodes.lua:77
 msgid "Barrel"
 msgstr "Barile"
 
-#: mods/xdecor/src/nodes.lua:109
+#: src/nodes.lua:109
 msgid "Wooden Cabinet"
 msgstr "Stipo di legno"
 
 #. ~ Tooltip for block that stores items
-#: mods/xdecor/src/nodes.lua:111 mods/xdecor/src/nodes.lua:139
-#: mods/xdecor/src/nodes.lua:161
+#: src/nodes.lua:111 src/nodes.lua:139 src/nodes.lua:161
 msgid "24 inventory slots"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:120
+#: src/nodes.lua:120
 msgid "Half Wooden Cabinet"
 msgstr "Stipo di legno a metà"
 
 #. ~ Tooltip for block that stores items
-#: mods/xdecor/src/nodes.lua:123
+#: src/nodes.lua:123
 msgid "8 inventory slots"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:138 mods/xdecor/src/nodes.lua:155
+#: src/nodes.lua:138 src/nodes.lua:155
 msgid "Plain Shelf"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:160
+#: src/nodes.lua:160
 msgid "Multi Shelf"
 msgstr "Mensole"
 
-#: mods/xdecor/src/nodes.lua:170
+#: src/nodes.lua:170
 msgid "Candle"
 msgstr "Candela"
 
-#: mods/xdecor/src/nodes.lua:202
+#: src/nodes.lua:202
 msgid "Chair"
 msgstr "Sedia"
 
-#: mods/xdecor/src/nodes.lua:226
+#: src/nodes.lua:226
 msgid "Cobweb"
 msgstr "Ragnatela"
 
-#: mods/xdecor/src/nodes.lua:239
+#: src/nodes.lua:239
 msgid "Red Curtain"
 msgstr "Tenda rossa"
 
-#: mods/xdecor/src/nodes.lua:323
+#: src/nodes.lua:323
 msgid "Cushion"
 msgstr "Cuscino"
 
-#: mods/xdecor/src/nodes.lua:338
+#: src/nodes.lua:338
 msgid "Cushion Block"
 msgstr "Blocco di cuscini"
 
-#: mods/xdecor/src/nodes.lua:355
+#: src/nodes.lua:355
 msgid "Japanese Door"
 msgstr "Porta giapponese"
 
-#: mods/xdecor/src/nodes.lua:363
+#: src/nodes.lua:363
 msgid "Prison Door"
 msgstr "Porta di prigione"
 
-#: mods/xdecor/src/nodes.lua:376
+#: src/nodes.lua:376
 msgid "Rusty Prison Door"
 msgstr "Porta di prigione arrugginita"
 
-#: mods/xdecor/src/nodes.lua:389
+#: src/nodes.lua:389
 msgid "Screen Door"
 msgstr "Porta a schermo"
 
-#: mods/xdecor/src/nodes.lua:397
+#: src/nodes.lua:397
 msgid "Paper Door"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:405
+#: src/nodes.lua:405
 msgid "Woodglass Door"
 msgstr "Porta di vetro"
 
-#: mods/xdecor/src/nodes.lua:450 mods/xdecor/src/nodes.lua:470
+#: src/nodes.lua:450 src/nodes.lua:471
 msgid "Ender Chest"
 msgstr "Baule ender"
 
-#: mods/xdecor/src/nodes.lua:451
+#. ~ Ender chest tooltip
+#: src/nodes.lua:452
 msgid "Interdimensional inventory"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:480
+#: src/nodes.lua:481
 msgid "Ivy"
 msgstr "Edera"
 
-#: mods/xdecor/src/nodes.lua:494
+#: src/nodes.lua:495
 msgid "Weathercock"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:507
+#: src/nodes.lua:508
 msgid "Lantern"
 msgstr "Lanterna"
 
-#: mods/xdecor/src/nodes.lua:582
+#: src/nodes.lua:583
 msgid "Hanging Lantern"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:626
+#: src/nodes.lua:627
 msgid "Steel Lattice Light Box"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:627
+#: src/nodes.lua:628
 msgid "Wooden Cross Light Box"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:628
+#: src/nodes.lua:629
 msgid "Wooden Rhombus Light Box"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:643
+#: src/nodes.lua:644
 msgid "Potted White Dandelion"
 msgstr "Soffione bianco in vaso"
 
-#: mods/xdecor/src/nodes.lua:644
+#: src/nodes.lua:645
 msgid "Potted Yellow Dandelion"
 msgstr "Soffione giallo in vaso"
 
-#: mods/xdecor/src/nodes.lua:645
+#: src/nodes.lua:646
 msgid "Potted Geranium"
 msgstr "Geranio in vaso"
 
-#: mods/xdecor/src/nodes.lua:646
+#: src/nodes.lua:647
 msgid "Potted Rose"
 msgstr "Rosa in vaso"
 
-#: mods/xdecor/src/nodes.lua:647
+#: src/nodes.lua:648
 msgid "Potted Tulip"
 msgstr "Tulipano in vaso"
 
-#: mods/xdecor/src/nodes.lua:648
+#: src/nodes.lua:649
 msgid "Potted Viola"
 msgstr "Violetta in vaso"
 
-#: mods/xdecor/src/nodes.lua:684
+#: src/nodes.lua:685
 msgid "Painting"
 msgstr "Dipinto"
 
-#: mods/xdecor/src/nodes.lua:759
+#: src/nodes.lua:760
 msgid "Garden Stone Path"
 msgstr "Sentiero da giardino in pietra"
 
-#: mods/xdecor/src/nodes.lua:784
+#: src/nodes.lua:785
 msgid "Cactus Brick"
 msgstr "Mattone di cactus"
 
-#: mods/xdecor/src/nodes.lua:785
+#: src/nodes.lua:786
 msgid "Coal Stone Tile"
 msgstr "Mattonella di pietra di carbone"
 
-#: mods/xdecor/src/nodes.lua:786
+#: src/nodes.lua:787
 msgid "Polished Desert Stone Block"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:787
+#: src/nodes.lua:788
 msgid "Hardened Clay"
 msgstr "Argilla indurita"
 
-#: mods/xdecor/src/nodes.lua:788
+#: src/nodes.lua:789
 msgid "Moon Brick"
 msgstr "Mattone lunare"
 
-#: mods/xdecor/src/nodes.lua:789
+#: src/nodes.lua:790
 msgid "Runestone"
 msgstr "Pietra runica"
 
-#: mods/xdecor/src/nodes.lua:793
+#: src/nodes.lua:794
 msgid "Polished Stone Block"
 msgstr ""
 
-#: mods/xdecor/src/nodes.lua:798
+#: src/nodes.lua:799
 msgid "Packed Ice"
 msgstr "Ghiaccio compatto"
 
-#: mods/xdecor/src/nodes.lua:805
+#: src/nodes.lua:806
 msgid "Wooden Tile"
 msgstr "Mattonella di legno"
 
-#: mods/xdecor/src/nodes.lua:813
+#. ~ Furniture
+#: src/nodes.lua:815
 msgid "Table"
 msgstr "Tavolo"
 
-#: mods/xdecor/src/nodes.lua:824
+#: src/nodes.lua:826
 msgid "Tatami"
 msgstr "Tatami"
 
-#: mods/xdecor/src/nodes.lua:834
+#: src/nodes.lua:836
 msgid "Trampoline"
 msgstr "Trampolino"
 
-#: mods/xdecor/src/nodes.lua:865
+#: src/nodes.lua:867
 msgid "Television"
 msgstr "Televisione"
 
-#: mods/xdecor/src/nodes.lua:884
+#: src/nodes.lua:886
 msgid "Wood Framed Glass"
 msgstr "Cornice in legno con vetro"
 
-#: mods/xdecor/src/nodes.lua:944
+#: src/nodes.lua:946
 msgid "Radio"
 msgstr ""
 
 #. ~ as in "loudspeaker"
-#: mods/xdecor/src/nodes.lua:946
+#: src/nodes.lua:948
 msgid "Speaker"
 msgstr ""
 
-#: mods/xdecor/src/rope.lua:103
+#: src/rope.lua:103
 msgid "Rope"
 msgstr "Corda"
 
 #. ~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: mods/xdecor/src/workbench.lua:19
+#: src/workbench.lua:19
 msgid "@1 Nanoslab"
 msgstr ""
 
 #. ~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: mods/xdecor/src/workbench.lua:21
+#: src/workbench.lua:21
 msgid "@1 Micropanel"
 msgstr ""
 
 #. ~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: mods/xdecor/src/workbench.lua:23
+#: src/workbench.lua:23
 msgid "@1 Microslab"
 msgstr ""
 
-#. ~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
-#: mods/xdecor/src/workbench.lua:26
+#. ~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
+#: src/workbench.lua:26
 msgid "@1 Thin Stair"
 msgstr ""
 
-#. ~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
-#: mods/xdecor/src/workbench.lua:28
+#. ~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
+#: src/workbench.lua:28
 msgid "@1 Cube"
 msgstr ""
 
-#. ~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
-#: mods/xdecor/src/workbench.lua:30
+#. ~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
+#: src/workbench.lua:30
 msgid "@1 Panel"
 msgstr ""
 
-#. ~ Block name of a block with 1/2 the height of a full block. @1 = original node name (e.g. "Stone")
-#: mods/xdecor/src/workbench.lua:32 mods/xdecor/src/workbench.lua:408
-#: mods/xdecor/src/workbench.lua:415 mods/xdecor/handlers/registration.lua:84
-#: mods/xdecor/handlers/registration.lua:92
+#. ~ Block name of a block with 1/2 the height of a full block. @1 = original block name (e.g. "Stone")
+#: src/workbench.lua:32 src/workbench.lua:410 src/workbench.lua:417
+#: handlers/registration.lua:84 handlers/registration.lua:92
 msgid "@1 Slab"
 msgstr ""
 
-#. ~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
-#: mods/xdecor/src/workbench.lua:35
+#. ~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
+#: src/workbench.lua:35
 msgid "@1 Double Panel"
 msgstr ""
 
-#. ~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
-#: mods/xdecor/src/workbench.lua:38
+#. ~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
+#: src/workbench.lua:38
 msgid "@1 Half-Stair"
 msgstr ""
 
-#. ~ Block name of a 'traditional' stair-shaped block. @1 = original node name (e.g. "Stone")
-#: mods/xdecor/src/workbench.lua:41 mods/xdecor/src/workbench.lua:399
-#: mods/xdecor/src/workbench.lua:414 mods/xdecor/handlers/registration.lua:75
-#: mods/xdecor/handlers/registration.lua:91
+#. ~ Block name of a 'traditional' stair-shaped block. @1 = original block name (e.g. "Stone")
+#: src/workbench.lua:41 src/workbench.lua:399 src/workbench.lua:416
+#: handlers/registration.lua:75 handlers/registration.lua:91
 msgid "@1 Stair"
 msgstr ""
 
-#. ~ Label shown in work bench menu where you can cut a node
-#: mods/xdecor/src/workbench.lua:128
+#. ~ Label shown in work bench menu where you can cut a block to create smaller versions of it
+#: src/workbench.lua:128
 msgid "Cut"
 msgstr "Tagliare"
 
 #. ~ Label shown in work bench menu where you can repair an item
-#: mods/xdecor/src/workbench.lua:130
+#: src/workbench.lua:130
 msgid "Repair"
 msgstr "Riparare"
 
 #. ~ Button in work bench menu for the crafting grid
-#: mods/xdecor/src/workbench.lua:134
+#: src/workbench.lua:134
 msgid "Crafting"
 msgstr "Fabbricare"
 
 #. ~ Button in work bench menu for its inventory
-#: mods/xdecor/src/workbench.lua:136
+#: src/workbench.lua:136
 msgid "Storage"
 msgstr "Conservare"
 
 #. ~ Button to return to main page in work bench menu
-#: mods/xdecor/src/workbench.lua:157 mods/xdecor/src/workbench.lua:165
+#: src/workbench.lua:157 src/workbench.lua:165
 msgid "Back"
 msgstr "Indietro"
 
-#: mods/xdecor/src/workbench.lua:197 mods/xdecor/src/workbench.lua:324
+#: src/workbench.lua:197 src/workbench.lua:324
 msgid "Work Bench"
 msgstr "Banco da lavoro"
 
 #. ~ Work bench tooltip
-#: mods/xdecor/src/workbench.lua:326
+#: src/workbench.lua:326
 msgid ""
 "For cutting blocks, repairing tools with a hammer, crafting and storing items"
 msgstr ""
 
-#: mods/xdecor/src/workbench.lua:402 mods/xdecor/src/workbench.lua:417
-#: mods/xdecor/handlers/registration.lua:78
-#: mods/xdecor/handlers/registration.lua:94
+#. ~ Block name of a stair-shaped block, inner corner. @1 = original block name (e.g. "Stone")
+#: src/workbench.lua:403 src/workbench.lua:419 handlers/registration.lua:78
+#: handlers/registration.lua:94
 msgid "Inner @1 Stair"
 msgstr ""
 
-#: mods/xdecor/src/workbench.lua:404 mods/xdecor/src/workbench.lua:418
-#: mods/xdecor/handlers/registration.lua:80
-#: mods/xdecor/handlers/registration.lua:95
+#. ~ Block name of a stair-shaped block, outer corner. @1 = original block name (e.g. "Stone")
+#: src/workbench.lua:406 src/workbench.lua:420 handlers/registration.lua:80
+#: handlers/registration.lua:95
 msgid "Outer @1 Stair"
 msgstr ""
 
 #. ~ Hammer tooltip
-#: mods/xdecor/src/workbench.lua:552
+#: src/workbench.lua:554
 msgid "Repairs tools at the work bench"
 msgstr ""
 
-#: mods/xdecor/src/workbench.lua:601
+#: src/workbench.lua:603
 msgid "Hammer"
 msgstr "Martello"
