@@ -3151,9 +3151,12 @@ function realchess.can_dig(pos, player)
 	elseif (meta:get_string("gameResult") ~= "") then
 	-- If the game was completed, the board is free to be dug
 		return true
+	-- If no game is ongoing, board is free to be dug
+	elseif (lastMoveTime == 0) then
+		return true
 	-- If the game is ongoing and no move was made for TIMEOUT seconds,
 	-- the board is free to be dug
-	elseif (lastMoveTime == 0 and minetest.get_gametime() > timeout_limit) then
+	elseif minetest.get_gametime() >= timeout_limit then
 		return true
 	else
 		if playerName == playerWhite or playerName == playerBlack or botColor == "both" then
