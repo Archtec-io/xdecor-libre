@@ -1,0 +1,655 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Luanti textdomain xdecor x.x.x\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-18 04:22+0000\n"
+"PO-Revision-Date: 2025-08-18 04:22+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: ltt_convert 0.2.1\n"
+
+msgid "A libre decoration mod meant to be simple and well-featured."
+msgstr ""
+
+msgid "@1 Stair"
+msgstr ""
+
+msgid "Inner @1 Stair"
+msgstr ""
+
+msgid "Outer @1 Stair"
+msgstr ""
+
+msgid "@1 Slab"
+msgstr ""
+
+msgid "Weak Computer"
+msgstr ""
+
+msgid "Weak Computer 1"
+msgstr ""
+
+msgid "Weak Computer 2"
+msgstr ""
+
+msgid "Chess"
+msgstr "Echecs"
+
+msgid "Chess Debug"
+msgstr ""
+
+msgid "Select a game mode"
+msgstr ""
+
+msgid "Select a mode:"
+msgstr "Sélectionnez un mode de jeu:"
+
+msgid "Singleplayer"
+msgstr "Solo"
+
+msgid "Multiplayer"
+msgstr "Multijoueur"
+
+msgid "Bot vs Bot"
+msgstr ""
+
+msgid "check"
+msgstr "échec"
+
+msgid "checkmate"
+msgstr ""
+
+msgid "resigned"
+msgstr ""
+
+msgid "winner"
+msgstr ""
+
+msgid "loser"
+msgstr ""
+
+msgid "draw"
+msgstr ""
+
+msgid "PROMOTION\n"
+"FOR BLACK!"
+msgstr ""
+
+msgid "Promote pawn to:"
+msgstr ""
+
+msgid "PROMOTION\n"
+"FOR WHITE!"
+msgstr ""
+
+msgid "DRAW CLAIM\n"
+"BY WHITE!"
+msgstr ""
+
+msgid "DRAW CLAIM\n"
+"BY BLACK!"
+msgstr ""
+
+msgid "The player has invoked the 50-move rule for the next move. The next move might draw the game."
+msgstr ""
+
+msgid "The player has invoked the threefold-repetition rule for the next move. The next move might draw the game."
+msgstr ""
+
+msgid "New game"
+msgstr "Nouvelle partie"
+
+msgid "Resign"
+msgstr ""
+
+msgid "Select a color:"
+msgstr ""
+
+msgid "White"
+msgstr ""
+
+msgid "Black"
+msgstr ""
+
+msgid "Invoke the 50-move rule for your next move"
+msgstr ""
+
+msgid "Invoke the 50-move rule and draw the game"
+msgstr ""
+
+msgid "Invoke the threefold repetition rule and draw the game"
+msgstr ""
+
+msgid "Invoke the threefold repetition rule for your next move"
+msgstr ""
+
+msgid "You have checkmated @1. You win!"
+msgstr ""
+
+msgid "You were checkmated by @1. You lose!"
+msgstr ""
+
+msgid "The game ended up in a stalemate! It's a draw!"
+msgstr ""
+
+msgid "The game ended up in a dead position! It's a draw!"
+msgstr ""
+
+msgid "No piece was captured and no pawn was moved for 75 consecutive moves of each player. It's a draw!"
+msgstr ""
+
+msgid "You have drawn the game by invoking the 50-move rule."
+msgstr ""
+
+msgid "@1 has drawn the game by invoking the 50-move rule."
+msgstr ""
+
+msgid "You have failed to make a game-drawing move. The game continues."
+msgstr ""
+
+msgid "@1 made a draw claim using the 50-move rule but it was false. The game continues."
+msgstr ""
+
+msgid "The exact same position has occured 5 times. It's a draw!"
+msgstr ""
+
+msgid "You have drawn the game by invoking the threefold repetition rule."
+msgstr ""
+
+msgid "@1 has drawn the game by invoking the threefold repetition rule."
+msgstr ""
+
+msgid "@1 made a draw claim using the threefold repetition rule but it was false. The game continues."
+msgstr ""
+
+msgid "Chess Board"
+msgstr "Echiquier"
+
+msgid "Someone else plays white pieces!"
+msgstr "Quelqu’un d’autre joue les pièces blanches !"
+
+msgid "It's not your turn!"
+msgstr ""
+
+msgid "Someone else plays black pieces!"
+msgstr "Quelqu’un d’autre joue les pièces noires !"
+
+msgid "Black cannot move first!"
+msgstr ""
+
+msgid "@1 s"
+msgstr ""
+
+msgid "@1 min @2 s"
+msgstr ""
+
+msgid "You can't reset the chessboard, a game has been started. Try again in @1."
+msgstr ""
+
+msgid "Resigning is not possible yet."
+msgstr ""
+
+msgid "You have resigned."
+msgstr ""
+
+msgid "@1 has resigned. You win!"
+msgstr ""
+
+msgid "You can't resign, you're not playing in this game."
+msgstr ""
+
+msgid "You can't claim a draw, it's not your turn!"
+msgstr ""
+
+msgid "You're only a spectator in this game of Chess."
+msgstr ""
+
+msgid "This isn't the time for promotion."
+msgstr ""
+
+msgid "It's not your turn! This promotion is meant for the other player."
+msgstr ""
+
+msgid "You can't dig the chessboard, a game has been started. Reset it first or dig it again in @1."
+msgstr ""
+
+msgid "You can't dig the chessboard, a game has been started. Try it again in @1."
+msgstr ""
+
+msgid "Play a game of Chess against another player or the computer"
+msgstr ""
+
+msgid "White Pawn"
+msgstr "Pion blanc"
+
+msgid "Black Pawn"
+msgstr "Pion noir"
+
+msgid "White Rook"
+msgstr "Tour blanche"
+
+msgid "Black Rook"
+msgstr "Tour noire"
+
+msgid "White Knight"
+msgstr "Cavalier blanc"
+
+msgid "Black Knight"
+msgstr "Cavalier noir"
+
+msgid "White Bishop"
+msgstr "Fou blanc"
+
+msgid "Black Bishop"
+msgstr "Fou noir"
+
+msgid "White Queen"
+msgstr "Reine blanche"
+
+msgid "Black Queen"
+msgstr "Reine noire"
+
+msgid "White King"
+msgstr "Roi blanc"
+
+msgid "Black King"
+msgstr "Roi noir"
+
+msgid "Light a fire below to heat it up"
+msgstr ""
+
+msgid "Use a bowl to eat the soup"
+msgstr "Utilisez un bol pour boire la soupe"
+
+msgid "Drop foods inside to make a soup"
+msgstr "Placez des ingrédients à l’intérieur pour faire une soupe"
+
+msgid "Cauldron (empty)"
+msgstr "Chaudron (vide)"
+
+msgid "Cauldron (cold water)"
+msgstr ""
+
+msgid "Cauldron (cold river water)"
+msgstr ""
+
+msgid "Cauldron (cold soup)"
+msgstr ""
+
+msgid "Cauldron (boiling water)"
+msgstr ""
+
+msgid "Cauldron (boiling river water)"
+msgstr ""
+
+msgid "Cauldron (boiling soup)"
+msgstr ""
+
+msgid "Cauldron"
+msgstr "Chaudron"
+
+msgid "For storing water and cooking soup"
+msgstr ""
+
+msgid "Cauldron with Water (cold)"
+msgstr ""
+
+msgid "Cauldron with River Water (cold)"
+msgstr ""
+
+msgid "Cauldron with Soup (cold)"
+msgstr ""
+
+msgid "Cauldron with Water (boiling)"
+msgstr ""
+
+msgid "Cauldron with River Water (boiling)"
+msgstr ""
+
+msgid "Cauldron with Soup (boiling)"
+msgstr ""
+
+msgid "Bowl"
+msgstr "Bol"
+
+msgid "Bowl of soup"
+msgstr "Bol de soupe"
+
+msgid "Efficiency"
+msgstr "Efficacité"
+
+msgid "Durability"
+msgstr "Durabilité"
+
+msgid "Sharpness"
+msgstr "Tranchant"
+
+msgid "@1 (+@2%)"
+msgstr ""
+
+msgid "Your weapon inflicts more damage"
+msgstr "Votre arme inflige plus de dégâts"
+
+msgid "Your tool lasts longer"
+msgstr "Votre outil dure plus longtemps"
+
+msgid "Your tool digs faster"
+msgstr "Votre outil creuse plus vite"
+
+msgid "Enchantment Table"
+msgstr "Table d’enchantements"
+
+msgid "Enchant your tools with mese crystals"
+msgstr ""
+
+msgid "Enchanted @1\n"
+"@2"
+msgstr ""
+
+msgid "Enchanted @1"
+msgstr ""
+
+msgid "The bees are busy making honey."
+msgstr ""
+
+msgid "The bees are looking for flowers."
+msgstr ""
+
+msgid "The bees want to pollinate more flowers."
+msgstr ""
+
+msgid "The bees are idle."
+msgstr ""
+
+msgid "The bees are resting."
+msgstr ""
+
+msgid "Artificial Hive"
+msgstr "Ruche artificielle"
+
+msgid "Bees live here and produce honey"
+msgstr ""
+
+msgid "Honey"
+msgstr "Miel"
+
+msgid "Made by bees"
+msgstr ""
+
+msgid "@1 (owned by @2)"
+msgstr "@1 (propriété de @2)"
+
+msgid "Item Frame"
+msgstr "Cadre"
+
+msgid "For presenting a single item"
+msgstr ""
+
+msgid "× @1"
+msgstr ""
+
+msgid "Mailbox"
+msgstr "Boite aux lettres"
+
+msgid "Last donators"
+msgstr "Derniers donateurs"
+
+msgid "Send your goods to\n"
+"@1"
+msgstr "Envoyer vos biens à\n"
+"@1"
+
+msgid "@1's Mailbox"
+msgstr "Boite aux lettres de @1"
+
+msgid "The mailbox is full."
+msgstr "La boite aux lettres est pleine."
+
+msgid "Lets other players give you things"
+msgstr ""
+
+msgid "Opens doors when stepped on"
+msgstr ""
+
+msgid "Wooden Pressure Plate"
+msgstr "Plaque de pression en bois"
+
+msgid "Stone Pressure Plate"
+msgstr "Plaque de pression en pierre"
+
+msgid "Lever"
+msgstr "Levier"
+
+msgid "Opens doors when pulled"
+msgstr ""
+
+msgid "Bamboo Frame"
+msgstr "Cadre en bambou"
+
+msgid "Chainlink"
+msgstr "Maillon de chaîne"
+
+msgid "Rusty Iron Bars"
+msgstr "Barreaux en fer rouillé"
+
+msgid "Wood Frame"
+msgstr "Cadre en bois"
+
+msgid "Barricade"
+msgstr "Barricade"
+
+msgid "Barrel"
+msgstr "Tonneau"
+
+msgid "Wooden Cabinet"
+msgstr "Meuble en bois"
+
+msgid "24 inventory slots"
+msgstr ""
+
+msgid "Half Wooden Cabinet"
+msgstr "Demi meuble en bois"
+
+msgid "8 inventory slots"
+msgstr ""
+
+msgid "Plain Shelf"
+msgstr ""
+
+msgid "Multi Shelf"
+msgstr "Étagères multiple"
+
+msgid "Candle"
+msgstr "Bougie"
+
+msgid "Chair"
+msgstr "Chaise"
+
+msgid "Cobweb"
+msgstr "Toile d’araignée"
+
+msgid "Red Curtain"
+msgstr "Rideaux rouge"
+
+msgid "Cushion"
+msgstr "Coussin"
+
+msgid "Cushion Block"
+msgstr "Bloc de coussin"
+
+msgid "Japanese Door"
+msgstr "Porte japonaise"
+
+msgid "Prison Door"
+msgstr "Porte de prison"
+
+msgid "Rusty Prison Door"
+msgstr "Barreaux de prison rouillés"
+
+msgid "Screen Door"
+msgstr "Porte avec moustiquaire"
+
+msgid "Paper Door"
+msgstr ""
+
+msgid "Woodglass Door"
+msgstr "Porte vitrée"
+
+msgid "Ender Chest"
+msgstr "Coffre de l’End"
+
+msgid "Interdimensional inventory"
+msgstr ""
+
+msgid "Ivy"
+msgstr "Lierre"
+
+msgid "Weathercock"
+msgstr ""
+
+msgid "Lantern"
+msgstr "Lanterne"
+
+msgid "Hanging Lantern"
+msgstr ""
+
+msgid "Steel Lattice Light Box"
+msgstr ""
+
+msgid "Wooden Cross Light Box"
+msgstr ""
+
+msgid "Wooden Rhombus Light Box"
+msgstr ""
+
+msgid "Potted White Dandelion"
+msgstr "Pissenlit blanc en pot"
+
+msgid "Potted Yellow Dandelion"
+msgstr "Pissenlit jaune en pot"
+
+msgid "Potted Geranium"
+msgstr "Géranium en pot"
+
+msgid "Potted Rose"
+msgstr "Rose en pot"
+
+msgid "Potted Tulip"
+msgstr "Tulipe en pot"
+
+msgid "Potted Viola"
+msgstr "Violette en pot"
+
+msgid "Painting"
+msgstr "Tableau"
+
+msgid "Garden Stone Path"
+msgstr "Chemin de pierres de jardin"
+
+msgid "Cactus Brick"
+msgstr "Brique en cactus"
+
+msgid "Coal Stone Tile"
+msgstr "Carreau en charbon et pierre"
+
+msgid "Polished Desert Stone Block"
+msgstr ""
+
+msgid "Hardened Clay"
+msgstr "Argile durcie"
+
+msgid "Moon Brick"
+msgstr "Brique lunaire"
+
+msgid "Runestone"
+msgstr "Pierre runique"
+
+msgid "Polished Stone Block"
+msgstr ""
+
+msgid "Packed Ice"
+msgstr "Glace compactée"
+
+msgid "Wooden Tile"
+msgstr "Carreau en bois"
+
+msgid "Table"
+msgstr "Table"
+
+msgid "Tatami"
+msgstr "Tatami"
+
+msgid "Trampoline"
+msgstr "Trampoline"
+
+msgid "Television"
+msgstr "Télévision"
+
+msgid "Wood Framed Glass"
+msgstr "Verre encadré par du bois"
+
+msgid "Radio"
+msgstr ""
+
+msgid "Speaker"
+msgstr ""
+
+msgid "Rope"
+msgstr "Corde"
+
+msgid "@1 Nanoslab"
+msgstr ""
+
+msgid "@1 Micropanel"
+msgstr ""
+
+msgid "@1 Microslab"
+msgstr ""
+
+msgid "@1 Thin Stair"
+msgstr ""
+
+msgid "@1 Cube"
+msgstr ""
+
+msgid "@1 Panel"
+msgstr ""
+
+msgid "@1 Double Panel"
+msgstr ""
+
+msgid "@1 Half-Stair"
+msgstr ""
+
+msgid "Cut"
+msgstr "Couper"
+
+msgid "Repair"
+msgstr "Réparer"
+
+msgid "Crafting"
+msgstr "Fabrication"
+
+msgid "Storage"
+msgstr "Stockage"
+
+msgid "Back"
+msgstr "Retour"
+
+msgid "Work Bench"
+msgstr "Atelier"
+
+msgid "For cutting blocks, repairing tools with a hammer, crafting and storing items"
+msgstr ""
+
+msgid "Repairs tools at the work bench"
+msgstr ""
+
+msgid "Hammer"
+msgstr "Marteau"
+
