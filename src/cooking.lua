@@ -333,6 +333,7 @@ end
 
 xdecor.register("cauldron_empty", {
 	description = S("Cauldron"),
+	--~ Cauldron tooltip
 	_tt_help = S("For storing water and cooking soup"),
 	groups = {cracky=2, oddly_breakable_by_hand=1,cauldron=1},
 	is_ground_content = false,
@@ -486,6 +487,7 @@ xdecor.register("cauldron_soup", {
 -- Craft items
 
 minetest.register_craftitem("xdecor:bowl", {
+	--~ Item that can hold soup
 	description = S("Bowl"),
 	inventory_image = "xdecor_bowl.png",
 	wield_image = "xdecor_bowl.png",

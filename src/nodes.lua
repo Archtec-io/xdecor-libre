@@ -448,6 +448,7 @@ end
 
 xdecor.register("enderchest", {
 	description = S("Ender Chest"),
+	--~ Ender chest tooltip
 	_tt_help = S("Interdimensional inventory"),
 	tiles = {
 		"xdecor_enderchest_top.png", "xdecor_enderchest_top.png",
@@ -810,6 +811,7 @@ register_hard_node("wood_tile_x", S("Wooden Tile"), {
 xdecor.register_legacy_aliases("wood_tile", "wood_tile_x")
 
 xdecor.register("table", {
+	--~ Furniture
 	description = S("Table"),
 	tiles = {"xdecor_wood.png"},
 	groups = {choppy = 2, oddly_breakable_by_hand = 1, flammable = 2},

@@ -9,6 +9,9 @@ local itemframe, tmp = {}, {}
 local S = minetest.get_translator("xdecor")
 screwdriver = screwdriver or {}
 
+-- Description of item frame node
+local DESC_ITEM_FRAME = S("Item Frame")
+
 local function remove_item(pos, node)
 	local objs = minetest.get_objects_inside_radius(pos, 0.5)
 	if not objs then return end
@@ -73,11 +76,13 @@ function itemframe.set_infotext(meta)
 	local owner = meta:get_string("owner")
 	if itemstring == "" then
 		if owner ~= "" then
-			--~ Item frame infotext. @1 = item frame name, @2 = owner name (player)
-			meta:set_string("infotext", S("@1 (owned by @2)",
-				S("Item Frame"), owner))
+			meta:set_string("infotext",
+				--~ Item frame infotext. @1 = item frame name, @2 = owner name (player)
+				S("@1 (owned by @2)",
+				--~ Block that can display an item
+				DESC_ITEM_FRAME, owner))
 		else
-			meta:set_string("infotext", S("Item Frame"))
+			meta:set_string("infotext", DESC_ITEM_FRAME)
 		end
 	else
 		local itemstack = ItemStack(itemstring)
@@ -86,7 +91,7 @@ function itemframe.set_infotext(meta)
 			tooltip = itemstack:get_name()
 		end
 		if itemstring == "" then
-			tooltip = S("Item Frame")
+			tooltip = DESC_ITEM_FRAME
 		end
 		if owner ~= "" then
 			meta:set_string("infotext", S("@1 (owned by @2)", tooltip, owner))
@@ -159,7 +164,7 @@ function itemframe.blast(pos)
 end
 
 xdecor.register("itemframe", {
-	description = S("Item Frame"),
+	description = DESC_ITEM_FRAME,
 	--~ Item frame tooltip
 	_tt_help = S("For presenting a single item"),
 	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3},

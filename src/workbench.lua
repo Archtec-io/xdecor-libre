@@ -22,22 +22,22 @@ workbench.defs = {
 	--~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
 	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, NS("@1 Microslab")},
 	{"thinstair",   8,  {{ 0, 7,  0, 16, 1, 8  },
-	--~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
+	--~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
 			{ 0, 15, 8, 16, 1, 8  }}, NS("@1 Thin Stair")},
-	--~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
+	--~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
 	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, NS("@1 Cube")},
-	--~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
+	--~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
 	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, NS("@1 Panel")},
-	--~ Block name of a block with 1/2 the height of a full block. @1 = original node name (e.g. "Stone")
+	--~ Block name of a block with 1/2 the height of a full block. @1 = original block name (e.g. "Stone")
 	{"slab",        2,  nil, NS("@1 Slab") },
 	{"doublepanel", 2,  {{ 0, 0,  0, 16, 8, 8  },
-	--~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
+	--~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
 			{ 0, 8,  8, 16, 8, 8  }}, NS("@1 Double Panel")},
 	{"halfstair",   2,  {{ 0, 0,  0, 8,  8, 16 },
-	--~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
+	--~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
 			{ 0, 8,  8, 8,  8, 8  }}, NS("@1 Half-Stair")},
 	{"stair_outer", 1,  nil, nil},
-	--~ Block name of a 'traditional' stair-shaped block. @1 = original node name (e.g. "Stone")
+	--~ Block name of a 'traditional' stair-shaped block. @1 = original block name (e.g. "Stone")
 	{"stair",       1,  nil, NS("@1 Stair")},
 	{"stair_inner", 1,  nil, nil},
 }
@@ -124,7 +124,7 @@ function workbench:get_output(inv, input, name)
 end
 
 local main_fs = ""..
-	--~ Label shown in work bench menu where you can cut a node
+	--~ Label shown in work bench menu where you can cut a block to create smaller versions of it
 	"label[0.9,1.23;"..FS("Cut").."]"
 	--~ Label shown in work bench menu where you can repair an item
 	.."label[0.9,2.23;"..FS("Repair").."]"
@@ -399,8 +399,10 @@ local function register_cut_raw(node, workbench_def)
 						groups, custom_tiles.stair, S("@1 Stair", def.description),
 						def.sounds)
 					stairs.register_stair_inner(item_name, node,
+						--~ Block name of a stair-shaped block, inner corner. @1 = original block name (e.g. "Stone")
 						groups, custom_tiles.stair_inner, "", def.sounds, nil, S("Inner @1 Stair", def.description))
 					stairs.register_stair_outer(item_name, node,
+						--~ Block name of a stair-shaped block, outer corner. @1 = original block name (e.g. "Stone")
 						groups, custom_tiles.stair_outer, "", def.sounds, nil, S("Outer @1 Stair", def.description))
 				end
 				if custom_tiles.slab then

@@ -1116,6 +1116,7 @@ local fs_init = [[
 	--~ Chess: Game mode selection prompt
 	.."label[2.2,0.652;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
 	.."label[2.2,10.21;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
+	--~ Chess: Game mode selection prompt
 	.."label[11.2,1.8;"..FS("Select a mode:").."]"
 	--~ Chess game mode (player vs bot)
 	.."button[11,2.1;3,0.8;single;"..FS("Singleplayer").."]"
@@ -1748,6 +1749,7 @@ local function update_formspec(meta)
 		if botColor ~= "black" and botColor ~= "both" then
 			-- Hide buttons if computer player promotes
 			promotion_formstring = promotion_formstring ..
+			--~ Chess: Prompt for player who must select to which piece to promote their pawn. Space for text is limited.
 			"label[13.15,6.35;"..FS("Promote pawn to:").."]" ..
 			"item_image_button[13.15,7.2;1,1;realchess:queen_black;p_queen_black;]" ..
 			"item_image_button[14.15,7.2;1,1;realchess:rook_black_1;p_rook_black;]" ..

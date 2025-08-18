@@ -71,6 +71,7 @@ function mailbox:formspec(pos, owner, is_owner)
 
 		return "size[9.5,9]"
 			.."label[0,0;"..FS("Mailbox").."]"
+			--~ Caption of the list of players who gave items in a mailbox
 			.."label[6,0;"..FS("Last donators").."]"
 			..[[ box[6,0.72;3.3,3.9;#555555]
 			listring[current_player;main]
@@ -112,6 +113,7 @@ function mailbox.after_place_node(pos, placer)
 	local player_name = placer:get_player_name()
 
 	meta:set_string("owner", player_name)
+	--~ Mailbox infotext. @1 = owner name
 	meta:set_string("infotext", S("@1's Mailbox", player_name))
 
 	local inv = meta:get_inventory()
