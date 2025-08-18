@@ -135,7 +135,7 @@ that X-Decor-libre replaces:
 * `textures/xdecor_speaker_top.png`
 * `sounds/xdecor_enchanting.ogg`
 
-(see `LICENSE` file for licensing).
+(see `LICENSE.txt` file for licensing).
 
 ## Technical information
 X-Decor-libre is a fork of X-Decor, from <https://github.com/minetest-mods/xdecor>,
