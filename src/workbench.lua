@@ -15,29 +15,29 @@ local DEFAULT_HAMMER_REPAIR_COST = 700
 -- Nodeboxes definitions
 workbench.defs = {
 	-- Name Yield Nodeboxes (X Y Z W H L)  Description
-	--~ Name of a nanoslab, a workbench-cut block. @1 = original node name (e.g. "Stone")
+	--~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
 	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }}, NS("@1 Nanoslab")},
-	--~ Name of a micropanel, a workbench-cut block. @1 = original node name (e.g. "Stone")
+	--~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
 	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }}, NS("@1 Micropanel")},
-	--~ Name of a microslab, a workbench-cut block. @1 = original node name (e.g. "Stone")
+	--~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
 	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, NS("@1 Microslab")},
 	{"thinstair",   8,  {{ 0, 7,  0, 16, 1, 8  },
-	--~ Name of a thin stair, a workbench-cut block. @1 = original node name (e.g. "Stone")
+	--~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
 			{ 0, 15, 8, 16, 1, 8  }}, NS("@1 Thin Stair")},
-	--~ Name of a 'cube', a small workbench-cut block. @1 = original node name (e.g. "Stone")
+	--~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
 	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, NS("@1 Cube")},
-	--~ Name of a panel, a workbench-cut block. @1 = original node name (e.g. "Stone")
+	--~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
 	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, NS("@1 Panel")},
-	--~ Name of a slab. @1 = original node name (e.g. "Stone")
+	--~ Block name of a block with 1/2 the height of a full block. @1 = original node name (e.g. "Stone")
 	{"slab",        2,  nil, NS("@1 Slab") },
 	{"doublepanel", 2,  {{ 0, 0,  0, 16, 8, 8  },
-	--~ Name of a double panel, a workbench-cut block. @1 = original node name (e.g. "Stone")
+	--~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
 			{ 0, 8,  8, 16, 8, 8  }}, NS("@1 Double Panel")},
 	{"halfstair",   2,  {{ 0, 0,  0, 8,  8, 16 },
-	--~ Name of a half stair, a workbench-cut block. @1 = original node name (e.g. "Stone")
+	--~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench. @1 = original node name (e.g. "Stone")
 			{ 0, 8,  8, 8,  8, 8  }}, NS("@1 Half-Stair")},
 	{"stair_outer", 1,  nil, nil},
-	--~ Name of a stair. @1 = original node name (e.g. "Stone")
+	--~ Block name of a 'traditional' stair-shaped block. @1 = original node name (e.g. "Stone")
 	{"stair",       1,  nil, NS("@1 Stair")},
 	{"stair_inner", 1,  nil, nil},
 }
@@ -124,15 +124,15 @@ function workbench:get_output(inv, input, name)
 end
 
 local main_fs = ""..
-	--~ Verb shown in workbench form where you can cut a node
+	--~ Label shown in work bench menu where you can cut a node
 	"label[0.9,1.23;"..FS("Cut").."]"
-	--~ Verb shown in workbench form where you can repair an item
+	--~ Label shown in work bench menu where you can repair an item
 	.."label[0.9,2.23;"..FS("Repair").."]"
 	..[[ box[-0.05,1;2.05,0.9;#555555]
 	box[-0.05,2;2.05,0.9;#555555] ]]
-	--~ Button in workbench form
+	--~ Button in work bench menu for the crafting grid
 	.."button[0,0;2,1;craft;"..FS("Crafting").."]"
-	--~ Button in workbench form
+	--~ Button in work bench menu for its inventory
 	.."button[2,0;2,1;storage;"..FS("Storage").."]"
 	..[[ image[3,1;1,1;gui_arrow.png]
 	image[0,1;1,1;worktable_saw.png]
@@ -153,6 +153,7 @@ local main_fs = ""..
 ]]
 
 local crafting_fs = "image[5,1;1,1;gui_furnace_arrow_bg.png^[transformR270]"
+	--~ Button to return to main page in work bench menu
 	.."button[0,0;1.5,1;back;< "..FS("Back").."]"
 	..[[ list[current_player;craft;2,0;3,3;]
 	list[current_player;craftpreview;6,1;1,1;]
@@ -321,6 +322,7 @@ end
 
 xdecor.register("workbench", {
 	description = S("Work Bench"),
+	--~ Work bench tooltip
 	_tt_help = S("For cutting blocks, repairing tools with a hammer, crafting and storing items"),
 	groups = {cracky = 2, choppy = 2, oddly_breakable_by_hand = 1},
 	is_ground_content = false,
@@ -546,6 +548,7 @@ then hammers will break eventually.
 function xdecor.register_hammer(name, def)
 	minetest.register_tool(name, {
 		description = def.description,
+		--~ Hammer tooltip
 		_tt_help = S("Repairs tools at the work bench"),
 		inventory_image = def.image,
 		wield_image = def.image,

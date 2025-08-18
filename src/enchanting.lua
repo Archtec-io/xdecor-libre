@@ -37,7 +37,7 @@ function enchanting:get_tooltip_raw(enchant, percent)
 	}
 
 	if minetest.colorize then
-		--~ Tooltip in format "<enchantment name> (+<bonus>%)", e.g. "Efficiency (+5%)"
+		--~ Tooltip for enchantment, in format "<enchantment name> (+<bonus>%)", e.g. "Efficiency (+5%)"
 		return minetest.colorize(specs[enchant], S("@1 (+@2%)", enchant_loc[enchant], percent))
 	else
 		return S("@1 (+@2%)", enchant_loc[enchant], percent)
@@ -239,6 +239,7 @@ end
 
 xdecor.register("enchantment_table", {
 	description = S("Enchantment Table"),
+	--~ Enchantment table tooltip
 	_tt_help = S("Enchant your tools with mese crystals"),
 	tiles = {
 		"xdecor_enchantment_top.png",  "xdecor_enchantment_bottom.png",

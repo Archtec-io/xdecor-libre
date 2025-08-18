@@ -85,6 +85,7 @@ function mailbox:formspec(pos, owner, is_owner)
 
 	return  "size[8,5]" ..
 		"list[current_player;main;0,1.25;8,4;]" ..
+		--~ Mailbox menu title. @1 = player name
 		"label[0,0;"..FS("Send your goods to\n@1",
 		(minetest.colorize and
 			minetest.colorize("#FFFF00", owner) or owner)) .. "]" ..
