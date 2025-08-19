@@ -2239,7 +2239,7 @@ end
 -- * to_index: Inventory list of destination square
 -- * playerName: Name of player to move
 function realchess.move(meta, from_list, from_index, to_list, to_index, playerName)
-	if from_list ~= "board" and to_list ~= "board" then
+	if from_list ~= "board" or to_list ~= "board" then
 		return false
 	end
 
@@ -2263,6 +2263,13 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 	local prevDoublePawnStepTo = meta:get_int("prevDoublePawnStepTo")
 	local kingMoved   = false
 	local thisMove    -- Will replace lastMove when move is legal
+
+	-- Forbid to move non-Chess pieces on the board
+	if minetest.get_item_group(pieceFrom, "chess_piece") == 0 then
+		return false
+	elseif pieceTo ~= "" and minetest.get_item_group(pieceTo, "chess_piece") == 0 then
+		return false
+	end
 
 	if pieceFrom:find("white") then
 		if playerWhite ~= "" and playerWhite ~= playerName then
@@ -3373,14 +3380,23 @@ else
 end
 minetest.register_node(":realchess:chessboard", chessboarddef)
 
-local function register_piece(name, white_desc, black_desc, count)
+local function register_piece(name, idnum, white_desc, black_desc, count)
 	for _, color in pairs({"black", "white"}) do
+
+	-- for chess_piece group rating
+	local g = idnum
+	if color == "black" then
+		g = -g
+	end
 	if not count then
 		minetest.register_craftitem(":realchess:" .. name .. "_" .. color, {
 			description = (color == "black") and black_desc or white_desc,
 			inventory_image = name .. "_" .. color .. ".png",
 			stack_max = 1,
-			groups = {not_in_creative_inventory=1}
+			-- chess_piece group declares this item to be a chess piece.
+			-- positive rating: white, negative rating: black
+			-- numeric absolute value declares piece type (pawn, rook, etc.)
+			groups = {chess_piece=g, not_in_creative_inventory=1}
 		})
 	else
 		for i = 1, count do
@@ -3388,39 +3404,39 @@ local function register_piece(name, white_desc, black_desc, count)
 				description = (color == "black") and black_desc or white_desc,
 				inventory_image = name .. "_" .. color .. ".png",
 				stack_max = 1,
-				groups = {not_in_creative_inventory=1}
+				groups = {chess_piece=g, not_in_creative_inventory=1}
 			})
 		end
 	end
 	end
 end
 
-register_piece("pawn",
+register_piece("pawn", 1,
 	--~ chess piece
 	S("White Pawn"),
 	--~ chess piece
 	S("Black Pawn"), 8)
-register_piece("rook",
+register_piece("rook", 2,
 	--~ chess piece
 	S("White Rook"),
 	--~ chess piece
 	S("Black Rook"), 2)
-register_piece("knight",
+register_piece("knight", 3,
 	--~ chess piece
 	S("White Knight"),
 	--~ chess piece
 	S("Black Knight"), 2)
-register_piece("bishop",
+register_piece("bishop", 4,
 	--~ chess piece
 	S("White Bishop"),
 	--~ chess piece
 	S("Black Bishop"), 2)
-register_piece("queen",
+register_piece("queen", 5,
 	--~ chess piece
 	S("White Queen"),
 	--~ chess piece
 	S("Black Queen"))
-register_piece("king",
+register_piece("king", 6,
 	--~ chess piece
 	S("White King"),
 	--~ chess piece
