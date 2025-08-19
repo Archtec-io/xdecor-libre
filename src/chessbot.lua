@@ -8,7 +8,6 @@ chessbot.cancel_job = function(pos)
 		active_jobs[hash]:cancel()
 		active_jobs[hash] = nil
 	end
-	minetest.log("error", "job cancelled")
 end
 
 local realchess = xdecor.chess
