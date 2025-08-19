@@ -48,7 +48,7 @@ local function best_move(moves, board_t)
 			-- according to a table.
 			if to_piece_name ~= "" then
 				for piece_type, piece_value in pairs(piece_values) do
-					if to_piece_name:find(piece_type) then
+					if realchess.get_piece_type(to_piece_name) == piece_type then
 						val = piece_value
 					end
 				end
