@@ -1,5 +1,16 @@
 local chessbot = {}
 
+local active_jobs = {}
+
+chessbot.cancel_job = function(pos)
+	local hash = minetest.hash_node_position(pos)
+	if active_jobs[hash] then
+		active_jobs[hash]:cancel()
+		active_jobs[hash] = nil
+	end
+	minetest.log("error", "job cancelled")
+end
+
 local realchess = xdecor.chess
 
 -- Delay in seconds for a bot moving a piece (excluding choosing a promotion)
@@ -129,7 +140,7 @@ function chessbot.choose_move(board_t, meta_t)
 	end
 end
 
-chessbot.perform_move = function(choice_from, choice_to, meta)
+chessbot.perform_move = function(pos, choice_from, choice_to, meta)
 	local lastMove = meta:get_string("lastMove")
 	local botColor = meta:get_string("botColor")
 	local currentBotColor, opponentColor
@@ -151,7 +162,7 @@ chessbot.perform_move = function(choice_from, choice_to, meta)
 
 	-- Bot resigns if no move chosen
 	if not choice_from or not choice_to then
-		realchess.resign(meta, currentBotColor)
+		realchess.resign(pos, meta, currentBotColor)
 		return
 	end
 
@@ -181,14 +192,14 @@ chessbot.perform_move = function(choice_from, choice_to, meta)
 		end
 
 		-- Make a move
-		local moveOK = realchess.move(meta, "board", choice_from, "board", choice_to, botName)
+		local moveOK = realchess.move(pos, meta, "board", choice_from, "board", choice_to, botName)
 		if not moveOK then
 			minetest.log("error", "[xdecor] Chess: Bot tried to make an invalid move from "..
 				realchess.index_to_notation(choice_from).." to "..realchess.index_to_notation(choice_to))
 		end
 		-- Bot resigns if it tried to make an invalid move
 		if not moveOK then
-			realchess.resign(meta, currentBotColor)
+			realchess.resign(pos, meta, currentBotColor)
 		end
 	else
 		minetest.log("error", "[xdecor] Chess: chessbot.perform_move: No last move!")
@@ -200,20 +211,18 @@ function chessbot.choose_promote(board_t, pawnIndex)
 	return "queen"
 end
 
-function chessbot.perform_promote(meta, promoteTo)
-	minetest.after(BOT_DELAY_PROMOTE, function()
-		local lastMove = meta:get_string("lastMove")
-		local color
-		if lastMove == "black" or lastMove == "" then
-			color = "white"
-		else
-			color = "black"
-		end
-		realchess.promote_pawn(meta, color, promoteTo)
-	end)
+function chessbot.perform_promote(pos, meta, promoteTo)
+	local lastMove = meta:get_string("lastMove")
+	local color
+	if lastMove == "black" or lastMove == "" then
+		color = "white"
+	else
+		color = "black"
+	end
+	realchess.promote_pawn(pos, meta, color, promoteTo)
 end
 
-function chessbot.move(inv, meta)
+function chessbot.move(pos, inv, meta)
 	local board_t = realchess.board_to_table(inv)
 	local meta_t = {
 		lastMove = meta:get_string("lastMove"),
@@ -226,18 +235,34 @@ function chessbot.move(inv, meta)
 		castlingBlackR = meta:get_int("castlingBlackR"),
 	}
 	local choice_from, choice_to = chessbot.choose_move(board_t, meta_t)
-	minetest.after(BOT_DELAY_MOVE, function()
-		chessbot.perform_move(choice_from, choice_to, meta)
+	local hash = minetest.hash_node_position(pos)
+	if active_jobs[hash] then
+		chessbot.cancel_job(pos)
+		minetest.log("error", "[xdecor] chessbot.move called although the chessbot already had an active job for "..minetest.pos_to_string(pos).."!")
+	end
+	local job = minetest.after(BOT_DELAY_MOVE, function()
+		active_jobs[hash] = nil
+		chessbot.perform_move(pos, choice_from, choice_to, meta)
 	end)
+	active_jobs[hash] = job
 end
 
-function chessbot.promote(inv, meta, pawnIndex)
+function chessbot.promote(pos, inv, meta, pawnIndex)
 	local board_t = realchess.board_to_table(inv)
 	local promoteTo = chessbot.choose_promote(board_t, pawnIndex)
 	if not promoteTo then
 		promoteTo = "queen"
 	end
-	chessbot.perform_promote(meta, promoteTo)
+	local hash = minetest.hash_node_position(pos)
+	if active_jobs[hash] then
+		chessbot.cancel_job(pos)
+		minetest.log("error", "[xdecor] chessbot.move called although the chessbot already had an active job for "..minetest.pos_to_string(pos).."!")
+	end
+	local job = minetest.after(BOT_DELAY_PROMOTE, function()
+		active_jobs[hash] = nil
+		chessbot.perform_promote(pos, meta, promoteTo)
+	end)
+	active_jobs[hash] = job
 end
 
 return chessbot
