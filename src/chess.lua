@@ -27,7 +27,7 @@ local ENABLE_CHESS_GAMES = true
 
 -- If true, will show some hidden state for debugging purposes
 -- and enables a "Bot vs Bot" gamemode for testing the bot
-local CHESS_DEBUG = false
+local CHESS_DEBUG = true
 
 -- Number of consecutive halfmoves in which no pawn was moved
 -- and no piece was captured after which a player can claim a draw.
@@ -507,7 +507,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 						moves[to_idx] = nil
 					end
 				elseif from_y - 2 == to_y then
-					if pieceTo ~= "" or from_y < 6 or pawnWhiteMove ~= "" then
+					if pieceTo ~= "" or from_y < 6 or pawnWhiteMove ~= "" or from_x ~= to_x then
 						moves[to_idx] = nil
 					end
 				else
@@ -562,7 +562,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 						moves[to_idx] = nil
 					end
 				elseif from_y + 2 == to_y then
-					if pieceTo ~= "" or from_y > 1 or pawnBlackMove ~= "" then
+					if pieceTo ~= "" or from_y > 1 or pawnBlackMove ~= "" or from_x ~= to_x then
 						moves[to_idx] = nil
 					end
 				else
