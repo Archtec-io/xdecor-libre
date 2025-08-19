@@ -27,7 +27,7 @@ local ENABLE_CHESS_GAMES = true
 
 -- If true, will show some hidden state for debugging purposes
 -- and enables a "Bot vs Bot" gamemode for testing the bot
-local CHESS_DEBUG = true
+local CHESS_DEBUG = false
 
 -- Number of consecutive halfmoves in which no pawn was moved
 -- and no piece was captured after which a player can claim a draw.

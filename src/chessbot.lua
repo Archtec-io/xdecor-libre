@@ -223,6 +223,10 @@ function chessbot.perform_promote(pos, meta, promoteTo)
 		minetest.log("error", "[xdecor] Chess: Bot failed to pick a pawn promotion")
 		realchess.resign(pos, meta, color)
 		return
+	elseif promoteTo ~= "queen" and promoteTo ~= "rook" and promoteTo ~= "knight" and promoteTo ~= "bishop" then
+		minetest.log("error", "[xdecor] Chess: Bot picked an invalid pawn promotion: "..tostring(promoteTo))
+		realchess.resign(pos, meta, color)
+		return
 	end
 	realchess.promote_pawn(pos, meta, color, promoteTo)
 end
