@@ -219,6 +219,11 @@ function chessbot.perform_promote(pos, meta, promoteTo)
 	else
 		color = "black"
 	end
+	if not promoteTo then
+		minetest.log("error", "[xdecor] Chess: Bot failed to pick a pawn promotion")
+		realchess.resign(pos, meta, color)
+		return
+	end
 	realchess.promote_pawn(pos, meta, color, promoteTo)
 end
 
@@ -250,9 +255,6 @@ end
 function chessbot.promote(pos, inv, meta, pawnIndex)
 	local board_t = realchess.board_to_table(inv)
 	local promoteTo = chessbot.choose_promote(board_t, pawnIndex)
-	if not promoteTo then
-		promoteTo = "queen"
-	end
 	local hash = minetest.hash_node_position(pos)
 	if active_jobs[hash] then
 		chessbot.cancel_job(pos)
