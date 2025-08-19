@@ -183,15 +183,6 @@ function realchess.board_to_table(inv)
 	return t
 end
 
-local piece_values = {
-	pawn   = 10,
-	knight = 30,
-	bishop = 30,
-	rook   = 50,
-	queen  = 90,
-	king   = 900
-}
-
 local rowDirs = {-1, -1, -1, 0, 0, 1, 1, 1}
 local colDirs = {-1, 0, 1, -1, 1, -1, 0, 1}
 
@@ -412,8 +403,8 @@ end
 -- * board: chessboard table
 -- * from_idx:
 -- returns: table with the keys used as destination indices
---    Any key with a numeric value is a possible destination.
---    The numeric value is a move rating for the bot and is 0 by default.
+--    Any key with the numeric value 0 is a possible destination.
+--    All other keys have the nil value.
 -- Example: { [4] = 0, [9] = 0 } -- can move to squares 4 and 9
 local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo, castlingRights)
 	local piece, color = board[from_idx]:match(":(%w+)_(%w+)")
@@ -817,19 +808,6 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 
 	if not next(moves) then
 		return {}
-	end
-
-	-- Rate the possible moves depending on its piece value
-	-- TODO: Move this to chessbot.lua
-	for i in pairs(moves) do
-		local stack_name = board[tonumber(i)]
-		if stack_name ~= "" then
-			for p, value in pairs(piece_values) do
-				if stack_name:find(p) then
-					moves[i] = value
-				end
-			end
-		end
 	end
 
 	return moves
