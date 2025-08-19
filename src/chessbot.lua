@@ -126,6 +126,7 @@ function chessbot.choose_move(board_t, meta_t)
 		local safe_moves, safe_moves_count = realchess.get_king_safe_moves(moves, board_t, currentBotColor)
 		if safe_moves_count == 0 then
 			-- No safe move: stalemate or checkmate
+			return
 		end
 		local choice_from, choice_to = best_move(safe_moves, board_t)
 		if choice_from == nil then
