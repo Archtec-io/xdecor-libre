@@ -261,7 +261,8 @@ function realchess.attacked(color, idx, board)
 				if row >= 1 and row <= 8 and col >= 1 and col <= 8 then
 					local square            = get_square(row, col)
 					local square_name       = board[square]
-					local piece, pieceColor = square_name:match(":(%w+)_(%w+)")
+					local piece             = realchess.get_piece_type(square_name)
+					local pieceColor        = realchess.get_piece_color(square_name)
 
 					if piece then
 						if pieceColor ~= color then
@@ -295,7 +296,8 @@ function realchess.attacked(color, idx, board)
 			if rowK >= 1 and rowK <= 8 and colK >= 1 and colK <= 8 then
 				local square            = get_square(rowK, colK)
 				local square_name       = board[square]
-				local piece, pieceColor = square_name:match(":(%w+)_(%w+)")
+				local piece             = realchess.get_piece_type(square_name)
+				local pieceColor        = realchess.get_piece_color(square_name)
 
 				if piece and pieceColor ~= color and piece == "knight" then
 					threatDetected = true
@@ -457,7 +459,8 @@ end
 --    All other keys have the nil value.
 -- Example: { [4] = 0, [9] = 0 } -- can move to squares 4 and 9
 local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo, castlingRights)
-	local piece, color = board[from_idx]:match(":(%w+)_(%w+)")
+	local piece = realchess.get_piece_type(board[from_idx])
+	local color = realchess.get_piece_color(board[from_idx])
 	if not piece then
 		return {}
 	end
@@ -892,7 +895,8 @@ end
 function realchess.locate_kings(board)
 	local Bidx, Widx
 	for i = 1, 64 do
-		local piece, color = board[i]:match(":(%w+)_(%w+)")
+		local piece = realchess.get_piece_type(board[i])
+		local color = realchess.get_piece_color(board[i])
 		if piece == "king" then
 			if color == "black" then
 				Bidx = i
@@ -1116,11 +1120,12 @@ for i = 1, #pieces_basenames do
 end
 
 local function get_figurine_id(piece_itemname)
-	local piece_s = piece_itemname:match(":(%w+_%w+)")
-	if not piece_s then
+	local piece = realchess.get_piece_type(piece_itemname)
+	local color = realchess.get_piece_color(piece_itemname)
+	if not piece or not color then
 		return MOVES_LIST_SYMBOL_EMPTY
 	else
-		return figurines_str:match("(%d+)=chess_figurine_" .. piece_s)
+		return figurines_str:match("(%d+)=chess_figurine_" .. piece .. "_" .. color)
 	end
 end
 
@@ -1660,7 +1665,12 @@ local function add_to_eaten_list(meta, piece)
 		if eaten ~= "" then
 			eaten = eaten .. ","
 		end
-		local piece_s = piece:match(":(%w+_%w+)") or ""
+		local piece_type = realchess.get_piece_type(piece)
+		local piece_color = realchess.get_piece_color(piece)
+		local piece_s = ""
+		if piece_type and piece_color then
+			piece_s = piece_type .. "_" .. piece_color
+		end
 		eaten = eaten .. piece_s
 		meta:set_string("eaten", eaten)
 		if CHESS_DEBUG then
