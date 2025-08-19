@@ -37,9 +37,12 @@ local DRAWCLAIM_LONGGAME_PLAYER = 100 -- 50-move rule
 local DRAWCLAIM_LONGGAME_FORCE = 150 -- 75-move rule
 
 -- Bot names
+--~ Name of computer player in Chess
 local BOT_NAME = NS("Weak Computer")
 -- Bot names in Bot vs Bot mode
+--~ Name of computer player in Chess
 local BOT_NAME_1 = NS("Weak Computer 1")
+--~ Name of computer player in Chess
 local BOT_NAME_2 = NS("Weak Computer 2")
 
 -- Timeout in seconds to allow resetting the game or digging the chessboard.
@@ -1110,12 +1113,17 @@ local fs_init = [[
 	.."bgcolor[#00000000;false]"
 	.."background[0,0;16,10.7563;chess_bg.png;true]"
 	.."style_type[button,image_button,item_image_button;bgcolor=#8f3000]"
+	--~ Chess: Game mode selection prompt
 	.."label[2.2,0.652;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
 	.."label[2.2,10.21;"..minetest.colorize("#404040", FS("Select a game mode")).."]"
+	--~ Chess: Game mode selection prompt
 	.."label[11.2,1.8;"..FS("Select a mode:").."]"
+	--~ Chess game mode (player vs bot)
 	.."button[11,2.1;3,0.8;single;"..FS("Singleplayer").."]"
+	--~ Chess game mode (player vs player)
 	.."button[11,3.1;3,0.8;multi;"..FS("Multiplayer").."]"
 	if CHESS_DEBUG then
+		--~ Chess game mode
 		fs_init = fs_init .."button[11,4.1;3,0.8;bot_vs_bot;"..FS("Bot vs Bot").."]"
 	end
 
@@ -1741,6 +1749,7 @@ local function update_formspec(meta)
 		if botColor ~= "black" and botColor ~= "both" then
 			-- Hide buttons if computer player promotes
 			promotion_formstring = promotion_formstring ..
+			--~ Chess: Prompt for player who must select to which piece to promote their pawn. Space for text is limited.
 			"label[13.15,6.35;"..FS("Promote pawn to:").."]" ..
 			"item_image_button[13.15,7.2;1,1;realchess:queen_black;p_queen_black;]" ..
 			"item_image_button[14.15,7.2;1,1;realchess:rook_black_1;p_rook_black;]" ..
@@ -1769,43 +1778,49 @@ local function update_formspec(meta)
 	local draw_claim_formstring = ""
 	if drawClaim ~= "" and gameResult == "" then
 		if lastMove == "black" or lastMove == "" then
-			--~ Chess: Shown when white player wants to claim a draw. Space for text is limited.
+			--~ Chess: Shown when white player wants to use the 50-move rule or threefold-repetition rule to claim a draw. Space for text is limited.
 			draw_claim_formstring = "label[10.1,6.35;"..FS("DRAW CLAIM\nBY WHITE!").."]"
 		else
-			--~ Chess: Shown when black player wants to claim a draw. Space for text is limited.
+			--~ Chess: Shown when black player wants to use the 50-move rule or threefold-repetition rule to claim a draw. Space for text is limited.
 			draw_claim_formstring = "label[10.1,6.35;"..FS("DRAW CLAIM\nBY BLACK!").."]"
 		end
 		if drawClaim == "50_move_rule" then
 			eaten_img = ""
 			draw_claim_formstring = draw_claim_formstring ..
 				"image[10.05,7.2;2,2;chess_draw_50move_next.png]"..
+				--~ Chess message
 				"textarea[13,6.35;2.2,3.2;;;"..FS("The player has invoked the 50-move rule for the next move. The next move might draw the game.").."]"
 		elseif drawClaim == "same_position_3" then
 			eaten_img = ""
 			draw_claim_formstring = draw_claim_formstring ..
 				"image[10.05,7.2;2,2;chess_draw_repeat3_next.png]"..
+				--~ Chess message
 				"textarea[13,6.35;2.2,3.2;;;"..FS("The player has invoked the threefold-repetition rule for the next move. The next move might draw the game.").."]"
 		end
 	end
 
 	-- Resign / Start new game
 	local game_buttons = ""
+	--~ Chess button
 	game_buttons = game_buttons .. "button[13.36,0.26;2,0.8;new;"..FS("New game").."]"
 
 	local playerActionsAvailable = mode ~= "bot_vs_bot" and gameResult == ""
 
 	if playerActionsAvailable and (playerWhite ~= "" and playerBlack ~= "") then
 		game_buttons = game_buttons .. "image_button[14.56,9.7;0.8,0.8;chess_resign.png;resign;]" ..
-			--~ Resign in Chess
+			--~ Resign (give up) in Chess
 			"tooltip[resign;"..FS("Resign").."]"
 	end
 
 	-- Let player choose with which to play singleplayer
 	if lastMove == "" and gameResult == "" and mode == "single" and playerWhite == "" then
+		--~ Chess: Prompt to select a player color
 		game_buttons = game_buttons .. "label[11.2,1.8;"..FS("Select a color:").."]"
 			.."style[single_black;bgcolor=#000000FF;textcolor=#FFFFFFFF]"
 			.."style[single_white;bgcolor=#FFFFFFFF;textcolor=#000000FF]"
+			--~ White Chess player
 			.."button[11,2.1;3,0.8;single_white;"..FS("White").."]"
+			--~ Black Chess player
 			.."button[11,3.1;3,0.8;single_black;"..FS("Black").."]"
 	end
 
@@ -1817,14 +1832,14 @@ local function update_formspec(meta)
 			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw
 			game_buttons = game_buttons .. "image_button[13.36,9.7;0.8,0.8;chess_draw_50move_next.png;draw_50_moves;]"..
 				"tooltip[draw_50_moves;"..
-				--~ Chess
+				--~ Chess message
 				FS("Invoke the 50-move rule for your next move").."]"
 		elseif halfmoveClock >= DRAWCLAIM_LONGGAME_PLAYER then
 			-- When the 50 moves without capture / pawn move have occured occur.
 			-- Will insta-draw.
 			game_buttons = game_buttons .. "image_button[13.36,9.7;0.8,0.8;chess_draw_50move.png;draw_50_moves;]"..
 				"tooltip[draw_50_moves;"..
-				--~ Chess
+				--~ Chess message
 				FS("Invoke the 50-move rule and draw the game").."]"
 		end
 
@@ -1837,14 +1852,14 @@ local function update_formspec(meta)
 			-- Will insta-draw.
 			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3.png;draw_repeat_3;]"..
 				"tooltip[draw_repeat_3;"..
-				--~ Chess
+				--~ Chess message
 				FS("Invoke the threefold repetition rule and draw the game").."]"
 		elseif maxRepeatedPositions >= 2 then
 			-- If the same position may be about to occur 3 times.
 			-- Will trigger "draw claim" mode in which player must do the final move that triggers the draw.
 			game_buttons = game_buttons .. "image_button[12.36,9.7;0.8,0.8;chess_draw_repeat3_next.png;draw_repeat_3;]"..
 				"tooltip[draw_repeat_3;"..
-				--~ Chess
+				--~ Chess message
 				FS("Invoke the threefold repetition rule for your next move").."]"
 		end
 	end
@@ -1974,7 +1989,9 @@ local function update_game_result(meta, lastMove)
 			meta:set_string("gameResult", "whiteWon")
 			meta:set_string("gameResultReason", "checkmate")
 			add_special_to_moves_list(meta, "whiteWon")
+			--~ Chess message. @1 = opponent name
 			send_message(playerWhite, S("You have checkmated @1. You win!", playerBlackDisplay), "white", botColor)
+			--~ Chess message. @1 = opponent name
 			send_message(playerBlack, S("You were checkmated by @1. You lose!", playerWhiteDisplay), "black", botColor)
 			minetest.log("action", "[xdecor] Chess: "..playerWhite.." won against "..playerBlack.." by checkmate")
 			return
@@ -1995,7 +2012,9 @@ local function update_game_result(meta, lastMove)
 			meta:set_string("gameResult", "blackWon")
 			meta:set_string("gameResultReason", "checkmate")
 			add_special_to_moves_list(meta, "blackWon")
+			--~ Chess message. @1 = opponent name
 			send_message(playerBlack, S("You have checkmated @1. You win!", playerWhiteDisplay), "white", botColor)
+			--~ Chess message. @1 = opponent name
 			send_message(playerWhite, S("You were checkmated by @1. You lose!", playerBlackDisplay), "white", botColor)
 			minetest.log("action", "[xdecor] Chess: "..playerBlack .." won against "..playerWhite.." by checkmate")
 			return
@@ -2029,6 +2048,7 @@ local function update_game_result(meta, lastMove)
 		meta:set_string("gameResult", "draw")
 		meta:set_string("gameResultReason", "75_move_rule")
 		add_special_to_moves_list(meta, "draw")
+		--~ Chess message
 		local msg = S("No piece was captured and no pawn was moved for 75 consecutive moves of each player. It's a draw!")
 		send_message_2(playerWhite, playerBlack, msg, botColor)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw via the 75-move rule")
@@ -2048,8 +2068,10 @@ local function update_game_result(meta, lastMove)
 			claimer = playerBlack
 			other = playerWhite
 		end
+		--~ Chess message
 		send_message(claimer, S("You have drawn the game by invoking the 50-move rule."), botColor)
 		if claimer ~= other then
+			--~ Chess message. @1 = player name
 			send_message(other, S("@1 has drawn the game by invoking the 50-move rule.", claimer), botColor)
 		end
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the 50-move rule")
@@ -2062,8 +2084,10 @@ local function update_game_result(meta, lastMove)
 			claimer = playerBlack
 			other = playerWhite
 		end
+		--~ Chess message shown when player has invoked a rule to claim a draw and had to make a game-drawing move but instead made a different move
 		send_message(claimer, S("You have failed to make a game-drawing move. The game continues."), botColor)
 		if claimer ~= other then
+			--~ Chess message shown when player (name = @1) has invoked the 50-move rule to claim a draw and had to make a game-drawing move but instead made a different move
 			send_message(other, S("@1 made a draw claim using the 50-move rule but it was false. The game continues.", claimer), botColor)
 		end
 	end
@@ -2132,7 +2156,7 @@ local function update_game_result(meta, lastMove)
 		meta:set_string("gameResult", "draw")
 		meta:set_string("gameResultReason", "same_position_5")
 		add_special_to_moves_list(meta, "draw")
-		--~ Chess message when the fivefold repetition has happened
+		--~ Chess message when a fivefold repetition has happened
 		local msg = S("The exact same position has occured 5 times. It's a draw!")
 		send_message_2(playerWhite, playerBlack, msg, botColor)
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because the same position has appeared 5 times")
@@ -2152,8 +2176,10 @@ local function update_game_result(meta, lastMove)
 			claimer = playerBlack
 			other = playerWhite
 		end
+		--~ Chess message
 		send_message(claimer, S("You have drawn the game by invoking the threefold repetition rule."), botColor)
 		if claimer ~= other then
+			--~ Chess message. @1 = player name
 			send_message(other, S("@1 has drawn the game by invoking the threefold repetition rule.", claimer), botColor)
 		end
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the threefold repetition rule")
@@ -2168,6 +2194,7 @@ local function update_game_result(meta, lastMove)
 		end
 		send_message(claimer, S("You have failed to make a game-drawing move. The game continues."), botColor)
 		if claimer ~= other then
+			--~ Chess message shown when player (name = @1) has invoked the threefold repetition rule to claim a draw and had to make a game-drawing move but instead made a different move
 			send_message(other, S("@1 made a draw claim using the threefold repetition rule but it was false. The game continues.", claimer), botColor)
 		end
 	end
@@ -2193,6 +2220,9 @@ function realchess.init(pos)
 	meta:set_string("whiteAttacked", "")
 	meta:set_string("promotionActive", "")
 
+	-- Records the world gametime (in seconds) at which the last move
+	-- was made, or, if none was made, the gametime of the start of the game.
+	-- If no game is ongoing, this is 0.
 	meta:set_int("lastMoveTime",   0)
 	meta:set_int("castlingBlackL", 1)
 	meta:set_int("castlingBlackR", 1)
@@ -2258,6 +2288,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 
 	if pieceFrom:find("white") then
 		if playerWhite ~= "" and playerWhite ~= playerName then
+			--~ Chess message when player tries to move with someone else's pieces
 			send_message(playerName, S("Someone else plays white pieces!"))
 			return false
 		end
@@ -2268,6 +2299,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 		end
 
 		if lastMove == "white" then
+			--~ Chess message
 			send_message(playerName, S("It's not your turn!"))
 			return
 		end
@@ -2277,6 +2309,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 
 	elseif pieceFrom:find("black") then
 		if playerBlack ~= "" and playerBlack ~= playerName then
+			--~ Chess message when player tries to move with someone else's pieces
 			send_message(playerName, S("Someone else plays black pieces!"))
 			return false
 		end
@@ -2293,6 +2326,7 @@ function realchess.move(meta, from_list, from_index, to_list, to_index, playerNa
 
 		if lastMove == "" then
 			-- Nobody has moved yet, and Black cannot move first
+			--~ Chess message
 			send_message(playerName, S("Black cannot move first!"))
 			return false
 		end
@@ -2847,6 +2881,7 @@ function realchess.fields(pos, _, fields, sender)
 
 	if fields.single or fields.multi or fields.bot_vs_bot then
 		if fields.bot_vs_bot then
+			meta:set_string("lastMoveTime", minetest.get_gametime())
 			if not CHESS_DEBUG then
 				-- Bot vs Bot only allowed in Chess Debug Mode
 				return
@@ -2862,6 +2897,7 @@ function realchess.fields(pos, _, fields, sender)
 		elseif fields.single then
 			meta:set_string("mode", "single")
 		elseif fields.multi then
+			meta:set_string("lastMoveTime", minetest.get_gametime())
 			meta:set_string("mode", "multi")
 		end
 		update_formspec(meta)
@@ -2871,6 +2907,7 @@ function realchess.fields(pos, _, fields, sender)
 	local mode = meta:get_string("mode")
 	-- "Play as White/Black" button in Singleplayer when nobody has moved yet
 	if (fields.single_black or fields.single_white) and mode == "single" and meta:get_string("gameResult") == "" and meta:get_string("lastMove") == "" then
+		meta:set_string("lastMoveTime", minetest.get_gametime())
 		if fields.single_white then
 			meta:set_string("botColor", "black")
 			meta:set_string("playerWhite", playerName)
@@ -2944,13 +2981,16 @@ function realchess.fields(pos, _, fields, sender)
 				realchess.resign(meta, "white")
 			end
 
+			--~ Chess message when player resigned (gave up)
 			send_message(loser, S("You have resigned."))
 			if playerWhite ~= playerBlack then
+				--~ Chess message when player resigned (gave up). @1 = opponent name
 				send_message(winner, S("@1 has resigned. You win!", loser))
 			end
 			minetest.log("action", "[xdecor] Chess: "..loser.." has resigned from the game against "..winner)
 			update_formspec(meta)
 		else
+			--~ Chess message
 			send_message(playerName, S("You can't resign, you're not playing in this game."))
 		end
 		return
@@ -2978,6 +3018,7 @@ function realchess.fields(pos, _, fields, sender)
 			claimer = playerBlack
 			other = playerWhite
 		else
+			--~ Chess message
 			send_message(playerName, S("You can't claim a draw, it's not your turn!"))
 			return
 		end
@@ -2988,8 +3029,10 @@ function realchess.fields(pos, _, fields, sender)
 			meta:set_string("gameResultReason", "50_move_rule")
 			add_special_to_moves_list(meta, "draw")
 			update_formspec(meta)
+			--~ Chess message
 			send_message(claimer, S("You have drawn the game by invoking the 50-move rule."), botColor)
 			if claimer ~= other then
+				--~ Chess message. @1 = player name
 				send_message(other, S("@1 has drawn the game by invoking the 50-move rule.", claimer), botColor)
 			end
 			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the 50-move rule")
@@ -3034,8 +3077,10 @@ function realchess.fields(pos, _, fields, sender)
 			meta:set_string("gameResultReason", "same_position_3")
 			add_special_to_moves_list(meta, "draw")
 			update_formspec(meta)
+			--~ Chess message
 			send_message(claimer, S("You have drawn the game by invoking the threefold repetition rule."), botColor)
 			if claimer ~= other then
+				--~ Chess message. @1 = player name
 				send_message(other, S("@1 has drawn the game by invoking the threefold repetition rule.", claimer), botColor)
 			end
 			minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the threefold repetition rule")
@@ -3064,11 +3109,11 @@ function realchess.fields(pos, _, fields, sender)
 			local pcolor = promo:sub(-5)
 			local activePromo = meta:get_string("promotionActive")
 			if activePromo == "" then
-				--~ Chess message
+				--~ Chess message when player tried to promote a pawn when it's not legal
 				send_message(playerName, S("This isn't the time for promotion."))
 				return
 			elseif activePromo ~= pcolor then
-				--~ Chess message
+				--~ Chess message when player tried to promote a pawn when it's not their turn
 				send_message(playerName, S("It's not your turn! This promotion is meant for the other player."))
 				return
 			end
@@ -3076,7 +3121,6 @@ function realchess.fields(pos, _, fields, sender)
 				realchess.promote_pawn(meta, pcolor, promo:sub(1, -7))
 				return
 			else
-				--~ Chess message
 				send_message(playerName, S("It's not your turn! This promotion is meant for the other player."))
 				return
 			end
@@ -3107,18 +3151,23 @@ function realchess.can_dig(pos, player)
 	elseif (meta:get_string("gameResult") ~= "") then
 	-- If the game was completed, the board is free to be dug
 		return true
+	-- If no game is ongoing, board is free to be dug
+	elseif (lastMoveTime == 0) then
+		return true
 	-- If the game is ongoing and no move was made for TIMEOUT seconds,
 	-- the board is free to be dug
-	elseif (lastMoveTime == 0 and minetest.get_gametime() > timeout_limit) then
+	elseif minetest.get_gametime() >= timeout_limit then
 		return true
 	else
 		if playerName == playerWhite or playerName == playerBlack or botColor == "both" then
 			send_message(playerName,
+					--~ Shown when player tried to dig a chessboard but is not allowed to. @1 = time
 					S("You can't dig the chessboard, a game has been started. " ..
 					"Reset it first or dig it again in @1.",
 					timeout_format(timeout_limit)))
 		else
 			send_message(playerName,
+					--~ Shown when player tried to dig a chessboard but is not allowed to. @1 = time
 					S("You can't dig the chessboard, a game has been started. " ..
 					"Try it again in @1.",
 					timeout_format(timeout_limit)))
@@ -3283,6 +3332,7 @@ local chessboarddef = {
 }
 if ENABLE_CHESS_GAMES then
 	-- Extend chess board node definition if chess games are enabled
+	--~ Chess board tooltip
 	chessboarddef._tt_help = S("Play a game of Chess against another player or the computer")
 	chessboarddef.on_blast = realchess.blast
 	chessboarddef.can_dig = realchess.can_dig
@@ -3367,12 +3417,36 @@ local function register_piece(name, white_desc, black_desc, count)
 	end
 end
 
-register_piece("pawn", S("White Pawn"), S("Black Pawn"), 8)
-register_piece("rook", S("White Rook"), S("Black Rook"), 2)
-register_piece("knight", S("White Knight"), S("Black Knight"), 2)
-register_piece("bishop", S("White Bishop"), S("Black Bishop"), 2)
-register_piece("queen", S("White Queen"), S("Black Queen"))
-register_piece("king", S("White King"), S("Black King"))
+register_piece("pawn",
+	--~ chess piece
+	S("White Pawn"),
+	--~ chess piece
+	S("Black Pawn"), 8)
+register_piece("rook",
+	--~ chess piece
+	S("White Rook"),
+	--~ chess piece
+	S("Black Rook"), 2)
+register_piece("knight",
+	--~ chess piece
+	S("White Knight"),
+	--~ chess piece
+	S("Black Knight"), 2)
+register_piece("bishop",
+	--~ chess piece
+	S("White Bishop"),
+	--~ chess piece
+	S("Black Bishop"), 2)
+register_piece("queen",
+	--~ chess piece
+	S("White Queen"),
+	--~ chess piece
+	S("Black Queen"))
+register_piece("king",
+	--~ chess piece
+	S("White King"),
+	--~ chess piece
+	S("Black King"))
 
 -- Recipes
 

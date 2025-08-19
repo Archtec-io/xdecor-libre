@@ -107,6 +107,7 @@ local function register_storage(name, desc, def)
 end
 
 register_storage("cabinet", S("Wooden Cabinet"), {
+	--~ Tooltip for block that stores items
 	_tt_help = S("24 inventory slots"),
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {
@@ -118,6 +119,7 @@ register_storage("cabinet", S("Wooden Cabinet"), {
 
 register_storage("cabinet_half", S("Half Wooden Cabinet"), {
 	inv_size = 8,
+	--~ Tooltip for block that stores items
 	_tt_help = S("8 inventory slots"),
 	node_box = xdecor.nodebox.slab_y(0.5, 0.5),
 	on_rotate = screwdriver.rotate_simple,
@@ -446,6 +448,7 @@ end
 
 xdecor.register("enderchest", {
 	description = S("Ender Chest"),
+	--~ Ender chest tooltip
 	_tt_help = S("Interdimensional inventory"),
 	tiles = {
 		"xdecor_enderchest_top.png", "xdecor_enderchest_top.png",
@@ -808,6 +811,7 @@ register_hard_node("wood_tile_x", S("Wooden Tile"), {
 xdecor.register_legacy_aliases("wood_tile", "wood_tile_x")
 
 xdecor.register("table", {
+	--~ Furniture
 	description = S("Table"),
 	tiles = {"xdecor_wood.png"},
 	groups = {choppy = 2, oddly_breakable_by_hand = 1, flammable = 2},
