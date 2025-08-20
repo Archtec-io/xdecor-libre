@@ -1,5 +1,15 @@
 local chessbot = {}
 
+local active_jobs = {}
+
+chessbot.cancel_job = function(pos)
+	local hash = minetest.hash_node_position(pos)
+	if active_jobs[hash] then
+		active_jobs[hash]:cancel()
+		active_jobs[hash] = nil
+	end
+end
+
 local realchess = xdecor.chess
 
 -- Delay in seconds for a bot moving a piece (excluding choosing a promotion)
@@ -7,24 +17,67 @@ local BOT_DELAY_MOVE = 1.0
 -- Delay in seconds for a bot promoting a piece
 local BOT_DELAY_PROMOTE = 1.0
 
-local function best_move(moves)
-	local value, choices = 0, {}
+-- How valuable the chessbot thinks each piece is
+-- (higher = more valuable)
+local piece_values = {
+	pawn   = 10,
+	knight = 30,
+	bishop = 30,
+	rook   = 50,
+	queen  = 90,
+	king   = 900
+}
 
-	for from, _ in pairs(moves) do
-	for to, val in pairs(_) do
-		if val > value then
-			value = val
-			choices = {{
-				from = from,
-				to = to
-			}}
-		elseif val == value then
-			choices[#choices + 1] = {
-				from = from,
-				to = to
-			}
+-- Pick a move from the list of all possible moves
+-- on this chessboard
+local function best_move(moves, board_t)
+	--[[ This is a VERY simple algorithm that will greedily
+	capture pieces as soon the opprtunity arises
+	and otherwise takes random moves.
+	This makes the bot very weak, as it lacks any kind of
+	foresight, but the algorithm is blazingly fast. ]]
+
+	--[[ The algorithm:
+	Look at all moves and rate each of them with a number
+	(higher = better). Pick the move with the highest rating.
+	If it's a tie, pick randomly from the tied moves.
+	Non-capturing moves are rated 0.
+	Capturing moves are rated by which piece is captured
+	(in piece_values) ]]
+
+	local max_value, choices = 0, {}
+
+	for from, tos in pairs(moves) do
+		for to, _ in pairs(tos) do
+			-- Move rating. rating 0 is for non-capturing moves.
+			-- higher ratings are for capturing moves.
+			local val = 0
+			local to_piece_name = board_t[to]
+
+			-- If destination is a piece that we capture, rate this move
+			-- according to a table.
+			if to_piece_name ~= "" then
+				for piece_type, piece_value in pairs(piece_values) do
+					if realchess.get_piece_type(to_piece_name) == piece_type then
+						val = piece_value
+					end
+				end
+			end
+
+			-- Update the list of best moves (choices).
+			if val > max_value then
+				max_value = val
+				choices = {{
+					from = from,
+					to = to
+				}}
+			elseif val == max_value then
+				choices[#choices + 1] = {
+					from = from,
+					to = to
+				}
+			end
 		end
-	end
 	end
 
 	if #choices == 0 then
@@ -72,8 +125,9 @@ function chessbot.choose_move(board_t, meta_t)
 		local safe_moves, safe_moves_count = realchess.get_king_safe_moves(moves, board_t, currentBotColor)
 		if safe_moves_count == 0 then
 			-- No safe move: stalemate or checkmate
+			return
 		end
-		local choice_from, choice_to = best_move(safe_moves)
+		local choice_from, choice_to = best_move(safe_moves, board_t)
 		if choice_from == nil then
 			-- No best move: stalemate or checkmate
 			return
@@ -86,7 +140,7 @@ function chessbot.choose_move(board_t, meta_t)
 	end
 end
 
-chessbot.perform_move = function(choice_from, choice_to, meta)
+chessbot.perform_move = function(pos, choice_from, choice_to, meta)
 	local lastMove = meta:get_string("lastMove")
 	local botColor = meta:get_string("botColor")
 	local currentBotColor, opponentColor
@@ -108,7 +162,7 @@ chessbot.perform_move = function(choice_from, choice_to, meta)
 
 	-- Bot resigns if no move chosen
 	if not choice_from or not choice_to then
-		realchess.resign(meta, currentBotColor)
+		realchess.resign(pos, meta, currentBotColor)
 		return
 	end
 
@@ -138,14 +192,14 @@ chessbot.perform_move = function(choice_from, choice_to, meta)
 		end
 
 		-- Make a move
-		local moveOK = realchess.move(meta, "board", choice_from, "board", choice_to, botName)
+		local moveOK = realchess.move(pos, meta, "board", choice_from, "board", choice_to, botName)
 		if not moveOK then
 			minetest.log("error", "[xdecor] Chess: Bot tried to make an invalid move from "..
 				realchess.index_to_notation(choice_from).." to "..realchess.index_to_notation(choice_to))
 		end
 		-- Bot resigns if it tried to make an invalid move
 		if not moveOK then
-			realchess.resign(meta, currentBotColor)
+			realchess.resign(pos, meta, currentBotColor)
 		end
 	else
 		minetest.log("error", "[xdecor] Chess: chessbot.perform_move: No last move!")
@@ -157,20 +211,27 @@ function chessbot.choose_promote(board_t, pawnIndex)
 	return "queen"
 end
 
-function chessbot.perform_promote(meta, promoteTo)
-	minetest.after(BOT_DELAY_PROMOTE, function()
-		local lastMove = meta:get_string("lastMove")
-		local color
-		if lastMove == "black" or lastMove == "" then
-			color = "white"
-		else
-			color = "black"
-		end
-		realchess.promote_pawn(meta, color, promoteTo)
-	end)
+function chessbot.perform_promote(pos, meta, promoteTo)
+	local lastMove = meta:get_string("lastMove")
+	local color
+	if lastMove == "black" or lastMove == "" then
+		color = "white"
+	else
+		color = "black"
+	end
+	if not promoteTo then
+		minetest.log("error", "[xdecor] Chess: Bot failed to pick a pawn promotion")
+		realchess.resign(pos, meta, color)
+		return
+	elseif promoteTo ~= "queen" and promoteTo ~= "rook" and promoteTo ~= "knight" and promoteTo ~= "bishop" then
+		minetest.log("error", "[xdecor] Chess: Bot picked an invalid pawn promotion: "..tostring(promoteTo))
+		realchess.resign(pos, meta, color)
+		return
+	end
+	realchess.promote_pawn(pos, meta, color, promoteTo)
 end
 
-function chessbot.move(inv, meta)
+function chessbot.move(pos, inv, meta)
 	local board_t = realchess.board_to_table(inv)
 	local meta_t = {
 		lastMove = meta:get_string("lastMove"),
@@ -183,18 +244,31 @@ function chessbot.move(inv, meta)
 		castlingBlackR = meta:get_int("castlingBlackR"),
 	}
 	local choice_from, choice_to = chessbot.choose_move(board_t, meta_t)
-	minetest.after(BOT_DELAY_MOVE, function()
-		chessbot.perform_move(choice_from, choice_to, meta)
+	local hash = minetest.hash_node_position(pos)
+	if active_jobs[hash] then
+		chessbot.cancel_job(pos)
+		minetest.log("error", "[xdecor] chessbot.move called although the chessbot already had an active job for "..minetest.pos_to_string(pos).."!")
+	end
+	local job = minetest.after(BOT_DELAY_MOVE, function()
+		active_jobs[hash] = nil
+		chessbot.perform_move(pos, choice_from, choice_to, meta)
 	end)
+	active_jobs[hash] = job
 end
 
-function chessbot.promote(inv, meta, pawnIndex)
+function chessbot.promote(pos, inv, meta, pawnIndex)
 	local board_t = realchess.board_to_table(inv)
 	local promoteTo = chessbot.choose_promote(board_t, pawnIndex)
-	if not promoteTo then
-		promoteTo = "queen"
+	local hash = minetest.hash_node_position(pos)
+	if active_jobs[hash] then
+		chessbot.cancel_job(pos)
+		minetest.log("error", "[xdecor] chessbot.move called although the chessbot already had an active job for "..minetest.pos_to_string(pos).."!")
 	end
-	chessbot.perform_promote(meta, promoteTo)
+	local job = minetest.after(BOT_DELAY_PROMOTE, function()
+		active_jobs[hash] = nil
+		chessbot.perform_promote(pos, meta, promoteTo)
+	end)
+	active_jobs[hash] = job
 end
 
 return chessbot

@@ -341,10 +341,6 @@ xdecor.register("cushion_block", {
 	is_ground_content = false,
 })
 
-local function door_access(name)
-	return name:find("prison")
-end
-
 local xdecor_doors = {
 	japanese = {
 		recipe = {
@@ -366,6 +362,7 @@ local xdecor_doors = {
 		sound_close = "xpanes_steel_bar_door_close",
 		gain_open = 0.18,
 		gain_close = 0.16,
+		protected = true,
 	},
 	rusty_prison = {
 		recipe = {
@@ -379,6 +376,7 @@ local xdecor_doors = {
 		sound_close = "xpanes_steel_bar_door_close",
 		gain_open = 0.21,
 		gain_close = 0.19,
+		protected = true,
 	},
 	screen = {
 		recipe = {
@@ -439,7 +437,7 @@ for name, def in pairs(xdecor_doors) do
 		sound_close = def.sound_close,
 		gain_open = def.gain_open,
 		gain_close = def.gain_close,
-		protected = door_access(name),
+		protected = def.protected,
 		groups = {choppy = 2, cracky = 2, oddly_breakable_by_hand = 1, door = 1, node = 1},
 		recipe = def.recipe,
 		mesecons = mesecons_register,
