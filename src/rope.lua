@@ -74,6 +74,16 @@ function rope.remove(pos, oldnode, digger, rope_name)
 	-- Remove all ropes below our rope
 	local positions = {}
 	while minetest.get_node(below).name == rope_name do
+		local pname = ""
+		local protection_bypass = false
+		if digger and digger:is_player() then
+			protection_bypass = minetest.check_player_privs(digger, "protection_bypass")
+			pname = digger:get_player_name()
+		end
+		-- Stop removing ropes when reaching protected land
+		if minetest.is_protected(below, pname) and not protection_bypass then
+			break
+		end
 		table.insert(positions, table.copy(below))
 		below.y = below.y - 1
 		num = num + 1
