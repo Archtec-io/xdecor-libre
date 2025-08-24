@@ -71,13 +71,17 @@ function rope.remove(pos, oldnode, digger, rope_name)
 	local num = 0
 	local below = {x = pos.x, y = pos.y, z = pos.z}
 
+	-- Remove all ropes below our rope
+	local positions = {}
 	while minetest.get_node(below).name == rope_name do
-		minetest.remove_node(below)
+		table.insert(positions, table.copy(below))
 		below.y = below.y - 1
 		num = num + 1
 	end
-
-	if num == 0 then return end
+	if num == 0 then
+		return
+	end
+	minetest.bulk_set_node(positions, {name="air", param2=0})
 
 	if digger and digger:is_player() then
 		-- Play dig sound manually
@@ -96,9 +100,13 @@ function rope.remove(pos, oldnode, digger, rope_name)
 				minetest.add_item(pos, leftover)
 			end
 		end
+
+		minetest.log("action", "[xdecor] Rope of length "..(num+1).." dug by "..digger:get_player_name().." starting at "..minetest.pos_to_string(pos))
 	else
 		-- No digger: Drop rope as item
 		minetest.add_item(pos, "xdecor:rope")
+
+		minetest.log("action", "[xdecor] Rope of length "..(num+1).." removed starting at "..minetest.pos_to_string(pos))
 	end
 
 	return true
