@@ -100,3 +100,48 @@ remembers the name of the original bowl in the metadata under
 `original_bowl`. If `original_bowl` is the empty string, or contains the
 name of an unknown item, `xdecor:bowl` is the assumed default.
 (However, an unknown item in `original_bowl` will trigger a warning.)
+
+
+
+## Groups
+
+This mod introduces the following groups:
+
+* `potted_flower=1`: Potted flower
+* `food_bowl=1`: Empty bowl
+* `lever=X`: Lever (1 = off, 2 = on)
+* `pressure_plate=X`: Pressure plate (1 = off, 2 = on)
+* `cauldron=X`: Cauldron
+  * `1`: Empty cauldron
+  * `2`: Cauldron with cold liquid
+  * `3`: Cauldron with boiling liquid
+* `xdecor_cut=1`: For nodes cut by the workbench (not the normal slab, normal stair, inner or outer stair).
+  Cut nodes will also receive one of the following groups to specify the shape:
+  * `xdecor_cut_microslab=1`: Microslab
+  * `xdecor_cut_nanoslab=1`: Nanoslab
+  * `xdecor_cut_panel=1`: Panel
+  * `xdecor_cut_doublepanel=1`: Double panel
+  * `xdecor_cut_micropanel=1`: Micropanel
+  * `xdecor_cut_cube=1`: Cube
+  * `xdecor_cut_halfstair=1`: Half stair
+  * `xdecor_cut_thinstair=1`: Thin stair
+* `not_cuttable=1`: Prevent this node from being cut by the workbench
+* `repair_hammer=1`: A hammer that repairs tools (do not add this group manually, see `src/workbench.lua`)
+* `chess_piece=X`: Chess piece for Chess (see `src/chess.lua` for details)
+* `enchanted_tool=1`: Enchanted tool
+  * `enchantment_durable=1`: Enchanted tool with Durability enchantment
+  * `enchantment_fast=1`: Enchanted tool with Efficiency enchantment
+  * `enchantment_sharp=1`: Enchanted tool with Sharpness enchantment
+
+These groups are for cauldron features (please read the “Cauldron compatibility”
+section above before using them):
+
+* `xdecor_soup_ingredient=1`: Add this item as a possible soup ingredient
+* `xdecor_soup_ingredient=-1`: Exclude this item as a possible soup ingredient
+* `xdecor_cauldron_heater=1`: If placed below cauldron, it will heat it up
+* `xdecor_soup_bowl=1`: A bowl that can collect soup from the cauldron
+
+These groups are reserved for internal use:
+
+* `xdecor_actuator=X`: A node that can turned on and off and toggles neighboring doors. 1 = off, 2 = on. Used by lever and pressure plate
+* `sittable=1`: Player can sit down on this node (also needs to call `xdecor.sit` to function)
