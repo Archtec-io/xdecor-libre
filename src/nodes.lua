@@ -641,9 +641,9 @@ end
 local xdecor_potted = {
 	dandelion_white = S("Potted White Dandelion"),
 	dandelion_yellow = S("Potted Yellow Dandelion"),
-	geranium = S("Potted Geranium"),
-	rose = S("Potted Rose"),
-	tulip = S("Potted Tulip"),
+	geranium = S("Potted Blue Geranium"),
+	rose = S("Potted Red Rose"),
+	tulip = S("Potted Orange Tulip"),
 	viola = S("Potted Viola"),
 }
 
