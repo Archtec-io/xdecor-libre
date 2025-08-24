@@ -656,7 +656,7 @@ for f, desc in pairs(xdecor_potted) do
 	xdecor.register("potted_" .. f, {
 		description = desc,
 		walkable = false,
-		groups = {snappy = 3, flammable = 3, plant = 1, flower = 1},
+		groups = {snappy = 3, flammable = 3, plant = 1, flower = 1, potted_flower = 1},
 		is_ground_content = false,
 		tiles = {"xdecor_" .. f .. "_pot.png"},
 		inventory_image = "xdecor_" .. f .. "_pot.png",

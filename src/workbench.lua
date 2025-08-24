@@ -434,6 +434,14 @@ local function register_cut_raw(node, workbench_def)
 			minetest.log("error", "[xdecor] register_cut_raw: Refusing to register node "..cutnodename.." becaut it was already registered!")
 			return false
 		end
+
+		-- Add groups to identify node as a cut node
+		local cutgroups = table.copy(groups)
+		-- Marks it as a cut node
+		cutgroups["xdecor_cut"] = 1
+		-- Specifies the cut type (nanoslab, panel, etc.)
+		cutgroups["xdecor_cut_"..workbench_def[1]] = 1
+
 		minetest.register_node(":" .. cutnodename, {
 			description = S(workbench_def[4], def.description),
 			paramtype = "light",
@@ -442,7 +450,7 @@ local function register_cut_raw(node, workbench_def)
 			sounds = def.sounds,
 			tiles = tiles_special_cut,
 			use_texture_alpha = def.use_texture_alpha,
-			groups = groups,
+			groups = cutgroups,
 			is_ground_content = def.is_ground_content,
 			node_box = xdecor.pixelbox(16, workbench_def[3]),
 			sunlight_propagates = true,
