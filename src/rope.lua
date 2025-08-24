@@ -94,9 +94,6 @@ function rope.remove(pos, oldnode, digger, rope_name)
 	minetest.bulk_set_node(positions, {name="air", param2=0})
 
 	if digger and digger:is_player() then
-		-- Play dig sound manually
-		minetest.sound_play(ropesounds.dug, {pos=pos}, true)
-
 		local digger_inv = digger:get_inventory()
 		-- Give/drop rope items
 		local creative = minetest.is_creative_enabled(digger:get_player_name())
