@@ -70,7 +70,6 @@ end
 function rope.remove(pos, oldnode, digger, rope_name)
 	local num = 0
 	local below = {x = pos.x, y = pos.y, z = pos.z}
-	local digger_inv = digger:get_inventory()
 
 	while minetest.get_node(below).name == rope_name do
 		minetest.remove_node(below)
@@ -80,20 +79,26 @@ function rope.remove(pos, oldnode, digger, rope_name)
 
 	if num == 0 then return end
 
-	-- Play dig sound manually
-	minetest.sound_play(ropesounds.dug, {pos=pos}, true)
+	if digger and digger:is_player() then
+		-- Play dig sound manually
+		minetest.sound_play(ropesounds.dug, {pos=pos}, true)
 
-	-- Give/drop rope items
-	local creative = minetest.is_creative_enabled(digger:get_player_name())
-	if not creative or not digger_inv:contains_item("main", rope_name) then
-		if creative then
-			num = 1
+		local digger_inv = digger:get_inventory()
+		-- Give/drop rope items
+		local creative = minetest.is_creative_enabled(digger:get_player_name())
+		if not creative or not digger_inv:contains_item("main", rope_name) then
+			if creative then
+				num = 1
+			end
+			local item = rope_name.." "..num
+			local leftover = digger_inv:add_item("main", rope_name.." "..num)
+			if not leftover:is_empty() then
+				minetest.add_item(pos, leftover)
+			end
 		end
-		local item = rope_name.." "..num
-		local leftover = digger_inv:add_item("main", rope_name.." "..num)
-		if not leftover:is_empty() then
-			minetest.add_item(pos, leftover)
-		end
+	else
+		-- No digger: Drop rope as item
+		minetest.add_item(pos, "xdecor:rope")
 	end
 
 	return true
