@@ -638,13 +638,18 @@ for l, desc in pairs(xdecor_lightbox) do
 	})
 end
 
+-- Potted flowers
 local xdecor_potted = {
+	-- Based on the original Minetest Game flowers
 	dandelion_white = S("Potted White Dandelion"),
 	dandelion_yellow = S("Potted Yellow Dandelion"),
 	geranium = S("Potted Blue Geranium"),
 	rose = S("Potted Red Rose"),
 	tulip = S("Potted Orange Tulip"),
 	viola = S("Potted Viola"),
+	-- Based on the flowers added in Minetest Game 5.0.0
+	tulip_black = S("Potted Black Tulip"),
+	chrysanthemum_green = S("Potted Green Chrysanthemum"),
 }
 
 for f, desc in pairs(xdecor_potted) do
@@ -663,13 +668,16 @@ for f, desc in pairs(xdecor_potted) do
 		selection_box = xdecor.nodebox.slab_y(0.3)
 	})
 
-	minetest.register_craft({
-		output = "xdecor:potted_" .. f,
-		recipe = {
-			{"default:clay_brick", "flowers:" .. f, "default:clay_brick"},
-			{"", "default:clay_brick", ""}
-		}
-	})
+	-- Register recipe only if the matching flower exists
+	if minetest.registered_items["flowers:" .. f] then
+		minetest.register_craft({
+			output = "xdecor:potted_" .. f,
+			recipe = {
+				{"default:clay_brick", "flowers:" .. f, "default:clay_brick"},
+				{"", "default:clay_brick", ""}
+			}
+		})
+	end
 end
 
 local painting_box = {
