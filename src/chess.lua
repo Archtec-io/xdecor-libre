@@ -3541,35 +3541,41 @@ The functions will be called in a blocking manner, so should
 return quickly!
 
 Params:
-* chosse_move: function(board, gameState)
+* choose_move: function(board, game_state)
   Is called when the bot is asked to pick a move, given a
   chessboard, its pieces and the game state.
   Params:
   * board: Table containing every square on the board
-  * gameState: Table containing more info about the current state of the game
+  * game_state: Table containing more info about the current state of the game
   Must return: Two numbers, the first one is the square to
   move from, the second one is the square to move towards
   To make a castling move, move the king according to
   castling rules, the tower will be moved automatically.
   If nil is returned or the move is illegal, the bot resigns
-* choose_promote = function(board_t, pawnIndex)
+* choose_promote = function(board, game_state, pawn_index)
   Is called when one of the bot's pawns managed to reach the
   other end of the board and gains a promotion.
   Params:
-  * board: Table containing every square on the board
-  * pawnIndex: Board table index of the pawn to promote
+  * board: See `choose_move`
+  * game_state: See `choose_move`
+  * pawn_index: Board table index of the pawn to promote
+
   Must return: What piece to promote the pawn to:
                "queen", "rook", "bishop" or "knight"
   If anything else is returned, the bot resigns
-* name: Human readable
+* name: Human readable chessbot name,
+  untranslated (but you can mark it with a no-op translation
+  symbol like `NS = function return(s) end`)
 * id: Unique identifier of the chessbot
 
-`board_t` table format:
-This is a table with 64 entries, starting at index 1. Each field contains a string.
+`board` table format:
+This is a table with 64 entries, starting at index 1 representing
+the square a8, followed by 2=b8, 3=c8, 4=d8, ... 9=a7, 10=b7, ... 64=h1.
+Each field contains a string.
 The empty string is for the empty square, whereas a field with a non-empty
 string denotes a piece, using the itemname of the piece.
 
-`meta_t` table contains these fields:
+`game_state` table contains these fields:
 * lastMove: Which player made the last move: "black" or "white". empty string if nobody moved yet
 * botColor: Color of the bot to play: "black" or "white"
 * castlingWhiteL: equals the number 1 if White has the right to castle queenside
