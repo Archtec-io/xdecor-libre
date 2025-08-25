@@ -11,7 +11,7 @@ xdecor.chess = {}
 
 local realchess = xdecor.chess -- just an alias
 
--- Load chess bot code
+-- Load chessbot code (framework only)
 local chessbot = dofile(minetest.get_modpath(minetest.get_current_modname()).."/src/chessbot.lua")
 
 screwdriver = screwdriver or {}
@@ -86,15 +86,6 @@ function realchess.get_piece_type(itemname)
 	end
 end
 
--- Bot names
---~ Name of computer player in Chess
-local BOT_NAME = NS("Weak Computer")
--- Bot names in Bot vs Bot mode
---~ Name of computer player in Chess
-local BOT_NAME_1 = NS("Weak Computer 1")
---~ Name of computer player in Chess
-local BOT_NAME_2 = NS("Weak Computer 2")
-
 -- Timeout in seconds to allow resetting the game or digging the chessboard.
 -- If no move was made for this time, everyone can reset the game
 -- and remove the chessboard.
@@ -109,13 +100,9 @@ local function get_display_player_name(meta, playerColor)
 	local botColor = meta:get_string("botColor")
 	local displayName
 	if playerColor == botColor and (botColor == "white" or botColor == "black") then
-		return "*"..S(BOT_NAME).."*"
+		return "*"..S(chessbot.name).."*"
 	elseif botColor == "both" then
-		if playerColor == "white" then
-			return "*"..S(BOT_NAME_1).."*"
-		else
-			return "*"..S(BOT_NAME_2).."*"
-		end
+		return "*"..S(chessbot.name).."*"
 	elseif playerColor == "white" then
 		return meta:get_string("playerWhite")
 	elseif playerColor == "black" then
@@ -2892,7 +2879,7 @@ function realchess.move(pos, meta, from_list, from_index, to_list, to_index, pla
 		-- explicitly selecting a color, interpret this as the player wanting
 		-- to play as white
 		if meta:get_string("mode") == "single" and lastMove == "" and meta:get_string("gameResult") == "" then
-			meta:set_string("playerBlack", "*"..BOT_NAME.."*")
+			meta:set_string("playerBlack", "*"..chessbot.name.."*")
 			meta:set_string("botColor", "black")
 		end
 	elseif meta:get_string("playerBlack") == "" then
@@ -2956,8 +2943,8 @@ function realchess.fields(pos, _, fields, sender)
 			meta:set_string("botColor", "both")
 			-- Add asterisk to bot names so it can't collide with a player name
 			-- (asterisk is forbidden in player names)
-			meta:set_string("playerWhite", "*"..BOT_NAME_1.."*")
-			meta:set_string("playerBlack", "*"..BOT_NAME_2.."*")
+			meta:set_string("playerWhite", "*"..S(chessbot.name).."*")
+			meta:set_string("playerBlack", "*"..S(chessbot.name).."*")
 			local inv = meta:get_inventory()
 			chessbot.move(pos, inv, meta)
 		elseif fields.single then
@@ -2977,11 +2964,11 @@ function realchess.fields(pos, _, fields, sender)
 		if fields.single_white then
 			meta:set_string("botColor", "black")
 			meta:set_string("playerWhite", playerName)
-			meta:set_string("playerBlack", "*"..BOT_NAME.."*")
+			meta:set_string("playerBlack", "*"..chessbot.name.."*")
 			update_formspec(meta)
 		else
 			meta:set_string("botColor", "white")
-			meta:set_string("playerWhite", "*"..BOT_NAME.."*")
+			meta:set_string("playerWhite", "*"..chessbot.name.."*")
 			meta:set_string("playerBlack", playerName)
 			update_formspec(meta)
 			local inv = meta:get_inventory()
@@ -3540,3 +3527,70 @@ minetest.register_craft({
 		{"stairs:slab_wood", "stairs:slab_wood", "stairs:slab_wood"}
 	}
 })
+
+--[[ API FUNCTIONS ]]
+
+--[[ Set a custom chessbot to play as the computer in Chess.
+This will replace any previously set chessbot, as only one chessbot
+is supported at a time.
+A chessbot is just a set of functions that this mod will call
+once it queries the chessbot to make a decision.
+The functions will be called in a blocking manner, so should
+return quickly!
+
+Params:
+* chosse_move: function(board, gameState)
+  Is called when the bot is asked to pick a move, given a
+  chessboard, its pieces and the game state.
+  Params:
+  * board: Table containing every square on the board
+  * gameState: Table containing more info about the current state of the game
+  Must return: Two numbers, the first one is the square to
+  move from, the second one is the square to move towards
+  To make a castling move, move the king according to
+  castling rules, the tower will be moved automatically.
+  If nil is returned or the move is illegal, the bot resigns
+* choose_promote = function(board_t, pawnIndex)
+  Is called when one of the bot's pawns managed to reach the
+  other end of the board and gains a promotion.
+  Params:
+  * board: Table containing every square on the board
+  * pawnIndex: Board table index of the pawn to promote
+  Must return: What piece to promote the pawn to:
+               "queen", "rook", "bishop" or "knight"
+  If anything else is returned, the bot resigns
+* name: Human readable
+* id: Unique identifier of the chessbot
+
+`board_t` table format:
+This is a table with 64 entries, starting at index 1. Each field contains a string.
+The empty string is for the empty square, whereas a field with a non-empty
+string denotes a piece, using the itemname of the piece.
+
+`meta_t` table contains these fields:
+* lastMove: Which player made the last move: "black" or "white". empty string if nobody moved yet
+* botColor: Color of the bot: "black", "white" or "both"
+* castlingWhiteL: equals the number 1 if White has the right to castle queenside
+* castlingWhiteR: equals the number 1 if White has the right to castle kingside
+* castlingBlackL: equals the number 1 if Black has the right to castle queenside
+* castlingBlackR: equals the number 1 if Black has the right to castle kingside
+* prevDoublePawnStepTo: if a pawn did a double-step in the previous move,
+ this is the board index of the destination. if no pawn made a double-step in the
+ previous halfmove, this is 0.
+]]
+function realchess.set_chessbot(def)
+	chessbot.choose_move = def.choose_move
+	chessbot.choose_promote = def.choose_promote
+	chessbot.name = def.name or S("Computer")
+	chessbot.id = def.id
+	if not chessbot.choose_move or not chessbot.choose_promote or not chessbot.id then
+		minetest.log("error", "[xdecor] Chess: set_chessbot called with incomplete parameters!")
+		return
+	end
+	minetest.log("action", "[xdecor] Chess: Chessbot set to: "..chessbot.id)
+end
+
+--[[ END OF API FUNCTIONS ]]
+
+-- Initially set the built-in weak chessbot (can be overwritten later by mods)
+local chessbot_weak = dofile(minetest.get_modpath(minetest.get_current_modname()).."/src/chessbot_weak.lua")
