@@ -784,7 +784,12 @@ local function register_hard_node(name, desc, def)
 		tiles = def.tiles or {"xdecor_" .. name .. ".png"},
 		groups = def.groups or {cracky = 1},
 		is_ground_content = false,
-		sounds = def.sounds or default.node_sound_stone_defaults()
+		sounds = def.sounds or default.node_sound_stone_defaults(),
+		-- Use a default rotation to avoid annoying rotation
+		-- on normal placement.
+		-- The nodes can still be rotated by e.g. the screwdriver
+		-- because xdecor.register uses 'facedir' by default.
+		place_param2 = 0,
 	})
 end
 
