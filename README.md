@@ -59,7 +59,15 @@ X-Decor-libre can be extended in a limited fashion. See `API.md` for details.
 
 This mod can also be translated. See `TRANSLATING.md` for details.
 
-### Information about the original mod
+## Information about the original mod
+
+### Compatibility
+
+X-Decor-libre is highly compatible with X-Decor. Read
+“`historic/upgrade.md`” for details on how to upgrade from X-Decor
+to X-Decor-libre.
+
+### More information
 
 For more information about the original X-Decor mod (from which this one
 is derived) and a comparison between both mods, see the text files
