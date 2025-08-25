@@ -23,9 +23,10 @@ With this mod, nodes from other mods will be available for
 cutting as well.
 
 This has been the original behavior of X-Decor-libre in the past,
-but it has been removed due to hard-to-debug compatibility
-issues like naming collisions. This mod basically
-replicates this old behavior, but a bit more stable.
+but it has been removed in version `libre6` due to
+hard-to-debug compatibility issues like naming collisions.
+This mod basically replicates this old behavior, but a bit
+more stable.
 
 ## Usage
 

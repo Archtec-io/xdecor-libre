@@ -34,6 +34,12 @@ for maintenance and bugfixing.
 Compared to the original X-Decor mod, this is a list of changes
 that X-Decor-libre provides:
 
+Important compatibilty-relevant change:
+
+* Mod no longer registers cut nodes for mods other than `xdecor`
+  and `default` (see `historic/upgrade.md` for details) (since
+  version `libre6`)
+
 Added blocks:
 
 * Potted Green Chrysanthemum
