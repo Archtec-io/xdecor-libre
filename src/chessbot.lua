@@ -27,6 +27,7 @@ local get_game_state = function(meta)
 		castlingWhiteR = meta:get_int("castlingWhiteR"),
 		castlingBlackL = meta:get_int("castlingBlackL"),
 		castlingBlackR = meta:get_int("castlingBlackR"),
+		halfmoveClock = meta:get_int("halfmoveClock"),
 	}
 end
 

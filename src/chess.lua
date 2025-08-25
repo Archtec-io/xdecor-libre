@@ -3576,7 +3576,10 @@ string denotes a piece, using the itemname of the piece.
 * castlingBlackR: equals the number 1 if Black has the right to castle kingside
 * prevDoublePawnStepTo: if a pawn did a double-step in the previous move,
  this is the board index of the destination. if no pawn made a double-step in the
- previous halfmove, this is 0.
+ previous halfmove, this is 0
+* halfmoveClock: A number that counts how many consecutive halfmoves
+  have been made with no pawn advancing and no piece being captured
+  (relevant for 50-move or 75-move rule)
 ]]
 function realchess.set_chessbot(def)
 	chessbot.choose_move = def.choose_move
