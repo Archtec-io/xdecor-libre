@@ -47,6 +47,7 @@ chessbot.perform_move = function(pos, choice_from, choice_to, meta)
 		return
 	end
 
+	local botName
 	if currentBotColor == "white" then
 		botName = meta:get_string("playerWhite")
 	else
