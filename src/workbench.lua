@@ -614,13 +614,14 @@ end
 
 --[[ Returns true if cut node variants can be registered
 for the node AND this node doesn't already have
-cut nodes registered.
-NOTE: This check is only for namespace-availability,
-not if registering cut node variants for this
-node makes sense technically or gameplay-wise. ]]
+cut nodes registered. ]]
 xdecor.can_cut = function(nodename)
 	-- Node already has cut variants: Fail
 	if xdecor.is_cut_registered(nodename) then
+		return false
+	end
+	-- Check group
+	if minetest.get_item_group(nodename, "not_cuttable") == 1 then
 		return false
 	end
 	for w=1, #workbench.defs do
