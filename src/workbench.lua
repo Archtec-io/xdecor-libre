@@ -573,7 +573,9 @@ function xdecor.register_hammer(name, def)
 	})
 end
 
---[[ EXPERIMENTAL FUNCTION:
+--[[ API FUNCTIONS ]]
+
+--[[
 Registers various 'cut' node variants for the node with the given nodename,
 which will be available in the workbench.
 This must only be called once per node. Calling it again is an error.
@@ -590,7 +592,8 @@ The following nodes will be registered:
 * <nodename>_halfstair
 
 You MUST make sure these names are not already taken before
-calling this function. Failing to do so is an error.
+calling this function. Call xdecor.can_cut to do this.
+Failing to do so is an error.
 
 Additionally, a slab, stair, inner stair and outer stair
 will be registered by using the `stairs` mod if the slab
@@ -604,6 +607,35 @@ xdecor.register_cut = function(nodename)
 	return workbench:register_cut(nodename)
 end
 
+-- Returns true if cut nodes have been registered for the given node
+xdecor.is_cut_registered = function(nodename)
+	return registered_cuttable_nodes[nodename] == true
+end
+
+--[[ Returns true if cut node variants can be registered
+for the node AND this node doesn't already have
+cut nodes registered.
+NOTE: This check is only for namespace-availability,
+not if registering cut node variants for this
+node makes sense technically or gameplay-wise. ]]
+xdecor.can_cut = function(nodename)
+	-- Node already has cut variants: Fail
+	if xdecor.is_cut_registered(nodename) then
+		return false
+	end
+	for w=1, #workbench.defs do
+		local wdef = workbench.defs[w]
+		local cut = wdef[1]
+		if cut ~= "stair" and cut ~= "slab" and cut ~= "stair_inner" and cut ~= "stair_outer" then
+			if minetest.registered_nodes[nodename .. "_" ..cut] then
+				-- There already exists a node with one of the required names: Fail
+				return false
+			end
+		end
+	end
+	-- All tests passed: Success!
+	return true
+end
 
 --[[ END OF API FUNCTIONS ]]
 
