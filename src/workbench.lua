@@ -353,7 +353,6 @@ local function register_cut_raw(node, workbench_def)
 	if item_name and workbench_def[3] then
 		local groups = {}
 		local tiles
-		groups.not_in_creative_inventory = 1
 
 		for k, v in pairs(def.groups) do
 			if k ~= "wood" and k ~= "stone" and k ~= "level" then
@@ -441,6 +440,9 @@ local function register_cut_raw(node, workbench_def)
 		cutgroups["xdecor_cut"] = 1
 		-- Specifies the cut type (nanoslab, panel, etc.)
 		cutgroups["xdecor_cut_"..workbench_def[1]] = 1
+
+		-- Also hide cut nodes from creative inv
+		cutgroups.not_in_creative_inventory = 1
 
 		minetest.register_node(":" .. cutnodename, {
 			description = S(workbench_def[4], def.description),
