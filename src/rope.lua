@@ -70,30 +70,50 @@ end
 function rope.remove(pos, oldnode, digger, rope_name)
 	local num = 0
 	local below = {x = pos.x, y = pos.y, z = pos.z}
-	local digger_inv = digger:get_inventory()
 
+	-- Remove all ropes below our rope
+	local positions = {}
 	while minetest.get_node(below).name == rope_name do
-		minetest.remove_node(below)
+		local pname = ""
+		local protection_bypass = false
+		if digger and digger:is_player() then
+			protection_bypass = minetest.check_player_privs(digger, "protection_bypass")
+			pname = digger:get_player_name()
+		end
+		-- Stop removing ropes when reaching protected land
+		if minetest.is_protected(below, pname) and not protection_bypass then
+			break
+		end
+		table.insert(positions, table.copy(below))
 		below.y = below.y - 1
 		num = num + 1
 	end
+	if num == 0 then
+		return
+	end
+	minetest.bulk_set_node(positions, {name="air", param2=0})
 
-	if num == 0 then return end
-
-	-- Play dig sound manually
-	minetest.sound_play(ropesounds.dug, {pos=pos}, true)
-
-	-- Give/drop rope items
-	local creative = minetest.is_creative_enabled(digger:get_player_name())
-	if not creative or not digger_inv:contains_item("main", rope_name) then
-		if creative then
-			num = 1
+	if digger and digger:is_player() then
+		local digger_inv = digger:get_inventory()
+		-- Give/drop rope items
+		local creative = minetest.is_creative_enabled(digger:get_player_name())
+		if not creative or not digger_inv:contains_item("main", rope_name) then
+			if creative then
+				num = 1
+			end
+			local item = rope_name.." "..num
+			local leftover = digger_inv:add_item("main", rope_name.." "..num)
+			if not leftover:is_empty() then
+				minetest.add_item(pos, leftover)
+			end
 		end
-		local item = rope_name.." "..num
-		local leftover = digger_inv:add_item("main", rope_name.." "..num)
-		if not leftover:is_empty() then
-			minetest.add_item(pos, leftover)
-		end
+
+		minetest.log("action", "[xdecor] Rope of length "..(num+1).." dug by "..digger:get_player_name().." starting at "..minetest.pos_to_string(pos))
+	else
+		-- No digger: Drop rope as item
+		minetest.add_item(pos, "xdecor:rope")
+
+		minetest.log("action", "[xdecor] Rope of length "..(num+1).." removed starting at "..minetest.pos_to_string(pos))
 	end
 
 	return true
