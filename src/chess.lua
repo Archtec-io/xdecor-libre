@@ -3569,7 +3569,7 @@ string denotes a piece, using the itemname of the piece.
 
 `meta_t` table contains these fields:
 * lastMove: Which player made the last move: "black" or "white". empty string if nobody moved yet
-* botColor: Color of the bot: "black", "white" or "both"
+* botColor: Color of the bot to play: "black" or "white"
 * castlingWhiteL: equals the number 1 if White has the right to castle queenside
 * castlingWhiteR: equals the number 1 if White has the right to castle kingside
 * castlingBlackL: equals the number 1 if Black has the right to castle queenside

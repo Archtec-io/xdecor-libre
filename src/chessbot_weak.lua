@@ -79,7 +79,7 @@ local function best_move(moves, board)
 end
 
 local function choose_move(board, game_state)
-	local currentBotColor = game_state["playerColor"]
+	local currentBotColor = game_state["botColor"]
 	local prevDoublePawnStepTo = game_state["prevDoublePawnStepTo"]
 	local castlingRights = {
 		castlingWhiteR = game_state["castlingWhiteR"],

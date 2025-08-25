@@ -21,7 +21,7 @@ local get_game_state = function(meta)
 		color = "black"
 	end
 	return {
-		playerColor = color,
+		botColor = color,
 		prevDoublePawnStepTo = meta:get_int("prevDoublePawnStepTo"),
 		castlingWhiteL = meta:get_int("castlingWhiteL"),
 		castlingWhiteR = meta:get_int("castlingWhiteR"),
@@ -40,7 +40,7 @@ local BOT_DELAY_PROMOTE = 1.0
 
 chessbot.perform_move = function(pos, choice_from, choice_to, meta)
 	local game_state = get_game_state(meta)
-	local currentBotColor = game_state.playerColor
+	local currentBotColor = game_state.botColor
 
 	-- Bot resigns if no move chosen
 	if not choice_from or not choice_to then
