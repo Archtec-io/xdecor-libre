@@ -3528,7 +3528,9 @@ minetest.register_craft({
 	}
 })
 
---[[ API FUNCTIONS ]]
+--[[ EXPERIMENTAL API FUNCTION
+Use at your own risk!
+]]
 
 --[[ Set a custom chessbot to play as the computer in Chess.
 This will replace any previously set chessbot, as only one chessbot
