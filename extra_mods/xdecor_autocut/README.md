@@ -1,5 +1,12 @@
 # X-Decor-libre Autocut [`xdecor_autocut`]
 
+## Version
+
+This is version `1.0.0` of `xdecor_autocut`, compatible
+with version `libre14` or later of X-Decor-libre.
+
+## Description
+
 This is a companion mod for X-Decor-libre [`xdecor`].
 
 It automatically adds many more “cut” variants for most

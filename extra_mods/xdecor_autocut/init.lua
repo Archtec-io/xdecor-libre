@@ -10,13 +10,13 @@ minetest.register_on_mods_loaded(function()
 				else
 					-- Not all of the available node names are available
 					-- for X-Decor-libre to add: Skip this node
-					minetest.log("warning", "[xdecor_autocut] Skipped adding cut nodes for "..nodename.." because at least one of the required nodenames is already taken")
+					minetest.log("action", "[xdecor_autocut] Skipped adding cut nodes for "..nodename.." because at least one of the required nodenames is already taken")
 				end
 			end
 		end
 	end
 	for n=1, #nodes do
 		xdecor.register_cut(nodes[n])
-		minetest.log("warning", "[xdecor_autocut] Registered cut nodes for: "..nodes[n])
+		minetest.log("action", "[xdecor_autocut] Registered cut nodes for: "..nodes[n])
 	end
 end)
