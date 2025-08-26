@@ -372,13 +372,13 @@ local function can_castle(board, from_idx, to_idx, castlingRights)
 	end
 	local possible_castles = {
 		-- white queenside
-		{ y = 7, to_x = 2, rook_idx = 57, rook_goal = 60, acheck_dir = -1, color = "white", rightName = "castlingWhiteL", rook_id = 1 },
+		{ y = 7, to_x = 2, rook_idx = 57, rook_goal = 60, acheck_dir = -1, color = "white", rightName = "castlingWhiteL" },
 		-- white kingside
-		{ y = 7, to_x = 6, rook_idx = 64, rook_goal = 62, acheck_dir = 1, color = "white", rightName = "castlingWhiteR", rook_id = 2 },
+		{ y = 7, to_x = 6, rook_idx = 64, rook_goal = 62, acheck_dir = 1, color = "white", rightName = "castlingWhiteR" },
 		-- black queenside
-		{ y = 0, to_x = 2, rook_idx = 1, rook_goal = 4, acheck_dir = -1, color = "black", rightName = "castlingBlackL", rook_id = 1 },
+		{ y = 0, to_x = 2, rook_idx = 1, rook_goal = 4, acheck_dir = -1, color = "black", rightName = "castlingBlackL" },
 		-- black kingside
-		{ y = 0, to_x = 6, rook_idx = 8, rook_goal = 6, acheck_dir = 1, color = "black", rightName = "castlingBlackR", rook_id = 2 },
+		{ y = 0, to_x = 6, rook_idx = 8, rook_goal = 6, acheck_dir = 1, color = "black", rightName = "castlingBlackR" },
 	}
 
 	for p=1, #possible_castles do
@@ -386,7 +386,7 @@ local function can_castle(board, from_idx, to_idx, castlingRights)
 		if pc.color == kingColor and pc.to_x == to_x and to_y == pc.y and from_y == pc.y then
 			local castlingRightVal = castlingRights[pc.rightName]
 			local rookPiece = board[pc.rook_idx]
-			if castlingRightVal == 1 and rookPiece == "realchess:rook_"..kingColor.."_"..pc.rook_id then
+			if castlingRightVal == 1 and realchess.get_piece_type(rookPiece) == "rook" and realchess.get_piece_color(rookPiece) == kingColor then
 				-- Check if all squares between king and rook are empty
 				local empty_start, empty_end
 				if pc.acheck_dir == -1 then
@@ -410,7 +410,7 @@ local function can_castle(board, from_idx, to_idx, castlingRights)
 						return false
 					end
 				end
-				return true, pc.rook_idx, pc.rook_goal, "realchess:rook_"..kingColor.."_"..pc.rook_id
+				return true, pc.rook_idx, pc.rook_goal, rookPiece
 			end
 		end
 	end
