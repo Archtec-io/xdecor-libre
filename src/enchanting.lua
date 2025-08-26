@@ -329,6 +329,7 @@ function enchanting:register_tool(original_tool_name, def)
 		groups = {}
 	end
 	groups.not_in_creative_inventory = 1
+	groups.enchanted_tool = 1
 	for _, enchant in ipairs(def.enchants) do
 		local groupcaps = table.copy(original_groupcaps)
 		local full_punch_interval = original_toolcaps.full_punch_interval
@@ -348,13 +349,16 @@ function enchanting:register_tool(original_tool_name, def)
 		if enchant == "durable" then
 			groupcaps[dig_group].uses = ceil(original_groupcaps[dig_group].uses *
 						     bonus_defs.uses)
+			groups.enchantment_durable = 1
 		elseif enchant == "fast" then
 			for i, time in pairs(original_groupcaps[dig_group].times) do
 				groupcaps[dig_group].times[i] = time - bonus_defs.times
 			end
+			groups.enchantment_fast = 1
 		elseif enchant == "sharp" then
 			fleshy = original_damage_groups.fleshy
 			fleshy = fleshy + bonus_defs.damages
+			groups.enchantment_sharp = 1
 		else
 			minetest.log("error", "[xdecor] Called enchanting:register_tool with unsupported enchant: "..tostring(enchant))
 			return

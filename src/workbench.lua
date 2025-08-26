@@ -353,7 +353,6 @@ local function register_cut_raw(node, workbench_def)
 	if item_name and workbench_def[3] then
 		local groups = {}
 		local tiles
-		groups.not_in_creative_inventory = 1
 
 		for k, v in pairs(def.groups) do
 			if k ~= "wood" and k ~= "stone" and k ~= "level" then
@@ -434,6 +433,17 @@ local function register_cut_raw(node, workbench_def)
 			minetest.log("error", "[xdecor] register_cut_raw: Refusing to register node "..cutnodename.." becaut it was already registered!")
 			return false
 		end
+
+		-- Add groups to identify node as a cut node
+		local cutgroups = table.copy(groups)
+		-- Marks it as a cut node
+		cutgroups["xdecor_cut"] = 1
+		-- Specifies the cut type (nanoslab, panel, etc.)
+		cutgroups["xdecor_cut_"..workbench_def[1]] = 1
+
+		-- Also hide cut nodes from creative inv
+		cutgroups.not_in_creative_inventory = 1
+
 		minetest.register_node(":" .. cutnodename, {
 			description = S(workbench_def[4], def.description),
 			paramtype = "light",
@@ -442,7 +452,7 @@ local function register_cut_raw(node, workbench_def)
 			sounds = def.sounds,
 			tiles = tiles_special_cut,
 			use_texture_alpha = def.use_texture_alpha,
-			groups = groups,
+			groups = cutgroups,
 			is_ground_content = def.is_ground_content,
 			node_box = xdecor.pixelbox(16, workbench_def[3]),
 			sunlight_propagates = true,
@@ -563,7 +573,9 @@ function xdecor.register_hammer(name, def)
 	})
 end
 
---[[ EXPERIMENTAL FUNCTION:
+--[[ API FUNCTIONS ]]
+
+--[[
 Registers various 'cut' node variants for the node with the given nodename,
 which will be available in the workbench.
 This must only be called once per node. Calling it again is an error.
@@ -580,7 +592,8 @@ The following nodes will be registered:
 * <nodename>_halfstair
 
 You MUST make sure these names are not already taken before
-calling this function. Failing to do so is an error.
+calling this function. Call xdecor.can_cut to do this.
+Failing to do so is an error.
 
 Additionally, a slab, stair, inner stair and outer stair
 will be registered by using the `stairs` mod if the slab
@@ -594,6 +607,36 @@ xdecor.register_cut = function(nodename)
 	return workbench:register_cut(nodename)
 end
 
+-- Returns true if cut nodes have been registered for the given node
+xdecor.is_cut_registered = function(nodename)
+	return registered_cuttable_nodes[nodename] == true
+end
+
+--[[ Returns true if cut node variants can be registered
+for the node AND this node doesn't already have
+cut nodes registered. ]]
+xdecor.can_cut = function(nodename)
+	-- Node already has cut variants: Fail
+	if xdecor.is_cut_registered(nodename) then
+		return false
+	end
+	-- Check group
+	if minetest.get_item_group(nodename, "not_cuttable") == 1 then
+		return false
+	end
+	for w=1, #workbench.defs do
+		local wdef = workbench.defs[w]
+		local cut = wdef[1]
+		if cut ~= "stair" and cut ~= "slab" and cut ~= "stair_inner" and cut ~= "stair_outer" then
+			if minetest.registered_nodes[nodename .. "_" ..cut] then
+				-- There already exists a node with one of the required names: Fail
+				return false
+			end
+		end
+	end
+	-- All tests passed: Success!
+	return true
+end
 
 --[[ END OF API FUNCTIONS ]]
 

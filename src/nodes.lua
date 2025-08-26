@@ -638,20 +638,25 @@ for l, desc in pairs(xdecor_lightbox) do
 	})
 end
 
+-- Potted flowers
 local xdecor_potted = {
+	-- Based on the original Minetest Game flowers
 	dandelion_white = S("Potted White Dandelion"),
 	dandelion_yellow = S("Potted Yellow Dandelion"),
-	geranium = S("Potted Geranium"),
-	rose = S("Potted Rose"),
-	tulip = S("Potted Tulip"),
+	geranium = S("Potted Blue Geranium"),
+	rose = S("Potted Red Rose"),
+	tulip = S("Potted Orange Tulip"),
 	viola = S("Potted Viola"),
+	-- Based on the flowers added in Minetest Game 5.0.0
+	tulip_black = S("Potted Black Tulip"),
+	chrysanthemum_green = S("Potted Green Chrysanthemum"),
 }
 
 for f, desc in pairs(xdecor_potted) do
 	xdecor.register("potted_" .. f, {
 		description = desc,
 		walkable = false,
-		groups = {snappy = 3, flammable = 3, plant = 1, flower = 1},
+		groups = {snappy = 3, flammable = 3, plant = 1, flower = 1, potted_flower = 1},
 		is_ground_content = false,
 		tiles = {"xdecor_" .. f .. "_pot.png"},
 		inventory_image = "xdecor_" .. f .. "_pot.png",
@@ -663,13 +668,16 @@ for f, desc in pairs(xdecor_potted) do
 		selection_box = xdecor.nodebox.slab_y(0.3)
 	})
 
-	minetest.register_craft({
-		output = "xdecor:potted_" .. f,
-		recipe = {
-			{"default:clay_brick", "flowers:" .. f, "default:clay_brick"},
-			{"", "default:clay_brick", ""}
-		}
-	})
+	-- Register recipe only if the matching flower exists
+	if minetest.registered_items["flowers:" .. f] then
+		minetest.register_craft({
+			output = "xdecor:potted_" .. f,
+			recipe = {
+				{"default:clay_brick", "flowers:" .. f, "default:clay_brick"},
+				{"", "default:clay_brick", ""}
+			}
+		})
+	end
 end
 
 local painting_box = {
@@ -776,7 +784,12 @@ local function register_hard_node(name, desc, def)
 		tiles = def.tiles or {"xdecor_" .. name .. ".png"},
 		groups = def.groups or {cracky = 1},
 		is_ground_content = false,
-		sounds = def.sounds or default.node_sound_stone_defaults()
+		sounds = def.sounds or default.node_sound_stone_defaults(),
+		-- Use a default rotation to avoid annoying rotation
+		-- on normal placement.
+		-- The nodes can still be rotated by e.g. the screwdriver
+		-- because xdecor.register uses 'facedir' by default.
+		place_param2 = 0,
 	})
 end
 
