@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Luanti textdomain xdecor\n"
 "Report-Msgid-Bugs-To: Wuzzy@disroot.org\n"
 "POT-Creation-Date: 2025-08-26 16:34+0200\n"
-"PO-Revision-Date: 2025-08-18 06:33+0200\n"
+"PO-Revision-Date: 2025-08-26 22:53+0200\n"
 "Last-Translator: Wuzzy <Wuzzy@disroot.org>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -14,9 +14,8 @@ msgstr ""
 "X-Generator: Poedit 3.6\n"
 
 #: src/chessbot_random.lua:51
-#, fuzzy
 msgid "Random Computer"
-msgstr "Schwacher Computer"
+msgstr "Zufallscomputer"
 
 #: src/chessbot_weak.lua:119
 msgid "Weak Computer"
@@ -436,9 +435,8 @@ msgid "Black King"
 msgstr "Schwarzer König"
 
 #: src/chess.lua:3667
-#, fuzzy
 msgid "Computer"
-msgstr "Schwacher Computer"
+msgstr "Computer"
 
 #. ~ cauldron hint
 #: src/cooking.lua:8
@@ -839,33 +837,28 @@ msgid "Potted Yellow Dandelion"
 msgstr "Gelber Löwenzahn im Topf"
 
 #: src/nodes.lua:646
-#, fuzzy
 msgid "Potted Blue Geranium"
-msgstr "Geranie im Topf"
+msgstr "Blaue Geranie im Topf"
 
 #: src/nodes.lua:647
-#, fuzzy
 msgid "Potted Red Rose"
-msgstr "Rose im Topf"
+msgstr "Rote Rose im Topf"
 
 #: src/nodes.lua:648
-#, fuzzy
 msgid "Potted Orange Tulip"
-msgstr "Tulpe im Topf"
+msgstr "Orange Tulpe im Topf"
 
 #: src/nodes.lua:649
 msgid "Potted Viola"
 msgstr "Veilchen im Topf"
 
 #: src/nodes.lua:651
-#, fuzzy
 msgid "Potted Black Tulip"
-msgstr "Tulpe im Topf"
+msgstr "Schwarze Tulpe im Topf"
 
 #: src/nodes.lua:652
-#, fuzzy
 msgid "Potted Green Chrysanthemum"
-msgstr "Geranie im Topf"
+msgstr "Grüne Chrysantheme im Topf"
 
 #: src/nodes.lua:691
 msgid "Painting"
