@@ -269,10 +269,22 @@ end
 function workbench.allow_move(pos, from_list, from_index, to_list, to_index, count, player)
 	if (to_list == "storage" and from_list ~= "forms") then
 		return count
-	elseif (to_list == "hammer" and from_list == "tool") or (to_list == "tool" and from_list == "hammer") then
+	elseif (to_list == "hammer" and (from_list == "tool" or from_list == "storage")) then
 		local inv = minetest.get_inventory({type="node", pos=pos})
 		local stack = inv:get_stack(from_list, from_index)
 		if minetest.get_item_group(stack:get_name(), "repair_hammer") == 1 then
+			return count
+		end
+	elseif (to_list == "tool") then
+		local inv = minetest.get_inventory({type="node", pos=pos})
+		local stack = inv:get_stack(from_list, from_index)
+		if workbench:repairable(stack:get_name()) then
+			return count
+		end
+	elseif (to_list == "input") then
+		local inv = minetest.get_inventory({type="node", pos=pos})
+		local stack = inv:get_stack(from_list, from_index)
+		if workbench:cuttable(stack:get_name()) then
 			return count
 		end
 	end
