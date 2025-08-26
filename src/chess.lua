@@ -46,6 +46,43 @@ local PIECE_QUEEN = 5
 local PIECE_KING = 6
 local PIECE_TYPES = 6 -- number of piece types above
 
+function realchess.get_piece_letter_color(letter)
+	if letter == "." then
+		return nil
+	else
+		local byte = string.byte(letter)
+		if not byte then
+			return nil
+		-- uppercase letter A-Z
+		elseif byte >= 0x41 and byte <= 0x5A then
+			return "white"
+		-- lowercase letter a-z
+		elseif byte >= 0x61 and byte <= 0x7A then
+			return "black"
+		else
+			return nil
+		end
+	end
+end
+function realchess.get_piece_letter_type(letter)
+	local ll = string.lower(letter)
+	if ll == "p" then
+		return "pawn"
+	elseif ll == "r" then
+		return "rook"
+	elseif ll == "n" then
+		return "knight"
+	elseif ll == "b" then
+		return "bishop"
+	elseif ll == "q" then
+		return "queen"
+	elseif ll == "k" then
+		return "king"
+	else
+		return nil
+	end
+end
+
 -- Takes an itemname and if it's a chess piece of this mod,
 -- returns its color. "black" or "white".
 -- Returns nil if not a chess piece.
@@ -201,6 +238,9 @@ local function send_message_2(playerName1, playerName2, message, botColor, isDeb
 end
 
 local notation_letters = {'a','b','c','d','e','f','g','h'}
+
+-- Converts a numeric board index (1..64) to square coordinates
+-- into algebraic notation (a1, a2, a3, etc.) in string form.
 function realchess.index_to_notation(idx)
 	local x, y = index_to_xy(idx)
 	if not x or not y then
@@ -211,13 +251,73 @@ function realchess.index_to_notation(idx)
 	return xstr .. ystr
 end
 
-function realchess.board_to_table(inv)
+-- abbreviations for each piece for the string
+-- representation of the board (like in FEN).
+-- To be populated by register_piece
+local letters_to_pieces = {}
+local pieces_to_letters = {}
+
+-- Converts a piece (itemname) to a single letter (black pawn = "p", white king = "K", etc.)
+local function piece_to_letter(piece)
+	if piece == "" then
+		-- The dot represents an empty space
+		return "."
+	else
+		return pieces_to_letters[piece]
+	end
+end
+-- Converts a piece letter back to an itemname
+local function letter_to_piece(letter)
+	-- The dot represents an empty space (and thus, an empty item)
+	if letter == "." then
+		return ""
+	else
+		return letters_to_pieces[letter]
+	end
+end
+
+--[[
+Takes a chessboard inventory with the inventory list 'board'
+which may contain Chess pieces and converts it into a table
+with indexes 1 to 64, each containing a 1-character string
+which tells you which piece it contains.
+List of possible letters:
+	.	empty space
+	p	black pawn
+	b	black bishop
+	q	black queen
+	k	black king
+	r	black rook
+	n	black knight
+	P	white pawn
+	B	white bishop
+	Q	white queen
+	K	white king
+	R	white rook
+	N	white knight
+]]
+function realchess.board_inv_to_table(inv)
 	local t = {}
 	for i = 1, 64 do
-		t[#t + 1] = inv:get_stack("board", i):get_name()
+		local piece = inv:get_stack("board", i):get_name()
+		local letter = piece_to_letter(piece)
+		t[i] = letter
 	end
-
 	return t
+end
+-- Takes a board table (see realchess.board_inv_to_table) 'tabl'
+-- and uses it to populate a chessboard inventory 'inv' with it.
+-- This will replace ALL items of the 'board' list of
+-- the given inventory.
+-- The board table MUST be valid; invalid input may lead to crashes.
+function realchess.board_table_to_inv(tabl, inv)
+	local inv_list = {}
+	for i = 1, 64 do
+		local letter = tabl[i]
+		local piece = letter_to_piece(letter)
+		inv_list[i] = piece
+	end
+	inv:set_list("board", inv_list)
 end
 
 local rowDirs = {-1, -1, -1, 0, 0, 1, 1, 1}
@@ -231,7 +331,7 @@ local rookThreats   = {false, true,  false, true,  true,  false, true,  false}
 local queenThreats  = {true,  true,  true,  true,  true,  true,  true,  true}
 local kingThreats   = {true,  true,  true,  true,  true,  true,  true,  true}
 
-function realchess.attacked(color, idx, board)
+function realchess.attacked(color, idx, board_t)
 	local threatDetected = false
 	local kill           = color == "white"
 	local pawnThreats    = {kill, false, kill, false, false, not kill, false, not kill}
@@ -247,9 +347,9 @@ function realchess.attacked(color, idx, board)
 
 				if row >= 1 and row <= 8 and col >= 1 and col <= 8 then
 					local square            = get_square(row, col)
-					local square_name       = board[square]
-					local piece             = realchess.get_piece_type(square_name)
-					local pieceColor        = realchess.get_piece_color(square_name)
+					local square_name       = board_t[square]
+					local piece             = realchess.get_piece_letter_type(square_name)
+					local pieceColor        = realchess.get_piece_letter_color(square_name)
 
 					if piece then
 						if pieceColor ~= color then
@@ -282,9 +382,9 @@ function realchess.attacked(color, idx, board)
 
 			if rowK >= 1 and rowK <= 8 and colK >= 1 and colK <= 8 then
 				local square            = get_square(rowK, colK)
-				local square_name       = board[square]
-				local piece             = realchess.get_piece_type(square_name)
-				local pieceColor        = realchess.get_piece_color(square_name)
+				local square_name       = board_t[square]
+				local piece             = realchess.get_piece_letter_type(square_name)
+				local pieceColor        = realchess.get_piece_letter_color(square_name)
 
 				if piece and pieceColor ~= color and piece == "knight" then
 					threatDetected = true
@@ -360,10 +460,10 @@ local function en_passant_to_string(double_step)
 	return s_en_passant
 end
 
-local function can_castle(board, from_idx, to_idx, castlingRights)
+local function can_castle(board_t, from_idx, to_idx, castlingRights)
 	local from_x, from_y = index_to_xy(from_idx)
 	local to_x, to_y = index_to_xy(to_idx)
-	local kingPiece = board[from_idx]
+	local kingPiece = letter_to_piece(board_t[from_idx])
 	local kingColor
 	if realchess.get_piece_color(kingPiece) == "black" then
 		kingColor = "black"
@@ -385,7 +485,8 @@ local function can_castle(board, from_idx, to_idx, castlingRights)
 		local pc = possible_castles[p]
 		if pc.color == kingColor and pc.to_x == to_x and to_y == pc.y and from_y == pc.y then
 			local castlingRightVal = castlingRights[pc.rightName]
-			local rookPiece = board[pc.rook_idx]
+			local rookPieceLetter = board_t[pc.rook_idx]
+			local rookPiece = letter_to_piece(rookPieceLetter)
 			if castlingRightVal == 1 and realchess.get_piece_type(rookPiece) == "rook" and realchess.get_piece_color(rookPiece) == kingColor then
 				-- Check if all squares between king and rook are empty
 				local empty_start, empty_end
@@ -399,14 +500,14 @@ local function can_castle(board, from_idx, to_idx, castlingRights)
 					empty_end = pc.rook_idx - 1
 				end
 				for i = empty_start, empty_end do
-					if board[i] ~= "" then
+					if board_t[i] ~= "." then
 						return false
 					end
 				end
 				-- Check if square of king as well the squares that king must cross and reach
 				-- are NOT attacked
 				for i = from_idx, from_idx + 2 * pc.acheck_dir, pc.acheck_dir do
-					if realchess.attacked(kingColor, i, board) then
+					if realchess.attacked(kingColor, i, board_t) then
 						return false
 					end
 				end
@@ -421,15 +522,15 @@ end
 -- Checks if a square to check if there is a piece that can be captured en passant. Returns true if this
 -- is the case, false otherwise.
 -- Parameters:
--- * board: chessboard table
+-- * board_t: chessboard table
 -- * victim_color: color of the opponent to capture a piece from. "white" or "black". (so in White's turn, pass "black" here)
 -- * victim_index: board index of the square where you expect the victim to be
 -- * prevDoublePawnStepTo: if a pawn did a double-step in the previous halfmove, this is the board index of the destination.
 --   if no pawn made a double-step in the previous halfmove, this is nil or 0.
-local function can_capture_en_passant(board, victim_color, victim_index, prevDoublePawnStepTo)
-	local victimPiece = board[victim_index]
+local function can_capture_en_passant(board_t, victim_color, victim_index, prevDoublePawnStepTo)
+	local victimPiece = board_t[victim_index]
 	local double_step_index = prevDoublePawnStepTo or 0
-	if double_step_index ~= 0 and double_step_index == victim_index and realchess.get_piece_color(victimPiece) == victim_color and realchess.get_piece_type(victimPiece) == "pawn" then
+	if double_step_index ~= 0 and double_step_index == victim_index and realchess.get_piece_letter_color(victimPiece) == victim_color and realchess.get_piece_letter_type(victimPiece) == "pawn" then
 		return true
 	end
 	return false
@@ -439,15 +540,16 @@ end
 -- square, according to the piece it occupies. Ignores restrictions like check, etc.
 -- If the square is empty, no moves are returned.
 -- Parameters:
--- * board: chessboard table
+-- * board_t: chessboard table
 -- * from_idx:
 -- returns: table with the keys used as destination indices
 --    Any key with the numeric value 0 is a possible destination.
 --    All other keys have the nil value.
 -- Example: { [4] = 0, [9] = 0 } -- can move to squares 4 and 9
-local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo, castlingRights)
-	local piece = realchess.get_piece_type(board[from_idx])
-	local color = realchess.get_piece_color(board[from_idx])
+local function get_theoretical_moves_from(board_t, from_idx, prevDoublePawnStepTo, castlingRights)
+	local piece_item = letter_to_piece(board_t[from_idx])
+	local piece = realchess.get_piece_type(piece_item)
+	local color = realchess.get_piece_color(piece_item)
 	if not piece then
 		return {}
 	end
@@ -455,20 +557,21 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 	local from_x, from_y = index_to_xy(from_idx)
 
 	for i = 1, 64 do
-		local stack_name = board[i]
+		local letter = board_t[i]
+		local stack_name = letter_to_piece(letter)
 		if stack_name == "" or (color == "black" and realchess.get_piece_color(stack_name) == "white") or (color == "white" and realchess.get_piece_color(stack_name) == "black") then
 			moves[i] = 0
 		end
 	end
 
 	for to_idx in pairs(moves) do
-		local pieceTo    = board[to_idx]
+		local pieceTo    = letter_to_piece(board_t[to_idx])
 		local to_x, to_y = index_to_xy(to_idx)
 
 		-- PAWN
 		if piece == "pawn" then
 			if color == "white" then
-				local pawnWhiteMove = board[xy_to_index(from_x, from_y - 1)]
+				local pawnWhiteMove = letter_to_piece(board_t[xy_to_index(from_x, from_y - 1)])
 				local en_passant = false
 				-- white pawns can go up only
 				if from_y - 1 == to_y then
@@ -482,7 +585,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 							can_capture = true
 						else
 							-- en passant
-							if can_capture_en_passant(board, "black", xy_to_index(to_x, from_y), prevDoublePawnStepTo) then
+							if can_capture_en_passant(board_t, "black", xy_to_index(to_x, from_y), prevDoublePawnStepTo) then
 								can_capture = true
 								en_passant = true
 							end
@@ -523,7 +626,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 				end
 
 			elseif color == "black" then
-				local pawnBlackMove = board[xy_to_index(from_x, from_y + 1)]
+				local pawnBlackMove = letter_to_piece(board_t[xy_to_index(from_x, from_y + 1)])
 				local en_passant = false
 				-- black pawns can go down only
 				if from_y + 1 == to_y then
@@ -537,7 +640,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 							can_capture = true
 						else
 							-- en passant
-							if can_capture_en_passant(board, "white", xy_to_index(to_x, from_y), prevDoublePawnStepTo) then
+							if can_capture_en_passant(board_t, "white", xy_to_index(to_x, from_y), prevDoublePawnStepTo) then
 								can_capture = true
 								en_passant = true
 							end
@@ -588,7 +691,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Moving down
 					-- Ensure that no piece disturbs the way
 					for i = from_y + 1, to_y - 1 do
-						if board[xy_to_index(from_x, i)] ~= "" then
+						if board_t[xy_to_index(from_x, i)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -596,7 +699,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Moving up
 					-- Ensure that no piece disturbs the way
 					for i = to_y + 1, from_y - 1 do
-						if board[xy_to_index(from_x, i)] ~= "" then
+						if board_t[xy_to_index(from_x, i)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -607,7 +710,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- moving right
 					-- ensure that no piece disturbs the way
 					for i = from_x + 1, to_x - 1 do
-						if board[xy_to_index(i, from_y)] ~= "" then
+						if board_t[xy_to_index(i, from_y)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -615,7 +718,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Moving left
 					-- Ensure that no piece disturbs the way
 					for i = to_x + 1, from_x - 1 do
-						if board[xy_to_index(i, from_y)] ~= "" then
+						if board_t[xy_to_index(i, from_y)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -677,7 +780,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Moving right-down
 					-- Ensure that no piece disturbs the way
 					for i = 1, dx - 1 do
-						if board[xy_to_index(from_x + i, from_y + i)] ~= "" then
+						if board_t[xy_to_index(from_x + i, from_y + i)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -685,7 +788,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Moving right-up
 					-- Ensure that no piece disturbs the way
 					for i = 1, dx - 1 do
-						if board[xy_to_index(from_x + i, from_y - i)] ~= "" then
+						if board_t[xy_to_index(from_x + i, from_y - i)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -695,7 +798,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Moving left-down
 					-- Ensure that no piece disturbs the way
 					for i = 1, dx - 1 do
-						if board[xy_to_index(from_x - i, from_y + i)] ~= "" then
+						if board_t[xy_to_index(from_x - i, from_y + i)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -703,7 +806,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Moving left-up
 					-- ensure that no piece disturbs the way
 					for i = 1, dx - 1 do
-						if board[xy_to_index(from_x - i, from_y - i)] ~= "" then
+						if board_t[xy_to_index(from_x - i, from_y - i)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -735,7 +838,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Moving down
 					-- Ensure that no piece disturbs the way
 					for i = from_y + 1, to_y - 1 do
-						if board[xy_to_index(from_x, i)] ~= "" then
+						if board_t[xy_to_index(from_x, i)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -743,7 +846,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Moving up
 					-- Ensure that no piece disturbs the way
 					for i = to_y + 1, from_y - 1 do
-						if board[xy_to_index(from_x, i)] ~= "" then
+						if board_t[xy_to_index(from_x, i)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -753,7 +856,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Goes right
 					-- Ensure that no piece disturbs the way
 					for i = 1, dx - 1 do
-						if board[xy_to_index(from_x + i, from_y)] ~= "" then
+						if board_t[xy_to_index(from_x + i, from_y)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -761,7 +864,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Goes right-down
 					-- Ensure that no piece disturbs the way
 					for i = 1, dx - 1 do
-						if board[xy_to_index(from_x + i, from_y + i)] ~= "" then
+						if board_t[xy_to_index(from_x + i, from_y + i)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -769,7 +872,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Goes right-up
 					-- Ensure that no piece disturbs the way
 					for i = 1, dx - 1 do
-						if board[xy_to_index(from_x + i, from_y - i)] ~= "" then
+						if board_t[xy_to_index(from_x + i, from_y - i)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -781,7 +884,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 						-- moving right
 						-- ensure that no piece disturbs the way
 						for i = from_x + 1, to_x - 1 do
-							if board[xy_to_index(i, from_y)] ~= "" then
+							if board_t[xy_to_index(i, from_y)] ~= "." then
 								moves[to_idx] = nil
 							end
 						end
@@ -789,7 +892,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 						-- Moving left
 						-- Ensure that no piece disturbs the way
 						for i = to_x + 1, from_x - 1 do
-							if board[xy_to_index(i, from_y)] ~= "" then
+							if board_t[xy_to_index(i, from_y)] ~= "." then
 								moves[to_idx] = nil
 							end
 						end
@@ -798,7 +901,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Goes left-down
 					-- Ensure that no piece disturbs the way
 					for i = 1, dx - 1 do
-						if board[xy_to_index(from_x - i, from_y + i)] ~= "" then
+						if board_t[xy_to_index(from_x - i, from_y + i)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -806,7 +909,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 					-- Goes left-up
 					-- Ensure that no piece disturbs the way
 					for i = 1, dx - 1 do
-						if board[xy_to_index(from_x - i, from_y - i)] ~= "" then
+						if board_t[xy_to_index(from_x - i, from_y - i)] ~= "." then
 							moves[to_idx] = nil
 						end
 					end
@@ -818,9 +921,9 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 			-- King can't move to any attacked square
 			-- king_board simulates the board with the king moved already.
 			-- Required for the attacked() check to work
-			local king_board = table.copy(board)
+			local king_board = table.copy(board_t)
 			king_board[to_idx] = king_board[from_idx]
-			king_board[from_idx] = ""
+			king_board[from_idx] = "."
 			if realchess.attacked(color, to_idx, king_board) then
 				moves[to_idx] = nil
 			else
@@ -836,7 +939,7 @@ local function get_theoretical_moves_from(board, from_idx, prevDoublePawnStepTo,
 				end
 
 				if dx > 1 or dy > 1 then
-					local cc = can_castle(board, from_idx, to_idx, castlingRights)
+					local cc = can_castle(board_t, from_idx, to_idx, castlingRights)
 					if not cc then
 						moves[to_idx] = nil
 					end
@@ -854,7 +957,7 @@ end
 
 -- returns all theoretically possible moves on the board for a player
 -- Parameters:
--- * board: chessboard table
+-- * board_t: chessboard table
 -- * player: "black" or "white"
 -- returns: table of this format:
 -- {
@@ -865,12 +968,12 @@ end
 --   origin_index is the board index for the square to start the piece from (as string)
 --   and this is the key for a list of destination indixes.
 --   r1, r2, r3 ... are numeric values (normally 0) to "rate" this square for the bot.
-function realchess.get_theoretical_moves_for(board, player, prevDoublePawnStepTo, castlingRights)
+function realchess.get_theoretical_moves_for(board_t, player, prevDoublePawnStepTo, castlingRights)
 	local moves = {}
 	for i = 1, 64 do
-		local possibleMoves = get_theoretical_moves_from(board, i, prevDoublePawnStepTo, castlingRights)
+		local possibleMoves = get_theoretical_moves_from(board_t, i, prevDoublePawnStepTo, castlingRights)
 		if next(possibleMoves) then
-			local stack_name = board[i]
+			local stack_name = letter_to_piece(board_t[i])
 			if realchess.get_piece_color(stack_name) == player then
 				moves[tostring(i)] = possibleMoves
 			end
@@ -879,17 +982,15 @@ function realchess.get_theoretical_moves_for(board, player, prevDoublePawnStepTo
 	return moves
 end
 
-function realchess.locate_kings(board)
+function realchess.locate_kings(board_t)
 	local Bidx, Widx
 	for i = 1, 64 do
-		local piece = realchess.get_piece_type(board[i])
-		local color = realchess.get_piece_color(board[i])
-		if piece == "king" then
-			if color == "black" then
-				Bidx = i
-			else
-				Widx = i
-			end
+		-- black king
+		if board_t[i] == "k" then
+			Bidx = i
+		-- white king
+		elseif board_t[i] == "K" then
+			Widx = i
 		end
 	end
 
@@ -901,13 +1002,13 @@ end
 -- that neither put or leave the king at risk.
 -- 2nd return value is the number of said safe moves.
 -- * theoretical_moves: moves table returned by realchess.get_theoretical_moves_for()
--- * board: board table
+-- * board_t: board table
 -- * player: player color ("white" or "black")
-function realchess.get_king_safe_moves(theoretical_moves, board, player)
+function realchess.get_king_safe_moves(theoretical_moves, board_t, player)
 	local safe_moves = {}
 	local safe_moves_count = 0
 	-- create a virtual board
-	local v_board = table.copy(board)
+	local v_board = table.copy(board_t)
 
 	for from_idx, _ in pairs(theoretical_moves) do
 	for to_idx, value in pairs(_) do
@@ -919,7 +1020,7 @@ function realchess.get_king_safe_moves(theoretical_moves, board, player)
 
 		-- move the piece on the virtual board
 		v_board[to_idx]   = v_board[from_idx]
-		v_board[from_idx] = ""
+		v_board[from_idx] = "."
 		local black_king_idx, white_king_idx = realchess.locate_kings(v_board)
 		if not black_king_idx or not white_king_idx then
 			minetest.log("error", "[xdecor] Chess: Insufficient kings on chessboard!")
@@ -954,9 +1055,9 @@ end
 -- NOT checked are dead posisions in which both sides can still move,
 -- but cannot capture pieces or checkmate the king
 -- Parameters
--- * board: Chessboard table
+-- * board_t: Chessboard table
 -- Returns true if the board is in a dead position, false otherwise.
-local function is_dead_position(board)
+local function is_dead_position(board_t)
 	-- Dead position by lack of material
 	local mat = {} -- material table to count pieces
 	-- white material
@@ -974,8 +1075,8 @@ local function is_dead_position(board)
 	-- black material
 	mat.b = table.copy(mat.w)
 	-- Count material for both players
-	for b=1, #board do
-		local piece = board[b]
+	for b=1, #board_t do
+		local piece = letter_to_piece(board_t[b])
 		if piece ~= "" then
 			local color
 			if realchess.get_piece_color(piece) == "white" then
@@ -1182,62 +1283,6 @@ local function add_special_to_moves_list(meta, special)
 	add_move_to_moves_list(meta, "", "", "", "", special)
 end
 
-
--- abbreviation for each piece for the string
--- representation of the board (like in FEN)
-local piece_letters = {
-	white = {
-		pawn   = "P",
-		knight = "N",
-		bishop = "B",
-		rook   = "R",
-		queen  = "Q",
-		king   = "K",
-	},
-	black = {
-		pawn   = "p",
-		knight = "n",
-		bishop = "b",
-		rook   = "r",
-		queen  = "q",
-		king   = "k",
-	},
-}
-
-local function piece_to_letter(piece)
-	if piece == "" then
-		return "."
-	elseif realchess.get_piece_color(piece) == "white" then
-		for k,v in pairs(piece_letters.white) do
-			if piece:find(k) then
-				return v
-			end
-		end
-	elseif realchess.get_piece_color(piece) == "black" then
-		for k,v in pairs(piece_letters.black) do
-			if piece:find(k) then
-				return v
-			end
-		end
-	end
-end
-local function letter_to_piece(letter)
-	if letter == "." then
-		return ""
-	else
-		for k,v in pairs(piece_letters.white) do
-			if v == letter then
-				return v
-			end
-		end
-		for k,v in pairs(piece_letters.black) do
-			if v == letter then
-				return v
-			end
-		end
-	end
-	return nil
-end
 
 -- Returns a list of all positions so far, for the purposes
 -- of determining position equality under the
@@ -1595,16 +1640,17 @@ local verify_eaten_list
 if CHESS_DEBUG then
 	verify_eaten_list = function(meta)
 		local inv = meta:get_inventory()
-		local board = realchess.board_to_table(inv)
+		local board_t = realchess.board_inv_to_table(inv)
 		local whitePiecesLeft = 0
 		local whitePiecesEaten = 0
 		local blackPiecesLeft = 0
 		local blackPiecesEaten = 0
 		for b=1, 64 do
-			local piece = board[b]
-			if realchess.get_piece_color(piece) == "white" then
+			local letter = board_t[b]
+			local lcolor = realchess.get_piece_letter_color(letter)
+			if lcolor == "white" then
 				whitePiecesLeft = whitePiecesLeft + 1
-			elseif realchess.get_piece_color(piece) == "black" then
+			elseif lcolor == "black" then
 				blackPiecesLeft = blackPiecesLeft + 1
 			end
 		end
@@ -1950,7 +1996,7 @@ end
 
 local function update_game_result(pos, meta, lastMove)
 	local inv = meta:get_inventory()
-	local board_t = realchess.board_to_table(inv)
+	local board_t = realchess.board_inv_to_table(inv)
 
 	local playerWhite = meta:get_string("playerWhite")
 	local playerBlack = meta:get_string("playerBlack")
@@ -2157,8 +2203,8 @@ local function update_game_result(pos, meta, lastMove)
 		local p_en_passant = pos_split[4]
 		local errors = 0
 		for b=1, #board_t do
-			local piece = board_t[b]
-			local letter_real = piece_to_letter(piece)
+			local letter_real = board_t[b]
+			local piece = letter_to_piece(letter_real)
 			local letter_pos = string.sub(p_board, b, b)
 			if letter_real ~= letter_pos then
 				minetest.log("error", "[xdecor] Chess: Position history inconsistency on board index "..b..": '"..letter_pos.."' seen but '"..letter_real.."' expected")
@@ -2454,8 +2500,8 @@ function realchess.move(pos, meta, from_list, from_index, to_list, to_index, pla
 					can_capture = true
 				else
 					-- en passant
-					local board = realchess.board_to_table(inv)
-					if can_capture_en_passant(board, "black", xy_to_index(to_x, from_y), prevDoublePawnStepTo) then
+					local board_t = realchess.board_inv_to_table(inv)
+					if can_capture_en_passant(board_t, "black", xy_to_index(to_x, from_y), prevDoublePawnStepTo) then
 						can_capture = true
 						en_passant_target = xy_to_index(to_x, from_y)
 					end
@@ -2523,8 +2569,8 @@ function realchess.move(pos, meta, from_list, from_index, to_list, to_index, pla
 					can_capture = true
 				else
 					-- en passant
-					local board = realchess.board_to_table(inv)
-					if can_capture_en_passant(board, "white", xy_to_index(to_x, from_y), prevDoublePawnStepTo) then
+					local board_t = realchess.board_inv_to_table(inv)
+					if can_capture_en_passant(board_t, "white", xy_to_index(to_x, from_y), prevDoublePawnStepTo) then
 						can_capture = true
 						en_passant_target = xy_to_index(to_x, from_y)
 					end
@@ -2775,7 +2821,7 @@ function realchess.move(pos, meta, from_list, from_index, to_list, to_index, pla
 		local dy = from_y - to_y
 		local check = true
 		local inv = meta:get_inventory()
-		local board = realchess.board_to_table(inv)
+		local board_t = realchess.board_inv_to_table(inv)
 		local castlingRights = {
 			castlingWhiteR = meta:get_int("castlingWhiteR"),
 			castlingWhiteL = meta:get_int("castlingWhiteL"),
@@ -2784,7 +2830,7 @@ function realchess.move(pos, meta, from_list, from_index, to_list, to_index, pla
 		}
 
 		-- Castling
-		local cc, rook_start, rook_goal, rook_name = can_castle(board, from_index, to_index, castlingRights)
+		local cc, rook_start, rook_goal, rook_name = can_castle(board_t, from_index, to_index, castlingRights)
 		if cc then
 			inv:set_stack(from_list, rook_goal, rook_name)
 			inv:set_stack(from_list, rook_start, "")
@@ -2809,17 +2855,17 @@ function realchess.move(pos, meta, from_list, from_index, to_list, to_index, pla
 
 	end
 
-	local board       = realchess.board_to_table(inv)
-	board[to_index]   = board[from_index]
-	board[from_index] = ""
+	local board_t       = realchess.board_inv_to_table(inv)
+	board_t[to_index]   = board_t[from_index]
+	board_t[from_index] = "."
 
-	local black_king_idx, white_king_idx = realchess.locate_kings(board)
+	local black_king_idx, white_king_idx = realchess.locate_kings(board_t)
 	if not black_king_idx or not white_king_idx then
 		minetest.log("error", "[xdecor] Chess: Insufficient kings on chessboard!")
 		return false
 	end
-	local blackAttacked = realchess.attacked("black", black_king_idx, board)
-	local whiteAttacked = realchess.attacked("white", white_king_idx, board)
+	local blackAttacked = realchess.attacked("black", black_king_idx, board_t)
+	local whiteAttacked = realchess.attacked("white", white_king_idx, board_t)
 
 	-- Refuse to move if it would put or leave the own king
 	-- under attack
@@ -3279,22 +3325,22 @@ end
 
 function realchess.update_state(meta, from_index, to_index, thisMove, promoteFrom, promoteTo)
 	local inv         = meta:get_inventory()
-	local board       = realchess.board_to_table(inv)
-	local pieceTo     = board[to_index]
-	local pieceFrom   = promoteFrom or board[from_index]
+	local board_t     = realchess.board_inv_to_table(inv)
+	local pieceTo     = letter_to_piece(board_t[to_index])
+	local pieceFrom   = promoteFrom or letter_to_piece(board_t[from_index])
 
 	if not promoteFrom then
-		board[to_index]   = board[from_index]
-		board[from_index] = ""
+		board_t[to_index]   = board_t[from_index]
+		board_t[from_index] = "."
 	end
 
-	local black_king_idx, white_king_idx = realchess.locate_kings(board)
+	local black_king_idx, white_king_idx = realchess.locate_kings(board_t)
 	if not black_king_idx or not white_king_idx then
 		minetest.log("error", "[xdecor] Chess: Insufficient kings on chessboard!")
 		return
 	end
-	local blackAttacked = realchess.attacked("black", black_king_idx, board)
-	local whiteAttacked = realchess.attacked("white", white_king_idx, board)
+	local blackAttacked = realchess.attacked("black", black_king_idx, board_t)
+	local whiteAttacked = realchess.attacked("white", white_king_idx, board_t)
 
 	if blackAttacked then
 		meta:set_string("blackAttacked", "true")
@@ -3456,7 +3502,7 @@ else
 end
 minetest.register_node(":realchess:chessboard", chessboarddef)
 
-local function register_piece(name, idnum, white_desc, black_desc, count)
+local function register_piece(name, idnum, white_letter, black_letter, white_desc, black_desc, count)
 	for _, color in pairs({"black", "white"}) do
 
 	-- for chess_piece group rating
@@ -3474,6 +3520,10 @@ local function register_piece(name, idnum, white_desc, black_desc, count)
 			-- numeric absolute value declares piece type (pawn, rook, etc.)
 			groups = {chess_piece=g, not_in_creative_inventory=1}
 		})
+
+		local letter = (color == "black") and black_letter or white_letter
+		letters_to_pieces[letter] = "realchess:"..name.."_"..color
+		pieces_to_letters["realchess:"..name.."_"..color] = letter
 	else
 		-- For historic reasons, some pieces redundantly get registered multiple times,
 		-- one for each piece in the starting position. This was used in old
@@ -3481,6 +3531,7 @@ local function register_piece(name, idnum, white_desc, black_desc, count)
 		-- castling rights. The code has since been changed so that the identity of pieces
 		-- is irrelevant to gameplay, but the redundant pieces still exist for
 		-- compatibility reasons.
+		local letter = (color == "black") and black_letter or white_letter
 		for i = 1, count do
 			minetest.register_craftitem(":realchess:" .. name .. "_" .. color .. "_" .. i, {
 				description = (color == "black") and black_desc or white_desc,
@@ -3488,37 +3539,39 @@ local function register_piece(name, idnum, white_desc, black_desc, count)
 				stack_max = 1,
 				groups = {chess_piece=g, not_in_creative_inventory=1}
 			})
+			pieces_to_letters["realchess:"..name.."_"..color.."_"..i] = letter
 		end
+		letters_to_pieces[letter] = "realchess:"..name.."_"..color.."_1"
 	end
 	end
 end
 
-register_piece("pawn", PIECE_PAWN,
+register_piece("pawn", PIECE_PAWN, "P", "p",
 	--~ chess piece
 	S("White Pawn"),
 	--~ chess piece
 	S("Black Pawn"), 8)
-register_piece("rook", PIECE_ROOK,
+register_piece("rook", PIECE_ROOK, "R", "r",
 	--~ chess piece
 	S("White Rook"),
 	--~ chess piece
 	S("Black Rook"), 2)
-register_piece("knight", PIECE_KNIGHT,
+register_piece("knight", PIECE_KNIGHT, "N", "n",
 	--~ chess piece
 	S("White Knight"),
 	--~ chess piece
 	S("Black Knight"), 2)
-register_piece("bishop", PIECE_BISHOP,
+register_piece("bishop", PIECE_BISHOP, "B", "b",
 	--~ chess piece
 	S("White Bishop"),
 	--~ chess piece
 	S("Black Bishop"), 2)
-register_piece("queen", PIECE_QUEEN,
+register_piece("queen", PIECE_QUEEN, "Q", "q",
 	--~ chess piece
 	S("White Queen"),
 	--~ chess piece
 	S("Black Queen"))
-register_piece("king", PIECE_KING,
+register_piece("king", PIECE_KING, "K", "k",
 	--~ chess piece
 	S("White King"),
 	--~ chess piece
@@ -3547,22 +3600,22 @@ The functions will be called in a blocking manner, so should
 return quickly!
 
 Params:
-* choose_move: function(board, game_state)
+* choose_move: function(board_t, game_state)
   Is called when the bot is asked to pick a move, given a
   chessboard, its pieces and the game state.
   Params:
-  * board: Table containing every square on the board
+  * board_t: Table containing every square on the board
   * game_state: Table containing more info about the current state of the game
   Must return: Two numbers, the first one is the square to
   move from, the second one is the square to move towards
   To make a castling move, move the king according to
   castling rules, the tower will be moved automatically.
   If nil is returned or the move is illegal, the bot resigns
-* choose_promote = function(board, game_state, pawn_index)
+* choose_promote = function(board_t, game_state, pawn_index)
   Is called when one of the bot's pawns managed to reach the
   other end of the board and gains a promotion.
   Params:
-  * board: See `choose_move`
+  * board_t: See `choose_move`
   * game_state: See `choose_move`
   * pawn_index: Board table index of the pawn to promote
 
@@ -3574,12 +3627,25 @@ Params:
   symbol like `NS = function return(s) end`)
 * id: Unique identifier of the chessbot
 
-`board` table format:
+`board_t` table format:
 This is a table with 64 entries, starting at index 1 representing
 the square a8, followed by 2=b8, 3=c8, 4=d8, ... 9=a7, 10=b7, ... 64=h1.
-Each field contains a string.
-The empty string is for the empty square, whereas a field with a non-empty
-string denotes a piece, using the itemname of the piece.
+Each field has a 1-character string as a value for whatever the square
+contains, according to this list:
+
+	.	empty space
+	p	black pawn
+	b	black bishop
+	q	black queen
+	k	black king
+	r	black rook
+	n	black knight
+	P	white pawn
+	B	white bishop
+	Q	white queen
+	K	white king
+	R	white rook
+	N	white knight
 
 `game_state` table contains these fields:
 * lastMove: Which player made the last move: "black" or "white". empty string if nobody moved yet

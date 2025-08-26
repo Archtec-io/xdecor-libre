@@ -110,7 +110,7 @@ function chessbot.perform_promote(pos, meta, promoteTo)
 end
 
 function chessbot.move(pos, inv, meta)
-	local board_t = realchess.board_to_table(inv)
+	local board_t = realchess.board_inv_to_table(inv)
 	local game_state = get_game_state(meta)
 	local choice_from, choice_to = chessbot.choose_move(board_t, game_state)
 	local hash = minetest.hash_node_position(pos)
@@ -126,7 +126,7 @@ function chessbot.move(pos, inv, meta)
 end
 
 function chessbot.promote(pos, inv, meta, pawnIndex)
-	local board_t = realchess.board_to_table(inv)
+	local board_t = realchess.board_inv_to_table(inv)
 	local game_state = get_game_state(meta)
 	local promoteTo = chessbot.choose_promote(board_t, game_state, pawnIndex)
 	local hash = minetest.hash_node_position(pos)

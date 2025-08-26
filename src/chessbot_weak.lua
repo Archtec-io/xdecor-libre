@@ -9,17 +9,21 @@ local realchess = xdecor.chess
 -- How valuable the chessbot thinks each piece is
 -- (higher = more valuable)
 local piece_values = {
-	pawn   = 10,
-	knight = 30,
-	bishop = 30,
-	rook   = 50,
-	queen  = 90,
-	king   = 900
+	p = 10, -- pawn
+	n = 30, -- knight
+	b = 30, -- bishop
+	r = 50, -- rook
+	q = 90, -- queen
+	k = 900, -- king
 }
+for k,v in pairs(piece_values) do
+	local upper = string.upper(k)
+	piece_values[upper] = v
+end
 
 -- Pick a move from the list of all possible moves
 -- on this chessboard
-local function best_move(moves, board)
+local function best_move(moves, board_t)
 	--[[ This is a VERY simple algorithm that will greedily
 	capture pieces as soon the opprtunity arises
 	and otherwise takes random moves.
@@ -41,14 +45,15 @@ local function best_move(moves, board)
 			-- Move rating. rating 0 is for non-capturing moves.
 			-- higher ratings are for capturing moves.
 			local val = 0
-			local to_piece_name = board[to]
+			local to_piece_name = board_t[to]
 
 			-- If destination is a piece that we capture, rate this move
 			-- according to a table.
-			if to_piece_name ~= "" then
+			if to_piece_name ~= "." then
 				for piece_type, piece_value in pairs(piece_values) do
-					if realchess.get_piece_type(to_piece_name) == piece_type then
+					if to_piece_name == piece_type then
 						val = piece_value
+						break
 					end
 				end
 			end
@@ -78,7 +83,7 @@ local function best_move(moves, board)
 	return tonumber(choice_from), choice_to
 end
 
-local function choose_move(board, game_state)
+local function choose_move(board_t, game_state)
 	local currentBotColor = game_state["botColor"]
 	local prevDoublePawnStepTo = game_state["prevDoublePawnStepTo"]
 	local castlingRights = {
@@ -88,13 +93,13 @@ local function choose_move(board, game_state)
 		castlingBlackL = game_state["castlingBlackL"],
 	}
 
-	local moves = realchess.get_theoretical_moves_for(board, currentBotColor, prevDoublePawnStepTo, castlingRights)
-	local safe_moves, safe_moves_count = realchess.get_king_safe_moves(moves, board, currentBotColor)
+	local moves = realchess.get_theoretical_moves_for(board_t, currentBotColor, prevDoublePawnStepTo, castlingRights)
+	local safe_moves, safe_moves_count = realchess.get_king_safe_moves(moves, board_t, currentBotColor)
 	if safe_moves_count == 0 then
 		-- No safe move: stalemate or checkmate
 		return
 	end
-	local choice_from, choice_to = best_move(safe_moves, board)
+	local choice_from, choice_to = best_move(safe_moves, board_t)
 	if choice_from == nil then
 		-- No best move: stalemate or checkmate
 		return
@@ -103,7 +108,7 @@ local function choose_move(board, game_state)
 	return choice_from, choice_to
 end
 
-local function choose_promote(board, game_state, pawnIndex)
+local function choose_promote(board_t, game_state, pawnIndex)
 	-- Bot always promotes to queen
 	return "queen"
 end
