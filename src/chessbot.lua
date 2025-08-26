@@ -112,7 +112,12 @@ end
 function chessbot.move(pos, inv, meta)
 	local board_t = realchess.board_inv_to_table(inv)
 	local game_state = get_game_state(meta)
+
+	local t1 = minetest.get_us_time()
 	local choice_from, choice_to = chessbot.choose_move(board_t, game_state)
+	local t2 = minetest.get_us_time()
+	minetest.log("verbose", "[xdecor] Chessbot at "..minetest.pos_to_string(pos).." took "..(t2-t1).. " µs to pick a move")
+
 	local hash = minetest.hash_node_position(pos)
 	if active_jobs[hash] then
 		chessbot.cancel_job(pos)
@@ -128,7 +133,12 @@ end
 function chessbot.promote(pos, inv, meta, pawnIndex)
 	local board_t = realchess.board_inv_to_table(inv)
 	local game_state = get_game_state(meta)
+
+	local t1 = minetest.get_us_time()
 	local promoteTo = chessbot.choose_promote(board_t, game_state, pawnIndex)
+	local t2 = minetest.get_us_time()
+	minetest.log("verbose", "[xdecor] Chessbot at "..minetest.pos_to_string(pos).." took "..(t2-t1).. " µs to pick a pawn promotion")
+
 	local hash = minetest.hash_node_position(pos)
 	if active_jobs[hash] then
 		chessbot.cancel_job(pos)
