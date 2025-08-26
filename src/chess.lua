@@ -3475,6 +3475,12 @@ local function register_piece(name, idnum, white_desc, black_desc, count)
 			groups = {chess_piece=g, not_in_creative_inventory=1}
 		})
 	else
+		-- For historic reasons, some pieces redundantly get registered multiple times,
+		-- one for each piece in the starting position. This was used in old
+		-- poorly programmed versions to check for the "identity" of pieces for
+		-- castling rights. The code has since been changed so that the identity of pieces
+		-- is irrelevant to gameplay, but the redundant pieces still exist for
+		-- compatibility reasons.
 		for i = 1, count do
 			minetest.register_craftitem(":realchess:" .. name .. "_" .. color .. "_" .. i, {
 				description = (color == "black") and black_desc or white_desc,
