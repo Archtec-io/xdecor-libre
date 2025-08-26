@@ -3676,4 +3676,4 @@ end
 --[[ END OF API FUNCTIONS ]]
 
 -- Initially set the built-in weak chessbot (can be overwritten later by mods)
-local chessbot_weak = dofile(minetest.get_modpath(minetest.get_current_modname()).."/src/chessbot_weak.lua")
+dofile(minetest.get_modpath(minetest.get_current_modname()).."/src/chessbot_weak.lua")
