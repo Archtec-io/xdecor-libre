@@ -3587,6 +3587,177 @@ minetest.register_craft({
 	}
 })
 
+--[[ Parse a chess position in Forsyth–Edwards Notation (FEN)
+and return a table, or nil in case of a syntax error.
+The table contains these fields:
+* board_t: Board table (defined elsewhere)
+* player: Player to move ("white" or "black")
+* castlingRights: {
+	castlingWhiteL: 1 if White can castle queenside, 0 otherwise
+	castlingWhiteR: 1 if White can castle kingside, 0 otherwise
+	castlingBlackL: 1 if Black can castle queenside, 0 otherwise
+	castlingBlackR: 1 if Black can castle kingside, 0 otherwise
+}
+* halfmove: number of halfmoves since the last capture or pawn advance
+* prevDoublePawnStepTo: if a pawn did a double-step in the previous move,
+  this is the numeric board index of the destination. If no pawn made a
+  double-step in the previous halfmove, this is 0
+* fullmove: counter that starts at one and is incremented by 1 each time Black has moved
+]]
+local function parse_fen(fen)
+	local fen_parts = string.split(fen, " ")
+	if not fen_parts or #fen_parts < 6 then
+		return nil
+	end
+	local fen_board = fen_parts[1]
+	local fen_player = fen_parts[2]
+	local fen_castling = fen_parts[3]
+	local fen_en_passant = fen_parts[4]
+	local fen_halfmove = tonumber(fen_parts[5])
+	local fen_fullmove = tonumber(fen_parts[6])
+	if not fen_halfmove or not fen_fullmove then
+		return nil
+	end
+	local board_t = {}
+	for b=1, string.len(fen_board) do
+		local p = string.sub(fen_board, b, b)
+		local pn = tonumber(p)
+		if type(pn) == "number" then
+			for i=1, pn do
+				table.insert(board_t, ".")
+			end
+		elseif p ~= "/" then
+			table.insert(board_t, p)
+		end
+	end
+	local player_to_move
+	if fen_player == "w" then
+		player_to_move = "white"
+	elseif fen_player == "b" then
+		player_to_move = "black"
+	else
+		return nil
+	end
+	local castlingRights = {
+		castlingWhiteL = 0,
+		castlingWhiteR = 0,
+		castlingBlackL = 0,
+		castlingBlackR = 0,
+	}
+	if fen_castling ~= "-" then
+		for c=1, string.len(fen_castling) do
+			local ca = string.sub(fen_castling, c, c)
+			if ca == "Q" then
+				castlingRights.castlingWhiteL = 1
+			elseif ca == "K" then
+				castlingRights.castlingWhiteR = 1
+			elseif ca == "q" then
+				castlingRights.castlingBlackL = 1
+			elseif ca == "k" then
+				castlingRights.castlingBlackR = 1
+			end
+		end
+	end
+	local prevDoublePawnStepTo = 0
+	if fen_en_passant ~= "-" then
+		local rank = string.sub(fen_en_passant, 1,1)
+		local file = string.sub(fen_en_passant, 2,2)
+		local x, y
+		if rank == "a" then
+			x = 0
+		elseif rank == "b" then
+			x = 1
+		elseif rank == "c" then
+			x = 2
+		elseif rank == "d" then
+			x = 3
+		elseif rank == "e" then
+			x = 4
+		elseif rank == "f" then
+			x = 5
+		elseif rank == "g" then
+			x = 6
+		elseif rank == "h" then
+			x = 7
+		end
+		y = (tonumber(file) or 1) - 1
+		if y == 3 then
+			y = 2
+		elseif y == 4 then
+			y = 5
+		end
+		local idx = xy_to_index(x, y)
+		prevDoublePawnStepTo = idx
+	end
+
+	return {
+		board_t = board_t,
+		player = player_to_move,
+		castlingRights = castlingRights,
+		prevDoublePawnStepTo = prevDoublePawnStepTo,
+		halfmove = fen_halfmove,
+		fullmove = fen_fullmove,
+	}
+end
+
+-- Count the number of legal moves from a given position given
+-- in FEN.
+local function get_moves_from_fen_position(fen)
+	local parsed_fen = parse_fen(fen)
+
+	-- Count moves
+	local theoretical_moves = realchess.get_theoretical_moves_for(parsed_fen.board_t, parsed_fen.player, parsed_fen.prevDoublePawnStepTo, parsed_fen.castlingRights)
+	local safe_moves, safe_moves_count = realchess.get_king_safe_moves(theoretical_moves, parsed_fen.board_t, parsed_fen.player)
+
+	return safe_moves, safe_moves_count
+end
+
+function perft_testing_suite()
+	-- Data from <http://www.rocechess.ch/perft.html> and converted to CSV.
+	-- CSV file uses the following roes:
+	-- Column 1: Chess position in FEN
+	-- Column 2: Number of moves this position (perft depth 1)
+	-- Column 3: Number of moves at perft depth 2
+	-- Column 4: Number of moves at perft depth 3
+	-- ...
+	local filepath = minetest.get_modpath("xdecor").."/testing/perftsuite.csv"
+	local iter = io.lines(filepath)
+	if not iter then
+		minetest.log("error", "[xdecor] Chess: Could not load perft testing suite")
+	end
+	local testnum = 0
+	local errors = 0
+	for line in io.lines(filepath) do
+		testnum = testnum + 1
+		local spl = string.split(line, ",")
+		if not spl or #spl == 0 then
+			minetest.log("error", "[xdecor] Chess: Could not split string from perft testing suite at line "..testnum)
+			return
+		end
+		local fen = spl[1]
+		local ply = {}
+		for i=2, #spl do
+			local depth = i-1
+			ply[depth] = tonumber(spl[i])
+			if not ply[depth] then
+				minetest.log("error", "[xdecor] Chess: perft depth in perftsuite.csv is not a number (line="..testnum..")")
+				return
+			end
+		end
+
+		-- Only test at ply 1
+		local moves, counted_moves = get_moves_from_fen_position(fen)
+		local expected_moves = ply[1]
+		if counted_moves ~= expected_moves then
+			minetest.log("error", "[xdecor] Chess: perft test #"..testnum.." FAILED! "..expected_moves.." move(s) expected, got "..counted_moves.." move(s)")
+			minetest.log("error", "[xdecor] Chess: Gotten moves: "..dump(moves))
+			errors = errors + 1
+		end
+	end
+	return errors == 0
+end
+
+
 --[[ EXPERIMENTAL API FUNCTION
 Use at your own risk!
 ]]
