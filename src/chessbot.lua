@@ -12,153 +12,35 @@ end
 
 local realchess = xdecor.chess
 
+local get_game_state = function(meta)
+	local lastMove = meta:get_string("lastMove")
+	local color
+	if lastMove == "black" or lastMove == "" then
+		color = "white"
+	else
+		color = "black"
+	end
+	return {
+		botColor = color,
+		prevDoublePawnStepTo = meta:get_int("prevDoublePawnStepTo"),
+		castlingWhiteL = meta:get_int("castlingWhiteL"),
+		castlingWhiteR = meta:get_int("castlingWhiteR"),
+		castlingBlackL = meta:get_int("castlingBlackL"),
+		castlingBlackR = meta:get_int("castlingBlackR"),
+		halfmoveClock = meta:get_int("halfmoveClock"),
+	}
+end
+
+
+
 -- Delay in seconds for a bot moving a piece (excluding choosing a promotion)
 local BOT_DELAY_MOVE = 1.0
 -- Delay in seconds for a bot promoting a piece
 local BOT_DELAY_PROMOTE = 1.0
 
--- How valuable the chessbot thinks each piece is
--- (higher = more valuable)
-local piece_values = {
-	pawn   = 10,
-	knight = 30,
-	bishop = 30,
-	rook   = 50,
-	queen  = 90,
-	king   = 900
-}
-
--- Pick a move from the list of all possible moves
--- on this chessboard
-local function best_move(moves, board_t)
-	--[[ This is a VERY simple algorithm that will greedily
-	capture pieces as soon the opprtunity arises
-	and otherwise takes random moves.
-	This makes the bot very weak, as it lacks any kind of
-	foresight, but the algorithm is blazingly fast. ]]
-
-	--[[ The algorithm:
-	Look at all moves and rate each of them with a number
-	(higher = better). Pick the move with the highest rating.
-	If it's a tie, pick randomly from the tied moves.
-	Non-capturing moves are rated 0.
-	Capturing moves are rated by which piece is captured
-	(in piece_values) ]]
-
-	local max_value, choices = 0, {}
-
-	for from, tos in pairs(moves) do
-		for to, _ in pairs(tos) do
-			-- Move rating. rating 0 is for non-capturing moves.
-			-- higher ratings are for capturing moves.
-			local val = 0
-			local to_piece_name = board_t[to]
-
-			-- If destination is a piece that we capture, rate this move
-			-- according to a table.
-			if to_piece_name ~= "" then
-				for piece_type, piece_value in pairs(piece_values) do
-					if realchess.get_piece_type(to_piece_name) == piece_type then
-						val = piece_value
-					end
-				end
-			end
-
-			-- Update the list of best moves (choices).
-			if val > max_value then
-				max_value = val
-				choices = {{
-					from = from,
-					to = to
-				}}
-			elseif val == max_value then
-				choices[#choices + 1] = {
-					from = from,
-					to = to
-				}
-			end
-		end
-	end
-
-	if #choices == 0 then
-		return nil
-	end
-	local random = math.random(1, #choices)
-	local choice_from, choice_to = choices[random].from, choices[random].to
-
-	return tonumber(choice_from), choice_to
-end
-
-function chessbot.choose_move(board_t, meta_t)
-	local lastMove = meta_t["lastMove"]
-	local gameResult = meta_t["gameResult"]
-	local botColor = meta_t["botColor"]
-	local prevDoublePawnStepTo = meta_t["prevDoublePawnStepTo"]
-	local castlingRights = {
-		castlingWhiteR = meta_t["castlingWhiteR"],
-		castlingWhiteL = meta_t["castlingWhiteL"],
-		castlingBlackR = meta_t["castlingBlackR"],
-		castlingBlackL = meta_t["castlingBlackL"],
-	}
-
-	if botColor == "" then
-		return
-	end
-	local currentBotColor, opponentColor
-	if botColor == "black" then
-		currentBotColor = "black"
-		opponentColor = "white"
-	elseif botColor == "white" then
-		currentBotColor = "white"
-		opponentColor = "black"
-	elseif botColor == "both" then
-		opponentColor = lastMove
-		if lastMove == "black" or lastMove == "" then
-			currentBotColor = "white"
-		else
-			currentBotColor = "black"
-		end
-	end
-	if (lastMove == opponentColor or ((botColor == "white" or botColor == "both") and lastMove == "")) and gameResult == "" then
-
-		local moves = realchess.get_theoretical_moves_for(board_t, currentBotColor, prevDoublePawnStepTo, castlingRights)
-		local safe_moves, safe_moves_count = realchess.get_king_safe_moves(moves, board_t, currentBotColor)
-		if safe_moves_count == 0 then
-			-- No safe move: stalemate or checkmate
-			return
-		end
-		local choice_from, choice_to = best_move(safe_moves, board_t)
-		if choice_from == nil then
-			-- No best move: stalemate or checkmate
-			return
-		end
-
-		return choice_from, choice_to
-	else
-		minetest.log("error", "[xdecor] Chess: chessbot.choose_move was apparently called in an invalid game state!")
-		return
-	end
-end
-
 chessbot.perform_move = function(pos, choice_from, choice_to, meta)
-	local lastMove = meta:get_string("lastMove")
-	local botColor = meta:get_string("botColor")
-	local currentBotColor, opponentColor
-	local botName
-	if botColor == "black" then
-		currentBotColor = "black"
-		opponentColor = "white"
-	elseif botColor == "white" then
-		currentBotColor = "white"
-		opponentColor = "black"
-	elseif botColor == "both" then
-		opponentColor = lastMove
-		if lastMove == "black" or lastMove == "" then
-			currentBotColor = "white"
-		else
-			currentBotColor = "black"
-		end
-	end
+	local game_state = get_game_state(meta)
+	local currentBotColor = game_state.botColor
 
 	-- Bot resigns if no move chosen
 	if not choice_from or not choice_to then
@@ -166,6 +48,7 @@ chessbot.perform_move = function(pos, choice_from, choice_to, meta)
 		return
 	end
 
+	local botName
 	if currentBotColor == "white" then
 		botName = meta:get_string("playerWhite")
 	else
@@ -206,11 +89,6 @@ chessbot.perform_move = function(pos, choice_from, choice_to, meta)
 	end
 end
 
-function chessbot.choose_promote(board_t, pawnIndex)
-	-- Bot always promotes to queen
-	return "queen"
-end
-
 function chessbot.perform_promote(pos, meta, promoteTo)
 	local lastMove = meta:get_string("lastMove")
 	local color
@@ -232,18 +110,14 @@ function chessbot.perform_promote(pos, meta, promoteTo)
 end
 
 function chessbot.move(pos, inv, meta)
-	local board_t = realchess.board_to_table(inv)
-	local meta_t = {
-		lastMove = meta:get_string("lastMove"),
-		gameResult = meta:get_string("gameResult"),
-		botColor = meta:get_string("botColor"),
-		prevDoublePawnStepTo = meta:get_int("prevDoublePawnStepTo"),
-		castlingWhiteL = meta:get_int("castlingWhiteL"),
-		castlingWhiteR = meta:get_int("castlingWhiteR"),
-		castlingBlackL = meta:get_int("castlingBlackL"),
-		castlingBlackR = meta:get_int("castlingBlackR"),
-	}
-	local choice_from, choice_to = chessbot.choose_move(board_t, meta_t)
+	local board_t = realchess.board_inv_to_table(inv)
+	local game_state = get_game_state(meta)
+
+	local t1 = minetest.get_us_time()
+	local choice_from, choice_to = chessbot.choose_move(board_t, game_state)
+	local t2 = minetest.get_us_time()
+	minetest.log("verbose", "[xdecor] Chessbot at "..minetest.pos_to_string(pos).." took "..(t2-t1).. " µs to pick a move")
+
 	local hash = minetest.hash_node_position(pos)
 	if active_jobs[hash] then
 		chessbot.cancel_job(pos)
@@ -257,8 +131,14 @@ function chessbot.move(pos, inv, meta)
 end
 
 function chessbot.promote(pos, inv, meta, pawnIndex)
-	local board_t = realchess.board_to_table(inv)
-	local promoteTo = chessbot.choose_promote(board_t, pawnIndex)
+	local board_t = realchess.board_inv_to_table(inv)
+	local game_state = get_game_state(meta)
+
+	local t1 = minetest.get_us_time()
+	local promoteTo = chessbot.choose_promote(board_t, game_state, pawnIndex)
+	local t2 = minetest.get_us_time()
+	minetest.log("verbose", "[xdecor] Chessbot at "..minetest.pos_to_string(pos).." took "..(t2-t1).. " µs to pick a pawn promotion")
+
 	local hash = minetest.hash_node_position(pos)
 	if active_jobs[hash] then
 		chessbot.cancel_job(pos)
