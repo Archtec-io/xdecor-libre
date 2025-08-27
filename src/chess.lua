@@ -3759,7 +3759,8 @@ local function get_moves_from_fen_position(fen)
 	return safe_moves, safe_moves_count
 end
 
-function perft_testing_suite()
+do
+local function perft_testing_suite()
 	-- Data from <http://www.rocechess.ch/perft.html> and converted to CSV.
 	-- CSV file uses the following roes:
 	-- Column 1: Chess position in FEN
@@ -3802,6 +3803,11 @@ function perft_testing_suite()
 		end
 	end
 	return errors == 0
+end
+
+if CHESS_DEBUG then
+	perft_testing_suite()
+end
 end
 
 
