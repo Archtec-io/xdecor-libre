@@ -541,11 +541,17 @@ end
 -- If the square is empty, no moves are returned.
 -- Parameters:
 -- * board_t: chessboard table
--- * from_idx:
--- returns: table with the keys used as destination indices
---    Any key with the numeric value 0 is a possible destination.
---    All other keys have the nil value.
--- Example: { [4] = 0, [9] = 0 } -- can move to squares 4 and 9
+-- * from_idx: board index of square from which to start
+-- returns: table of moves from that square, where each move is
+-- a "move" table of this form:
+-- { destination_idx, promote_to }
+-- with:
+-- * destination_idx: board index of the destination square
+-- * promote_to: if this move promotes a pawn, this indicates
+--   to which piece to promote to: "rook", "bishop", "knight" or "queen"
+--   otherwise, this is nil
+--
+-- Example: { { 4, nil }, { 9, nil } } -- can move to sqaures 4 and 9, no pawn promotion
 local function get_theoretical_moves_from(board_t, from_idx, prevDoublePawnStepTo, castlingRights)
 	local piece_item = letter_to_piece(board_t[from_idx])
 	local piece = realchess.get_piece_type(piece_item)
@@ -563,6 +569,7 @@ local function get_theoretical_moves_from(board_t, from_idx, prevDoublePawnStepT
 			moves[i] = 0
 		end
 	end
+	local promotions = {}
 
 	for to_idx in pairs(moves) do
 		local pieceTo    = letter_to_piece(board_t[to_idx])
@@ -625,6 +632,11 @@ local function get_theoretical_moves_from(board_t, from_idx, prevDoublePawnStepT
 					moves[to_idx] = nil
 				end
 
+				-- Promotion
+				if moves[to_idx] and to_y == 0 then
+					promotions[to_idx] = true
+				end
+
 			elseif color == "black" then
 				local pawnBlackMove = letter_to_piece(board_t[xy_to_index(from_x, from_y + 1)])
 				local en_passant = false
@@ -679,6 +691,12 @@ local function get_theoretical_moves_from(board_t, from_idx, prevDoublePawnStepT
 				else
 					moves[to_idx] = nil
 				end
+
+				-- Promotion
+				if moves[to_idx] and to_y == 7 then
+					promotions[to_idx] = true
+				end
+
 			else
 				moves[to_idx] = nil
 			end
@@ -952,34 +970,45 @@ local function get_theoretical_moves_from(board_t, from_idx, prevDoublePawnStepT
 		return {}
 	end
 
-	return moves
+	local moves_output = {}
+	for destination_idx, _ in pairs(moves) do
+		if promotions[destination_idx] then
+			table.insert(moves_output, { destination_idx, PIECE_ROOK })
+			table.insert(moves_output, { destination_idx, PIECE_QUEEN })
+			table.insert(moves_output, { destination_idx, PIECE_BISHOP })
+			table.insert(moves_output, { destination_idx, PIECE_KNIGHT })
+		else
+			table.insert(moves_output, { destination_idx })
+		end
+	end
+
+	return moves_output
 end
 
--- returns all theoretically possible moves on the board for a player
+-- returns theoretically all possible moves on the board for a player
 -- Parameters:
 -- * board_t: chessboard table
 -- * player: "black" or "white"
 -- returns: table of this format:
 -- {
---	[origin_index_1] = { [destination_index_1] = r1, [destination_index_2] = r2 },
---	[origin_index_2] = { [destination_index_3] = r3 },
+--	[origin_index_1] = { move1, move2, move3, ... }
+--	[origin_index_2] = { move1, move2, move3, ... }
 --      ...
 -- }
---   origin_index is the board index for the square to start the piece from (as string)
---   and this is the key for a list of destination indixes.
---   r1, r2, r3 ... are numeric values (normally 0) to "rate" this square for the bot.
+-- origin_index is the board index for the square to start the piece from (as string).
+-- a move has the same format as for get_theoretical_moves_from.
 function realchess.get_theoretical_moves_for(board_t, player, prevDoublePawnStepTo, castlingRights)
-	local moves = {}
+	local player_moves = {}
 	for i = 1, 64 do
-		local possibleMoves = get_theoretical_moves_from(board_t, i, prevDoublePawnStepTo, castlingRights)
-		if next(possibleMoves) then
+		local square_moves = get_theoretical_moves_from(board_t, i, prevDoublePawnStepTo, castlingRights)
+		for m=1, #square_moves do
 			local stack_name = letter_to_piece(board_t[i])
 			if realchess.get_piece_color(stack_name) == player then
-				moves[tostring(i)] = possibleMoves
+				player_moves[i] = square_moves
 			end
 		end
 	end
-	return moves
+	return player_moves
 end
 
 function realchess.locate_kings(board_t)
@@ -1010,8 +1039,10 @@ function realchess.get_king_safe_moves(theoretical_moves, board_t, player)
 	-- create a virtual board
 	local v_board = table.copy(board_t)
 
-	for from_idx, _ in pairs(theoretical_moves) do
-	for to_idx, value in pairs(_) do
+	for from_idx, destmoves in pairs(theoretical_moves) do
+	for d=1, #destmoves do
+		local destmove = destmoves[d]
+		local to_idx = destmove[1]
 		from_idx = tonumber(from_idx)
 
 		-- save the old board values before manipulating them
@@ -1019,7 +1050,23 @@ function realchess.get_king_safe_moves(theoretical_moves, board_t, player)
 		local bak_from = v_board[from_idx]
 
 		-- move the piece on the virtual board
-		v_board[to_idx]   = v_board[from_idx]
+		if destmove[2] then
+			-- Promote the pawn, if applicable
+			if destmove[2] == PIECE_KNIGHT then
+				v_board[to_idx] = "n"
+			elseif destmove[2] == PIECE_ROOK then
+				v_board[to_idx] = "r"
+			elseif destmove[2] == PIECE_BISHOP then
+				v_board[to_idx] = "b"
+			elseif destmove[2] == PIECE_QUEEN then
+				v_board[to_idx] = "q"
+			end
+			if player == "white" then
+				v_board[to_idx] = string.upper(v_board[to_idx])
+			end
+		else
+			v_board[to_idx]   = v_board[from_idx]
+		end
 		v_board[from_idx] = "."
 		local black_king_idx, white_king_idx = realchess.locate_kings(v_board)
 		if not black_king_idx or not white_king_idx then
@@ -1035,7 +1082,7 @@ function realchess.get_king_safe_moves(theoretical_moves, board_t, player)
 		local playerAttacked = realchess.attacked(player, king_idx, v_board)
 		if not playerAttacked then
 			safe_moves[from_idx] = safe_moves[from_idx] or {}
-			safe_moves[from_idx][to_idx] = value
+			table.insert(safe_moves[from_idx], destmove)
 			safe_moves_count = safe_moves_count + 1
 		end
 
