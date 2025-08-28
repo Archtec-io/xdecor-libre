@@ -40,36 +40,42 @@ local function best_move(moves, board_t)
 
 	local max_value, choices = 0, {}
 
-	for from, tos in pairs(moves) do
-		for to, _ in pairs(tos) do
-			-- Move rating. rating 0 is for non-capturing moves.
-			-- higher ratings are for capturing moves.
-			local val = 0
-			local to_piece_name = board_t[to]
+	for from, move in pairs(moves) do
+		for m=1, #move do
+			local to = move[m][1]
+			local promote_to = move[m][2]
 
-			-- If destination is a piece that we capture, rate this move
-			-- according to a table.
-			if to_piece_name ~= "." then
-				for piece_type, piece_value in pairs(piece_values) do
-					if to_piece_name == piece_type then
-						val = piece_value
-						break
+			-- No promotion or promotion to queen
+			if promote_to == nil or promote_to == 5 then
+				-- Move rating. rating 0 is for non-capturing moves.
+				-- higher ratings are for capturing moves.
+				local val = 0
+				local to_piece_name = board_t[to]
+
+				-- If destination is a piece that we capture, rate this move
+				-- according to a table.
+				if to_piece_name ~= "." then
+					for piece_type, piece_value in pairs(piece_values) do
+						if to_piece_name == piece_type then
+							val = piece_value
+							break
+						end
 					end
 				end
-			end
 
-			-- Update the list of best moves (choices).
-			if val > max_value then
-				max_value = val
-				choices = {{
-					from = from,
-					to = to
-				}}
-			elseif val == max_value then
-				choices[#choices + 1] = {
-					from = from,
-					to = to
-				}
+				-- Update the list of best moves (choices).
+				if val > max_value then
+					max_value = val
+					choices = {{
+						from = from,
+						to = to
+					}}
+				elseif val == max_value then
+					choices[#choices + 1] = {
+						from = from,
+						to = to
+					}
+				end
 			end
 		end
 	end

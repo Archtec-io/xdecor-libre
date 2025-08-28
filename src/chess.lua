@@ -541,11 +541,17 @@ end
 -- If the square is empty, no moves are returned.
 -- Parameters:
 -- * board_t: chessboard table
--- * from_idx:
--- returns: table with the keys used as destination indices
---    Any key with the numeric value 0 is a possible destination.
---    All other keys have the nil value.
--- Example: { [4] = 0, [9] = 0 } -- can move to squares 4 and 9
+-- * from_idx: board index of square from which to start
+-- returns: table of moves from that square, where each move is
+-- a "move" table of this form:
+-- { destination_idx, promote_to }
+-- with:
+-- * destination_idx: board index of the destination square
+-- * promote_to: if this move promotes a pawn, this indicates
+--   to which piece to promote to: "rook", "bishop", "knight" or "queen"
+--   otherwise, this is nil
+--
+-- Example: { { 4, nil }, { 9, nil } } -- can move to sqaures 4 and 9, no pawn promotion
 local function get_theoretical_moves_from(board_t, from_idx, prevDoublePawnStepTo, castlingRights)
 	local piece_item = letter_to_piece(board_t[from_idx])
 	local piece = realchess.get_piece_type(piece_item)
@@ -563,6 +569,7 @@ local function get_theoretical_moves_from(board_t, from_idx, prevDoublePawnStepT
 			moves[i] = 0
 		end
 	end
+	local promotions = {}
 
 	for to_idx in pairs(moves) do
 		local pieceTo    = letter_to_piece(board_t[to_idx])
@@ -625,6 +632,11 @@ local function get_theoretical_moves_from(board_t, from_idx, prevDoublePawnStepT
 					moves[to_idx] = nil
 				end
 
+				-- Promotion
+				if moves[to_idx] and to_y == 0 then
+					promotions[to_idx] = true
+				end
+
 			elseif color == "black" then
 				local pawnBlackMove = letter_to_piece(board_t[xy_to_index(from_x, from_y + 1)])
 				local en_passant = false
@@ -679,6 +691,12 @@ local function get_theoretical_moves_from(board_t, from_idx, prevDoublePawnStepT
 				else
 					moves[to_idx] = nil
 				end
+
+				-- Promotion
+				if moves[to_idx] and to_y == 7 then
+					promotions[to_idx] = true
+				end
+
 			else
 				moves[to_idx] = nil
 			end
@@ -952,34 +970,45 @@ local function get_theoretical_moves_from(board_t, from_idx, prevDoublePawnStepT
 		return {}
 	end
 
-	return moves
+	local moves_output = {}
+	for destination_idx, _ in pairs(moves) do
+		if promotions[destination_idx] then
+			table.insert(moves_output, { destination_idx, PIECE_ROOK })
+			table.insert(moves_output, { destination_idx, PIECE_QUEEN })
+			table.insert(moves_output, { destination_idx, PIECE_BISHOP })
+			table.insert(moves_output, { destination_idx, PIECE_KNIGHT })
+		else
+			table.insert(moves_output, { destination_idx })
+		end
+	end
+
+	return moves_output
 end
 
--- returns all theoretically possible moves on the board for a player
+-- returns theoretically all possible moves on the board for a player
 -- Parameters:
 -- * board_t: chessboard table
 -- * player: "black" or "white"
 -- returns: table of this format:
 -- {
---	[origin_index_1] = { [destination_index_1] = r1, [destination_index_2] = r2 },
---	[origin_index_2] = { [destination_index_3] = r3 },
+--	[origin_index_1] = { move1, move2, move3, ... }
+--	[origin_index_2] = { move1, move2, move3, ... }
 --      ...
 -- }
---   origin_index is the board index for the square to start the piece from (as string)
---   and this is the key for a list of destination indixes.
---   r1, r2, r3 ... are numeric values (normally 0) to "rate" this square for the bot.
+-- origin_index is the board index for the square to start the piece from (as string).
+-- a move has the same format as for get_theoretical_moves_from.
 function realchess.get_theoretical_moves_for(board_t, player, prevDoublePawnStepTo, castlingRights)
-	local moves = {}
+	local player_moves = {}
 	for i = 1, 64 do
-		local possibleMoves = get_theoretical_moves_from(board_t, i, prevDoublePawnStepTo, castlingRights)
-		if next(possibleMoves) then
+		local square_moves = get_theoretical_moves_from(board_t, i, prevDoublePawnStepTo, castlingRights)
+		for m=1, #square_moves do
 			local stack_name = letter_to_piece(board_t[i])
 			if realchess.get_piece_color(stack_name) == player then
-				moves[tostring(i)] = possibleMoves
+				player_moves[i] = square_moves
 			end
 		end
 	end
-	return moves
+	return player_moves
 end
 
 function realchess.locate_kings(board_t)
@@ -1010,8 +1039,10 @@ function realchess.get_king_safe_moves(theoretical_moves, board_t, player)
 	-- create a virtual board
 	local v_board = table.copy(board_t)
 
-	for from_idx, _ in pairs(theoretical_moves) do
-	for to_idx, value in pairs(_) do
+	for from_idx, destmoves in pairs(theoretical_moves) do
+	for d=1, #destmoves do
+		local destmove = destmoves[d]
+		local to_idx = destmove[1]
 		from_idx = tonumber(from_idx)
 
 		-- save the old board values before manipulating them
@@ -1019,7 +1050,23 @@ function realchess.get_king_safe_moves(theoretical_moves, board_t, player)
 		local bak_from = v_board[from_idx]
 
 		-- move the piece on the virtual board
-		v_board[to_idx]   = v_board[from_idx]
+		if destmove[2] then
+			-- Promote the pawn, if applicable
+			if destmove[2] == PIECE_KNIGHT then
+				v_board[to_idx] = "n"
+			elseif destmove[2] == PIECE_ROOK then
+				v_board[to_idx] = "r"
+			elseif destmove[2] == PIECE_BISHOP then
+				v_board[to_idx] = "b"
+			elseif destmove[2] == PIECE_QUEEN then
+				v_board[to_idx] = "q"
+			end
+			if player == "white" then
+				v_board[to_idx] = string.upper(v_board[to_idx])
+			end
+		else
+			v_board[to_idx]   = v_board[from_idx]
+		end
 		v_board[from_idx] = "."
 		local black_king_idx, white_king_idx = realchess.locate_kings(v_board)
 		if not black_king_idx or not white_king_idx then
@@ -1035,7 +1082,7 @@ function realchess.get_king_safe_moves(theoretical_moves, board_t, player)
 		local playerAttacked = realchess.attacked(player, king_idx, v_board)
 		if not playerAttacked then
 			safe_moves[from_idx] = safe_moves[from_idx] or {}
-			safe_moves[from_idx][to_idx] = value
+			table.insert(safe_moves[from_idx], destmove)
 			safe_moves_count = safe_moves_count + 1
 		end
 
@@ -3586,6 +3633,183 @@ minetest.register_craft({
 		{"stairs:slab_wood", "stairs:slab_wood", "stairs:slab_wood"}
 	}
 })
+
+--[[ Parse a chess position in Forsyth–Edwards Notation (FEN)
+and return a table, or nil in case of a syntax error.
+The table contains these fields:
+* board_t: Board table (defined elsewhere)
+* player: Player to move ("white" or "black")
+* castlingRights: {
+	castlingWhiteL: 1 if White can castle queenside, 0 otherwise
+	castlingWhiteR: 1 if White can castle kingside, 0 otherwise
+	castlingBlackL: 1 if Black can castle queenside, 0 otherwise
+	castlingBlackR: 1 if Black can castle kingside, 0 otherwise
+}
+* halfmove: number of halfmoves since the last capture or pawn advance
+* prevDoublePawnStepTo: if a pawn did a double-step in the previous move,
+  this is the numeric board index of the destination. If no pawn made a
+  double-step in the previous halfmove, this is 0
+* fullmove: counter that starts at one and is incremented by 1 each time Black has moved
+]]
+local function parse_fen(fen)
+	local fen_parts = string.split(fen, " ")
+	if not fen_parts or #fen_parts < 6 then
+		return nil
+	end
+	local fen_board = fen_parts[1]
+	local fen_player = fen_parts[2]
+	local fen_castling = fen_parts[3]
+	local fen_en_passant = fen_parts[4]
+	local fen_halfmove = tonumber(fen_parts[5])
+	local fen_fullmove = tonumber(fen_parts[6])
+	if not fen_halfmove or not fen_fullmove then
+		return nil
+	end
+	local board_t = {}
+	for b=1, string.len(fen_board) do
+		local p = string.sub(fen_board, b, b)
+		local pn = tonumber(p)
+		if type(pn) == "number" then
+			for i=1, pn do
+				table.insert(board_t, ".")
+			end
+		elseif p ~= "/" then
+			table.insert(board_t, p)
+		end
+	end
+	local player_to_move
+	if fen_player == "w" then
+		player_to_move = "white"
+	elseif fen_player == "b" then
+		player_to_move = "black"
+	else
+		return nil
+	end
+	local castlingRights = {
+		castlingWhiteL = 0,
+		castlingWhiteR = 0,
+		castlingBlackL = 0,
+		castlingBlackR = 0,
+	}
+	if fen_castling ~= "-" then
+		for c=1, string.len(fen_castling) do
+			local ca = string.sub(fen_castling, c, c)
+			if ca == "Q" then
+				castlingRights.castlingWhiteL = 1
+			elseif ca == "K" then
+				castlingRights.castlingWhiteR = 1
+			elseif ca == "q" then
+				castlingRights.castlingBlackL = 1
+			elseif ca == "k" then
+				castlingRights.castlingBlackR = 1
+			end
+		end
+	end
+	local prevDoublePawnStepTo = 0
+	if fen_en_passant ~= "-" then
+		local rank = string.sub(fen_en_passant, 1,1)
+		local file = string.sub(fen_en_passant, 2,2)
+		local x, y
+		if rank == "a" then
+			x = 0
+		elseif rank == "b" then
+			x = 1
+		elseif rank == "c" then
+			x = 2
+		elseif rank == "d" then
+			x = 3
+		elseif rank == "e" then
+			x = 4
+		elseif rank == "f" then
+			x = 5
+		elseif rank == "g" then
+			x = 6
+		elseif rank == "h" then
+			x = 7
+		end
+		y = (tonumber(file) or 1) - 1
+		if y == 3 then
+			y = 2
+		elseif y == 4 then
+			y = 5
+		end
+		local idx = xy_to_index(x, y)
+		prevDoublePawnStepTo = idx
+	end
+
+	return {
+		board_t = board_t,
+		player = player_to_move,
+		castlingRights = castlingRights,
+		prevDoublePawnStepTo = prevDoublePawnStepTo,
+		halfmove = fen_halfmove,
+		fullmove = fen_fullmove,
+	}
+end
+
+-- Count the number of legal moves from a given position given
+-- in FEN.
+local function get_moves_from_fen_position(fen)
+	local parsed_fen = parse_fen(fen)
+
+	-- Count moves
+	local theoretical_moves = realchess.get_theoretical_moves_for(parsed_fen.board_t, parsed_fen.player, parsed_fen.prevDoublePawnStepTo, parsed_fen.castlingRights)
+	local safe_moves, safe_moves_count = realchess.get_king_safe_moves(theoretical_moves, parsed_fen.board_t, parsed_fen.player)
+
+	return safe_moves, safe_moves_count
+end
+
+do
+local function perft_testing_suite()
+	-- Data from <http://www.rocechess.ch/perft.html> and converted to CSV.
+	-- CSV file uses the following roes:
+	-- Column 1: Chess position in FEN
+	-- Column 2: Number of moves this position (perft depth 1)
+	-- Column 3: Number of moves at perft depth 2
+	-- Column 4: Number of moves at perft depth 3
+	-- ...
+	local filepath = minetest.get_modpath("xdecor").."/testing/perftsuite.csv"
+	local iter = io.lines(filepath)
+	if not iter then
+		minetest.log("error", "[xdecor] Chess: Could not load perft testing suite")
+	end
+	local testnum = 0
+	local errors = 0
+	for line in io.lines(filepath) do
+		testnum = testnum + 1
+		local spl = string.split(line, ",")
+		if not spl or #spl == 0 then
+			minetest.log("error", "[xdecor] Chess: Could not split string from perft testing suite at line "..testnum)
+			return
+		end
+		local fen = spl[1]
+		local ply = {}
+		for i=2, #spl do
+			local depth = i-1
+			ply[depth] = tonumber(spl[i])
+			if not ply[depth] then
+				minetest.log("error", "[xdecor] Chess: perft depth in perftsuite.csv is not a number (line="..testnum..")")
+				return
+			end
+		end
+
+		-- Only test at ply 1
+		local moves, counted_moves = get_moves_from_fen_position(fen)
+		local expected_moves = ply[1]
+		if counted_moves ~= expected_moves then
+			minetest.log("error", "[xdecor] Chess: perft test #"..testnum.." FAILED! "..expected_moves.." move(s) expected, got "..counted_moves.." move(s)")
+			minetest.log("error", "[xdecor] Chess: Gotten moves: "..dump(moves))
+			errors = errors + 1
+		end
+	end
+	return errors == 0
+end
+
+if CHESS_DEBUG then
+	perft_testing_suite()
+end
+end
+
 
 --[[ EXPERIMENTAL API FUNCTION
 Use at your own risk!
