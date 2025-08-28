@@ -548,7 +548,3 @@ mostly for technical reasons:
 * There is no direct time limit, but the chessboard will unlock
   if nobody made a move in 5 minutes. This allows everyone to reset
   or dig the chessboard, which aborts the game without a result.
-* The chess notation is a more verbose and readable variant of
-  algebraic notation, but it isn’t identical to the notation
-  defined in Appendix C
-
