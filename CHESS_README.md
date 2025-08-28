@@ -13,6 +13,8 @@ the FIDE Laws of Chess from January 2023. However, for a
 computer version of Chess, there are still some details
 that might need explanation.
 
+
+
 ## Objective
 
 Chess is played between two players on a chessboard. One player plays
@@ -527,3 +529,26 @@ Explanation of the moves:
 #### Other symbols
 
 Other symbols are not used. So there are no special symbols for check and checkmate and no comments for moves considered good or bad.
+
+
+
+## Notworthy differences from The FIDE Laws of Chess (2023)
+
+X-Decor-libre tries to be as faithful to the FIDE Laws of Chess
+of 2023 as much as possible, but there are a few differences,
+mostly for technical reasons:
+
+* Players cannot agree to draw (Articles 5.2.3 and 9.1.1)
+* Only a few select obvious dead positions (like King vs King)
+  lead to an instant draw (Article 5.2.2)
+* Resigning always leads to an instant loss, even if the
+  opponent cannot give checkmate under any series of legal moves
+  (Article 5.1.2)
+* Pieces are never considered “touched”, Article 4 does not apply
+* There is no direct time limit, but the chessboard will unlock
+  if nobody made a move in 5 minutes. This allows everyone to reset
+  or dig the chessboard, which aborts the game without a result.
+* The chess notation is a more verbose and readable variant of
+  algebraic notation, but it isn’t identical to the notation
+  defined in Appendix C
+
