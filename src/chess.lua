@@ -2191,33 +2191,37 @@ local function update_game_result(pos, meta, lastMove)
 		update_formspec(meta)
 		local claimer, other
 		if lastMove == "black" or lastMove == "" then
-			claimer = playerWhite
-			other = playerBlack
-		else
 			claimer = playerBlack
+			claimerDisplay = playerBlackDisplay
 			other = playerWhite
+		else
+			claimer = playerWhite
+			claimerDisplay = playerWhiteDisplay
+			other = playerBlack
 		end
 		--~ Chess message
 		send_message(claimer, S("You have drawn the game by invoking the 50-move rule."), botColor)
 		if claimer ~= other then
 			--~ Chess message. @1 = player name
-			send_message(other, S("@1 has drawn the game by invoking the 50-move rule.", claimer), botColor)
+			send_message(other, S("@1 has drawn the game by invoking the 50-move rule.", claimerDisplay), botColor)
 		end
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the 50-move rule")
 	elseif drawClaim == "50_move_rule" then
 		local claimer, other
 		if lastMove == "black" or lastMove == "" then
-			claimer = playerWhite
-			other = playerBlack
-		else
 			claimer = playerBlack
+			claimerDisplay = playerBlackDisplay
 			other = playerWhite
+		else
+			claimer = playerWhite
+			claimerDisplay = playerWhiteDisplay
+			other = playerBlack
 		end
 		--~ Chess message shown when player has invoked a rule to claim a draw and had to make a game-drawing move but instead made a different move
 		send_message(claimer, S("You have failed to make a game-drawing move. The game continues."), botColor)
 		if claimer ~= other then
 			--~ Chess message shown when player (name = @1) has invoked the 50-move rule to claim a draw and had to make a game-drawing move but instead made a different move
-			send_message(other, S("@1 made a draw claim using the 50-move rule but it was false. The game continues.", claimer), botColor)
+			send_message(other, S("@1 made a draw claim using the 50-move rule but it was false. The game continues.", claimerDisplay), botColor)
 		end
 	end
 
@@ -2301,32 +2305,36 @@ local function update_game_result(pos, meta, lastMove)
 		update_formspec(meta)
 		local claimer, other
 		if lastMove == "black" or lastMove == "" then
-			claimer = playerWhite
-			other = playerBlack
-		else
 			claimer = playerBlack
+			claimerDisplay = playerBlackDisplay
 			other = playerWhite
+		else
+			claimer = playerWhite
+			claimerDisplay = playerWhiteDisplay
+			other = playerBlack
 		end
 		--~ Chess message
 		send_message(claimer, S("You have drawn the game by invoking the threefold repetition rule."), botColor)
 		if claimer ~= other then
 			--~ Chess message. @1 = player name
-			send_message(other, S("@1 has drawn the game by invoking the threefold repetition rule.", claimer), botColor)
+			send_message(other, S("@1 has drawn the game by invoking the threefold repetition rule.", claimerDisplay), botColor)
 		end
 		minetest.log("action", "[xdecor] Chess: A game between "..playerWhite.." and "..playerBlack.." ended in a draw because "..claimer.." has invoked the threefold repetition rule")
 	elseif drawClaim == "same_position_3" then
 		local claimer, other
 		if lastMove == "black" or lastMove == "" then
-			claimer = playerWhite
-			other = playerBlack
-		else
 			claimer = playerBlack
+			claimerDisplay = playerBlackDisplay
 			other = playerWhite
+		else
+			claimer = playerWhite
+			claimerDisplay = playerWhiteDisplay
+			other = playerBlack
 		end
 		send_message(claimer, S("You have failed to make a game-drawing move. The game continues."), botColor)
 		if claimer ~= other then
 			--~ Chess message shown when player (name = @1) has invoked the threefold repetition rule to claim a draw and had to make a game-drawing move but instead made a different move
-			send_message(other, S("@1 made a draw claim using the threefold repetition rule but it was false. The game continues.", claimer), botColor)
+			send_message(other, S("@1 made a draw claim using the threefold repetition rule but it was false. The game continues.", claimerDisplay), botColor)
 		end
 	end
 

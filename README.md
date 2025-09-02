@@ -9,6 +9,10 @@ This is a libre version (free software, free media) of the X-Decor mod for Luant
 It is the same as X-Decor, except with all the non-free files replaced and with
 bugfixes. There are no major new features.
 
+## Version
+
+This is version `libre14`.
+
 ## New blocks
 
 This mod adds many decoration blocks: Flower pot, weathervane, radio, speaker,

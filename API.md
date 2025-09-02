@@ -102,6 +102,13 @@ name of an unknown item, `xdecor:bowl` is the assumed default.
 (However, an unknown item in `original_bowl` will trigger a warning.)
 
 
+## Custom Chess bot (experimental)
+
+You can replace the (very weak) Chess computer player with a custom one.
+See `src/chess.lua` for details (`realchess.set_chessbot`).
+
+Note this feature is relatively experimental, but it has survived
+first initial tests.
 
 ## Groups
 
