@@ -2303,7 +2303,7 @@ local function update_game_result(pos, meta, lastMove)
 		meta:set_string("gameResultReason", "same_position_3")
 		add_special_to_moves_list(meta, "draw")
 		update_formspec(meta)
-		local claimer, other
+		local claimer, claimerDisplay, other
 		if lastMove == "black" or lastMove == "" then
 			claimer = playerBlack
 			claimerDisplay = playerBlackDisplay
