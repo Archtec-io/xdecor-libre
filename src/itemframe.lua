@@ -201,6 +201,7 @@ minetest.register_entity("xdecor:f_item", {
 		local pos = self.object:get_pos()
 		if minetest.get_node(pos).name ~= "xdecor:itemframe" then
 			self.object:remove()
+			return
 		end
 
 		if tmp.nodename and tmp.texture then
@@ -220,6 +221,8 @@ minetest.register_entity("xdecor:f_item", {
 				textures = {self.texture}
 			})
 		end
+
+		self.object:set_armor_groups({immortal=1})
 	end,
 	get_staticdata = function(self)
 		if self.nodename and self.texture then
@@ -227,7 +230,12 @@ minetest.register_entity("xdecor:f_item", {
 		end
 
 		return ""
-	end
+	end,
+
+	-- Minetest Game support: Prevent entity being pushed or damaged by TNT explosion
+	on_blast = function()
+		return false, false, {}
+	end,
 })
 
 -- Recipes
