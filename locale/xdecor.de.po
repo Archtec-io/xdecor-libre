@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Luanti textdomain xdecor\n"
 "Report-Msgid-Bugs-To: Wuzzy@disroot.org\n"
-"POT-Creation-Date: 2025-08-26 16:34+0200\n"
-"PO-Revision-Date: 2025-08-26 22:53+0200\n"
+"POT-Creation-Date: 2025-09-24 15:44+0200\n"
+"PO-Revision-Date: 2025-09-24 16:35+0200\n"
 "Last-Translator: Wuzzy <Wuzzy@disroot.org>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -13,11 +13,27 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.6\n"
 
+#: handlers/registration.lua:75 handlers/registration.lua:91
+msgid "@1 Stair"
+msgstr "@1treppe"
+
+#: handlers/registration.lua:78 handlers/registration.lua:94
+msgid "Inner @1 Stair"
+msgstr "Innere @1treppe"
+
+#: handlers/registration.lua:80 handlers/registration.lua:95
+msgid "Outer @1 Stair"
+msgstr "Äußere @1treppe"
+
+#: handlers/registration.lua:84 handlers/registration.lua:92
+msgid "@1 Slab"
+msgstr "@1platte"
+
 #: src/chessbot_random.lua:51
 msgid "Random Computer"
 msgstr "Zufallscomputer"
 
-#: src/chessbot_weak.lua:119
+#: src/chessbot_weak.lua:125
 msgid "Weak Computer"
 msgstr "Schwacher Computer"
 
@@ -30,62 +46,62 @@ msgid "Chess Debug"
 msgstr "Schachdebug"
 
 #. ~ Chess: Game mode selection prompt
-#: src/chess.lua:1237 src/chess.lua:1238
+#: src/chess.lua:1284 src/chess.lua:1285
 msgid "Select a game mode"
 msgstr "Wählen Sie einen Spielmodus"
 
 #. ~ Chess: Game mode selection prompt
-#: src/chess.lua:1240
+#: src/chess.lua:1287
 msgid "Select a mode:"
 msgstr "Modus wählen:"
 
 #. ~ Chess game mode (player vs bot)
-#: src/chess.lua:1242
+#: src/chess.lua:1289
 msgid "Singleplayer"
 msgstr "Einzelspieler"
 
 #. ~ Chess game mode (player vs player)
-#: src/chess.lua:1244
+#: src/chess.lua:1291
 msgid "Multiplayer"
 msgstr "Mehrspieler"
 
 #. ~ Chess game mode
-#: src/chess.lua:1247
+#: src/chess.lua:1294
 msgid "Bot vs Bot"
 msgstr "Bot vs. Bot"
 
 #. ~ Chess: player is in check
-#: src/chess.lua:1767
+#: src/chess.lua:1814
 msgid "check"
 msgstr "Schach"
 
 #. ~ Chess: player has been checkmated
-#: src/chess.lua:1769
+#: src/chess.lua:1816
 msgid "checkmate"
 msgstr "Schachmatt"
 
 #. ~ Chess: player has resigned
-#: src/chess.lua:1771
+#: src/chess.lua:1818
 msgid "resigned"
 msgstr "aufgegeben"
 
 #. ~ Chess: player has won
-#: src/chess.lua:1773
+#: src/chess.lua:1820
 msgid "winner"
 msgstr "Sieger"
 
 #. ~ Chess: player has lost
-#: src/chess.lua:1775
+#: src/chess.lua:1822
 msgid "loser"
 msgstr "Verlierer"
 
 #. ~ Chess: player has a draw
-#: src/chess.lua:1777
+#: src/chess.lua:1824
 msgid "draw"
 msgstr "Remis"
 
 #. ~ Chess: Shown when black player can promote a pawn. Space for text is limited.
-#: src/chess.lua:1822
+#: src/chess.lua:1869
 msgid ""
 "PROMOTION\n"
 "FOR BLACK!"
@@ -94,12 +110,12 @@ msgstr ""
 "FÜR SCHWARZ!"
 
 #. ~ Chess: Prompt for player who must select to which piece to promote their pawn. Space for text is limited.
-#: src/chess.lua:1828 src/chess.lua:1844
+#: src/chess.lua:1875 src/chess.lua:1891
 msgid "Promote pawn to:"
 msgstr "Bauer umwandeln zu:"
 
 #. ~ Chess: Shown when white player can promote a pawn. Space for text is limited.
-#: src/chess.lua:1839
+#: src/chess.lua:1886
 msgid ""
 "PROMOTION\n"
 "FOR WHITE!"
@@ -108,7 +124,7 @@ msgstr ""
 "FÜR WEISS!"
 
 #. ~ Chess: Shown when white player wants to use the 50-move rule or threefold-repetition rule to claim a draw. Space for text is limited.
-#: src/chess.lua:1857
+#: src/chess.lua:1904
 msgid ""
 "DRAW CLAIM\n"
 "BY WHITE!"
@@ -117,7 +133,7 @@ msgstr ""
 "VON WEISS!"
 
 #. ~ Chess: Shown when black player wants to use the 50-move rule or threefold-repetition rule to claim a draw. Space for text is limited.
-#: src/chess.lua:1860
+#: src/chess.lua:1907
 msgid ""
 "DRAW CLAIM\n"
 "BY BLACK!"
@@ -126,7 +142,7 @@ msgstr ""
 "VON SCHWARZ!"
 
 #. ~ Chess message
-#: src/chess.lua:1867
+#: src/chess.lua:1914
 msgid ""
 "The player has invoked the 50-move rule for the next move. The next move "
 "might draw the game."
@@ -135,7 +151,7 @@ msgstr ""
 "nächste Zug könnte die Partie remis enden lassen."
 
 #. ~ Chess message
-#: src/chess.lua:1873
+#: src/chess.lua:1920
 msgid ""
 "The player has invoked the threefold-repetition rule for the next move. The "
 "next move might draw the game."
@@ -144,72 +160,72 @@ msgstr ""
 "anwenden. Der nächste Zug könnte die Partie remis enden lassen."
 
 #. ~ Chess button
-#: src/chess.lua:1880
+#: src/chess.lua:1927
 msgid "New game"
 msgstr "Neues Spiel"
 
 #. ~ Resign (give up) in Chess
-#: src/chess.lua:1887
+#: src/chess.lua:1934
 msgid "Resign"
 msgstr "Aufgeben"
 
 #. ~ Chess: Prompt to select a player color
-#: src/chess.lua:1893
+#: src/chess.lua:1940
 msgid "Select a color:"
 msgstr "Farbe wählen:"
 
 #. ~ White Chess player
-#: src/chess.lua:1897
+#: src/chess.lua:1944
 msgid "White"
 msgstr "Weiß"
 
 #. ~ Black Chess player
-#: src/chess.lua:1899
+#: src/chess.lua:1946
 msgid "Black"
 msgstr "Schwarz"
 
 #. ~ Chess message
-#: src/chess.lua:1911
+#: src/chess.lua:1958
 msgid "Invoke the 50-move rule for your next move"
 msgstr "50-Züge-Regel für den nächsten Zug anwenden"
 
 #. ~ Chess message
-#: src/chess.lua:1918
+#: src/chess.lua:1965
 msgid "Invoke the 50-move rule and draw the game"
 msgstr "50-Züge-Regel anwenden und die Partie remis enden lassen"
 
 #. ~ Chess message
-#: src/chess.lua:1931
+#: src/chess.lua:1978
 msgid "Invoke the threefold repetition rule and draw the game"
 msgstr "Stellungswiederholungsregel anwenden und die Partie remis enden lassen"
 
 #. ~ Chess message
-#: src/chess.lua:1938
+#: src/chess.lua:1985
 msgid "Invoke the threefold repetition rule for your next move"
 msgstr "Stellungswiederholungsregel für den nächsten Zug anwenden"
 
 #. ~ Chess message. @1 = opponent name
-#: src/chess.lua:2069 src/chess.lua:2094
+#: src/chess.lua:2116 src/chess.lua:2141
 msgid "You have checkmated @1. You win!"
 msgstr "Sie haben @1 schachmatt gesetzt. Sieg!"
 
 #. ~ Chess message. @1 = opponent name
-#: src/chess.lua:2071 src/chess.lua:2096
+#: src/chess.lua:2118 src/chess.lua:2143
 msgid "You were checkmated by @1. You lose!"
 msgstr "Sie wurden von @1 schachmatt gesetzt. Niederlage!"
 
 #. ~ Chess message
-#: src/chess.lua:2081 src/chess.lua:2106
+#: src/chess.lua:2128 src/chess.lua:2153
 msgid "The game ended up in a stalemate! It's a draw!"
 msgstr "Das Partie endete in einem Patt. Das ist ein Remis!"
 
 #. ~ Chess message
-#: src/chess.lua:2119
+#: src/chess.lua:2166
 msgid "The game ended up in a dead position! It's a draw!"
 msgstr "Das Partie endete in einer toten Stellung. Das ist ein Remis!"
 
 #. ~ Chess message
-#: src/chess.lua:2133
+#: src/chess.lua:2180
 msgid ""
 "No piece was captured and no pawn was moved for 75 consecutive moves of each "
 "player. It's a draw!"
@@ -218,26 +234,26 @@ msgstr ""
 "kein Bauer gezogen. Es ist ein Remis!"
 
 #. ~ Chess message
-#: src/chess.lua:2154 src/chess.lua:3132
+#: src/chess.lua:2203 src/chess.lua:3187
 msgid "You have drawn the game by invoking the 50-move rule."
 msgstr ""
 "Sie haben die Partie remis enden lassen, indem Sie die 50-Züge-Regel "
 "angewandt haben."
 
 #. ~ Chess message. @1 = player name
-#: src/chess.lua:2157 src/chess.lua:3135
+#: src/chess.lua:2206 src/chess.lua:3190
 msgid "@1 has drawn the game by invoking the 50-move rule."
 msgstr "@1 hat die Partie mittels der 50-Züge Regel remis enden lassen."
 
 #. ~ Chess message shown when player has invoked a rule to claim a draw and had to make a game-drawing move but instead made a different move
-#: src/chess.lua:2170 src/chess.lua:2279
+#: src/chess.lua:2221 src/chess.lua:2334
 msgid "You have failed to make a game-drawing move. The game continues."
 msgstr ""
 "Sie haben keinen Zug gemacht, der die Partie remis enden lässt. Die Partie "
 "geht weiter."
 
 #. ~ Chess message shown when player (name = @1) has invoked the 50-move rule to claim a draw and had to make a game-drawing move but instead made a different move
-#: src/chess.lua:2173
+#: src/chess.lua:2224
 msgid ""
 "@1 made a draw claim using the 50-move rule but it was false. The game "
 "continues."
@@ -246,25 +262,25 @@ msgstr ""
 "Partie geht weiter."
 
 #. ~ Chess message when a fivefold repetition has happened
-#: src/chess.lua:2243
+#: src/chess.lua:2294
 msgid "The exact same position has occured 5 times. It's a draw!"
 msgstr "Die exakt gleiche Stellung ist 5 mal aufgetreten. Das ist ein Remis!"
 
 #. ~ Chess message
-#: src/chess.lua:2264 src/chess.lua:3180
+#: src/chess.lua:2317 src/chess.lua:3235
 msgid "You have drawn the game by invoking the threefold repetition rule."
 msgstr ""
 "Sie haben die Partie remis enden lassen, indem Sie die "
 "Stellungswiederholungsregel angewandt haben."
 
 #. ~ Chess message. @1 = player name
-#: src/chess.lua:2267 src/chess.lua:3183
+#: src/chess.lua:2320 src/chess.lua:3238
 msgid "@1 has drawn the game by invoking the threefold repetition rule."
 msgstr ""
 "@1 hat die Partie remis mittels der Stellungswiederholungsregel enden lassen."
 
 #. ~ Chess message shown when player (name = @1) has invoked the threefold repetition rule to claim a draw and had to make a game-drawing move but instead made a different move
-#: src/chess.lua:2282
+#: src/chess.lua:2337
 msgid ""
 "@1 made a draw claim using the threefold repetition rule but it was false. "
 "The game continues."
@@ -272,41 +288,41 @@ msgstr ""
 "@1 hat ein Remis mittels der Stellungswiederholungsregel beansprucht aber "
 "lag falsch. Die Partie geht weiter."
 
-#: src/chess.lua:2295 src/chess.lua:3424
+#: src/chess.lua:2350 src/chess.lua:3479
 msgid "Chess Board"
 msgstr "Schachbrett"
 
 #. ~ Chess message when player tries to move with someone else's pieces
-#: src/chess.lua:2389
+#: src/chess.lua:2444
 msgid "Someone else plays white pieces!"
 msgstr "Jemand anderes spielt Weiß!"
 
 #. ~ Chess message
-#: src/chess.lua:2400 src/chess.lua:2420
+#: src/chess.lua:2455 src/chess.lua:2475
 msgid "It's not your turn!"
 msgstr "Sie sind nicht am Zug!"
 
 #. ~ Chess message when player tries to move with someone else's pieces
-#: src/chess.lua:2410
+#: src/chess.lua:2465
 msgid "Someone else plays black pieces!"
 msgstr "Jemand anderes spielt Schwarz!"
 
 #. ~ Chess message
-#: src/chess.lua:2427
+#: src/chess.lua:2482
 msgid "Black cannot move first!"
 msgstr "Schwarz darf nicht zuerst ziehen!"
 
 #. ~ number of seconds
-#: src/chess.lua:2964
+#: src/chess.lua:3019
 msgid "@1 s"
 msgstr "@1 s"
 
 #. ~ number of minutes and seconds
-#: src/chess.lua:2968
+#: src/chess.lua:3023
 msgid "@1 min @2 s"
 msgstr "@1 min @2 s"
 
-#: src/chess.lua:3041
+#: src/chess.lua:3096
 msgid ""
 "You can't reset the chessboard, a game has been started. Try again in @1."
 msgstr ""
@@ -314,46 +330,46 @@ msgstr ""
 "gestartet. Versuchen Sie es erneut in @1."
 
 #. ~ Chess message when player tried to resign too early
-#: src/chess.lua:3053
+#: src/chess.lua:3108
 msgid "Resigning is not possible yet."
 msgstr "Aufgeben ist noch nicht möglich."
 
 #. ~ Chess message when player resigned (gave up)
-#: src/chess.lua:3084
+#: src/chess.lua:3139
 msgid "You have resigned."
 msgstr "Sie haben aufgegeben."
 
 #. ~ Chess message when player resigned (gave up). @1 = opponent name
-#: src/chess.lua:3087
+#: src/chess.lua:3142
 msgid "@1 has resigned. You win!"
 msgstr "@1 hat aufgegeben. Sie haben gewonnen!"
 
 #. ~ Chess message
-#: src/chess.lua:3093
+#: src/chess.lua:3148
 msgid "You can't resign, you're not playing in this game."
 msgstr "Sie können nicht aufgeben, Sie spielen nicht in dieser Partie."
 
 #. ~ Chess message
-#: src/chess.lua:3121 src/chess.lua:3168
+#: src/chess.lua:3176 src/chess.lua:3223
 msgid "You can't claim a draw, it's not your turn!"
 msgstr "Sie können kein Remis beanspruchen, Sie sind nicht am Zug!"
 
-#: src/chess.lua:3205
+#: src/chess.lua:3260
 msgid "You're only a spectator in this game of Chess."
 msgstr "Sie sind nur Zuschauer bei dieser Schachpartie."
 
 #. ~ Chess message when player tried to promote a pawn when it's not legal
-#: src/chess.lua:3212
+#: src/chess.lua:3267
 msgid "This isn't the time for promotion."
 msgstr "Jetzt ist nicht die Zeit für eine Umwandlung."
 
 #. ~ Chess message when player tried to promote a pawn when it's not their turn
-#: src/chess.lua:3216 src/chess.lua:3223
+#: src/chess.lua:3271 src/chess.lua:3278
 msgid "It's not your turn! This promotion is meant for the other player."
 msgstr "Sie sind nicht am Zug! Diese Umwandlung ist für den anderen Spieler."
 
 #. ~ Shown when player tried to dig a chessboard but is not allowed to. @1 = time
-#: src/chess.lua:3271
+#: src/chess.lua:3326
 msgid ""
 "You can't dig the chessboard, a game has been started. Reset it first or dig "
 "it again in @1."
@@ -362,7 +378,7 @@ msgstr ""
 "Setzen Sie es zuerst zurück oder bauen Sie es in @1 erneut ab."
 
 #. ~ Shown when player tried to dig a chessboard but is not allowed to. @1 = time
-#: src/chess.lua:3277
+#: src/chess.lua:3332
 msgid ""
 "You can't dig the chessboard, a game has been started. Try it again in @1."
 msgstr ""
@@ -370,71 +386,71 @@ msgstr ""
 "Versuchen Sie es erneut in @1."
 
 #. ~ Chess board tooltip
-#: src/chess.lua:3442
+#: src/chess.lua:3497
 msgid "Play a game of Chess against another player or the computer"
 msgstr "Für Schachspiele gegen einen anderen Spieler oder den Computer"
 
 #. ~ chess piece
-#: src/chess.lua:3551
+#: src/chess.lua:3606
 msgid "White Pawn"
 msgstr "Weißer Bauer"
 
 #. ~ chess piece
-#: src/chess.lua:3553
+#: src/chess.lua:3608
 msgid "Black Pawn"
 msgstr "Schwarzer Bauer"
 
 #. ~ chess piece
-#: src/chess.lua:3556
+#: src/chess.lua:3611
 msgid "White Rook"
 msgstr "Weißer Turm"
 
 #. ~ chess piece
-#: src/chess.lua:3558
+#: src/chess.lua:3613
 msgid "Black Rook"
 msgstr "Schwarzer Turm"
 
 #. ~ chess piece
-#: src/chess.lua:3561
+#: src/chess.lua:3616
 msgid "White Knight"
 msgstr "Weißer Springer"
 
 #. ~ chess piece
-#: src/chess.lua:3563
+#: src/chess.lua:3618
 msgid "Black Knight"
 msgstr "Schwarzer Springer"
 
 #. ~ chess piece
-#: src/chess.lua:3566
+#: src/chess.lua:3621
 msgid "White Bishop"
 msgstr "Weißer Läufer"
 
 #. ~ chess piece
-#: src/chess.lua:3568
+#: src/chess.lua:3623
 msgid "Black Bishop"
 msgstr "Schwarzer Läufer"
 
 #. ~ chess piece
-#: src/chess.lua:3571
+#: src/chess.lua:3626
 msgid "White Queen"
 msgstr "Weiße Dame"
 
 #. ~ chess piece
-#: src/chess.lua:3573
+#: src/chess.lua:3628
 msgid "Black Queen"
 msgstr "Schwarze Dame"
 
 #. ~ chess piece
-#: src/chess.lua:3576
+#: src/chess.lua:3631
 msgid "White King"
 msgstr "Weißer König"
 
 #. ~ chess piece
-#: src/chess.lua:3578
+#: src/chess.lua:3633
 msgid "Black King"
 msgstr "Schwarzer König"
 
-#: src/chess.lua:3667
+#: src/chess.lua:3899
 msgid "Computer"
 msgstr "Computer"
 
@@ -568,7 +584,7 @@ msgid "Enchant your tools with mese crystals"
 msgstr "Werkzeuge mit Mesekristallen verzaubern"
 
 #. ~ Enchanted tool description, e.g. "Enchanted Diamond Sword". @1 is the original tool name, @2 is the enchantment text, e.g. "Durability (+20%)"
-#: src/enchanting.lua:379 src/enchanting.lua:507
+#: src/enchanting.lua:388 src/enchanting.lua:516
 msgid ""
 "Enchanted @1\n"
 "@2"
@@ -577,7 +593,7 @@ msgstr ""
 "@2"
 
 #. ~ Enchanted tool description, e.g. "Enchanted Diamond Sword"
-#: src/enchanting.lua:381 src/enchanting.lua:508
+#: src/enchanting.lua:390 src/enchanting.lua:517
 msgid "Enchanted @1"
 msgstr "@1 (verzaubert)"
 
@@ -633,6 +649,2326 @@ msgstr "@1 (Eigentum von @2)"
 #: src/itemframe.lua:169
 msgid "For presenting a single item"
 msgstr "Präsentiert einen einzelnen Gegenstand"
+
+#: src/_locale_workbench.lua:2
+msgid "Coral Skeleton Stair"
+msgstr "Korallenskeletttreppe"
+
+#: src/_locale_workbench.lua:3
+msgid "Coral Skeleton Slab"
+msgstr "Korallenskelettplatte"
+
+#: src/_locale_workbench.lua:4
+msgid "Inner Coral Skeleton Stair"
+msgstr "Innere Korallenskeletttreppe"
+
+#: src/_locale_workbench.lua:5
+msgid "Outer Coral Skeleton Stair"
+msgstr "Äußere Korallenskeletttreppe"
+
+#: src/_locale_workbench.lua:6
+msgid "Coral Skeleton Nanoslab"
+msgstr "Korallenskelettnanoplatte"
+
+#: src/_locale_workbench.lua:7
+msgid "Coral Skeleton Micropanel"
+msgstr "Korallenskelettmikropaneel"
+
+#: src/_locale_workbench.lua:8
+msgid "Coral Skeleton Microslab"
+msgstr "Korallenskelettmikroplatte"
+
+#: src/_locale_workbench.lua:9
+msgid "Coral Skeleton Thin Stair"
+msgstr "Korallenskelettflachtreppe"
+
+#: src/_locale_workbench.lua:10
+msgid "Coral Skeleton Cube"
+msgstr "Korallenskelettwürfel"
+
+#: src/_locale_workbench.lua:11
+msgid "Coral Skeleton Panel"
+msgstr "Korallenskelettpaneel"
+
+#: src/_locale_workbench.lua:12
+msgid "Coral Skeleton Double Panel"
+msgstr "Korallenskelettdoppelpaneel"
+
+#: src/_locale_workbench.lua:13
+msgid "Coral Skeleton Half-Stair"
+msgstr "Korallenskeletthalbtreppe"
+
+#: src/_locale_workbench.lua:14
+msgid "Brown Coral Stair"
+msgstr "Braune Korallentreppe"
+
+#: src/_locale_workbench.lua:15
+msgid "Brown Coral Slab"
+msgstr "Braune Korallenplatte"
+
+#: src/_locale_workbench.lua:16
+msgid "Inner Brown Coral Stair"
+msgstr "Innere braune Korallentreppe"
+
+#: src/_locale_workbench.lua:17
+msgid "Outer Brown Coral Stair"
+msgstr "Äußere braune Korallentreppe"
+
+#: src/_locale_workbench.lua:18
+msgid "Brown Coral Nanoslab"
+msgstr "Braune Korallennanoplatte"
+
+#: src/_locale_workbench.lua:19
+msgid "Brown Coral Micropanel"
+msgstr "Braunes Korallenmikropaneel"
+
+#: src/_locale_workbench.lua:20
+msgid "Brown Coral Microslab"
+msgstr "Braune Korallenmikroplatte"
+
+#: src/_locale_workbench.lua:21
+msgid "Brown Coral Thin Stair"
+msgstr "Braune Korallenflachtreppe"
+
+#: src/_locale_workbench.lua:22
+msgid "Brown Coral Cube"
+msgstr "Brauner Korallenwürfel"
+
+#: src/_locale_workbench.lua:23
+msgid "Brown Coral Panel"
+msgstr "Braunes Korallenpaneel"
+
+#: src/_locale_workbench.lua:24
+msgid "Brown Coral Double Panel"
+msgstr "Braunes Korallendoppelpaneel"
+
+#: src/_locale_workbench.lua:25
+msgid "Brown Coral Half-Stair"
+msgstr "Braune Korallenhalbtreppe"
+
+#: src/_locale_workbench.lua:26
+msgid "Orange Coral Stair"
+msgstr "Orange Korallentreppe"
+
+#: src/_locale_workbench.lua:27
+msgid "Orange Coral Slab"
+msgstr "Orange Korallenplatte"
+
+#: src/_locale_workbench.lua:28
+msgid "Inner Orange Coral Stair"
+msgstr "Innere orange Korallentreppe"
+
+#: src/_locale_workbench.lua:29
+msgid "Outer Orange Coral Stair"
+msgstr "Äußere orange Korallentreppe"
+
+#: src/_locale_workbench.lua:30
+msgid "Orange Coral Nanoslab"
+msgstr "Orange Korallennanoplatte"
+
+#: src/_locale_workbench.lua:31
+msgid "Orange Coral Micropanel"
+msgstr "Orange Korallenmikropaneel"
+
+#: src/_locale_workbench.lua:32
+msgid "Orange Coral Microslab"
+msgstr "Orange Korallenmikroplatte"
+
+#: src/_locale_workbench.lua:33
+msgid "Orange Coral Thin Stair"
+msgstr "Orange Korallenflachtreppe"
+
+#: src/_locale_workbench.lua:34
+msgid "Orange Coral Cube"
+msgstr "Orange Korallenwürfel"
+
+#: src/_locale_workbench.lua:35
+msgid "Orange Coral Panel"
+msgstr "Orange Korallenpaneel"
+
+#: src/_locale_workbench.lua:36
+msgid "Orange Coral Double Panel"
+msgstr "Orange Korallendoppelpaneel"
+
+#: src/_locale_workbench.lua:37
+msgid "Orange Coral Half-Stair"
+msgstr "Orange Korallenhalbtreppe"
+
+#: src/_locale_workbench.lua:38
+msgid "Cobblestone Nanoslab"
+msgstr "Kopfsteinpflasternanoplatte"
+
+#: src/_locale_workbench.lua:39
+msgid "Cobblestone Micropanel"
+msgstr "Kopfsteinpflastermikropaneel"
+
+#: src/_locale_workbench.lua:40
+msgid "Cobblestone Microslab"
+msgstr "Kopfsteinpflastermikroplatte"
+
+#: src/_locale_workbench.lua:41
+msgid "Cobblestone Thin Stair"
+msgstr "Kopfsteinpflasterflachtreppe"
+
+#: src/_locale_workbench.lua:42
+msgid "Cobblestone Cube"
+msgstr "Kopfsteinpflasterwürfel"
+
+#: src/_locale_workbench.lua:43
+msgid "Cobblestone Panel"
+msgstr "Kopfsteinpflasterpaneel"
+
+#: src/_locale_workbench.lua:44
+msgid "Cobblestone Double Panel"
+msgstr "Kopfsteinpflasterdoppelpaneel"
+
+#: src/_locale_workbench.lua:45
+msgid "Cobblestone Half-Stair"
+msgstr "Kopfsteinpflasterhalbtreppe"
+
+#: src/_locale_workbench.lua:46
+msgid "Mossy Cobblestone Nanoslab"
+msgstr "Moosige Kopfsteinplflasternanoplatte"
+
+#: src/_locale_workbench.lua:47
+msgid "Mossy Cobblestone Micropanel"
+msgstr "Moosiges Kopfsteinpflastermikropaneel"
+
+#: src/_locale_workbench.lua:48
+msgid "Mossy Cobblestone Microslab"
+msgstr "Moosige Kopfsteinpflastermikroplatte"
+
+#: src/_locale_workbench.lua:49
+msgid "Mossy Cobblestone Thin Stair"
+msgstr "Moosige Kopfsteinpflasterflachtreppe"
+
+#: src/_locale_workbench.lua:50
+msgid "Mossy Cobblestone Cube"
+msgstr "Moosiger Kopfsteinpflasterwürfel"
+
+#: src/_locale_workbench.lua:51
+msgid "Mossy Cobblestone Panel"
+msgstr "Moosiges Kopfsteinpflasterpaneel"
+
+#: src/_locale_workbench.lua:52
+msgid "Mossy Cobblestone Double Panel"
+msgstr "Moosiges Kopfsteinpflasterdoppelpaneel"
+
+#: src/_locale_workbench.lua:53
+msgid "Mossy Cobblestone Half-Stair"
+msgstr "Moosige Kopfsteinpflasterhalbtreppe"
+
+#: src/_locale_workbench.lua:54
+msgid "Brick Block Nanoslab"
+msgstr "Ziegelblocknanoplatte"
+
+#: src/_locale_workbench.lua:55
+msgid "Brick Block Micropanel"
+msgstr "Ziegelblockmikropaneel"
+
+#: src/_locale_workbench.lua:56
+msgid "Brick Block Microslab"
+msgstr "Ziegelblockmikroplatte"
+
+#: src/_locale_workbench.lua:57
+msgid "Brick Block Thin Stair"
+msgstr "Ziegelblockflachtreppe"
+
+#: src/_locale_workbench.lua:58
+msgid "Brick Block Cube"
+msgstr "Ziegelblockwürfel"
+
+#: src/_locale_workbench.lua:59
+msgid "Brick Block Panel"
+msgstr "Ziegelblockpaneel"
+
+#: src/_locale_workbench.lua:60
+msgid "Brick Block Double Panel"
+msgstr "Ziegelblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:61
+msgid "Brick Block Half-Stair"
+msgstr "Ziegelblockhalbtreppe"
+
+#: src/_locale_workbench.lua:62
+msgid "Barrel Stair"
+msgstr "Fasstreppe"
+
+#: src/_locale_workbench.lua:63
+msgid "Barrel Slab"
+msgstr "Fassplatte"
+
+#: src/_locale_workbench.lua:64
+msgid "Inner Barrel Stair"
+msgstr "Innere Fasstreppe"
+
+#: src/_locale_workbench.lua:65
+msgid "Outer Barrel Stair"
+msgstr "Äußere Fasstreppe"
+
+#: src/_locale_workbench.lua:66
+msgid "Barrel Nanoslab"
+msgstr "Fassnanoplatte"
+
+#: src/_locale_workbench.lua:67
+msgid "Barrel Micropanel"
+msgstr "Fassmikropaneel"
+
+#: src/_locale_workbench.lua:68
+msgid "Barrel Microslab"
+msgstr "Fassmikroplatte"
+
+#: src/_locale_workbench.lua:69
+msgid "Barrel Thin Stair"
+msgstr "Fassflachtreppe"
+
+#: src/_locale_workbench.lua:70
+msgid "Barrel Cube"
+msgstr "Fasswürfel"
+
+#: src/_locale_workbench.lua:71
+msgid "Barrel Panel"
+msgstr "Fasspaneel"
+
+#: src/_locale_workbench.lua:72
+msgid "Barrel Double Panel"
+msgstr "Fassdoppelpaneel"
+
+#: src/_locale_workbench.lua:73
+msgid "Barrel Half-Stair"
+msgstr "Fasshalbtreppe"
+
+#: src/_locale_workbench.lua:74
+msgid "Wood Framed Glass Stair"
+msgstr "Holzrahmenglastreppe"
+
+#: src/_locale_workbench.lua:75
+msgid "Inner Wood Framed Glass Stair"
+msgstr "Innere Holzrahmenglastreppe"
+
+#: src/_locale_workbench.lua:76
+msgid "Outer Wood Framed Glass Stair"
+msgstr "Äußere Holzrahmenglastreppe"
+
+#: src/_locale_workbench.lua:77
+msgid "Wood Framed Glass Slab"
+msgstr "Holzrahmenglasplatte"
+
+#: src/_locale_workbench.lua:78
+msgid "Wood Framed Glass Nanoslab"
+msgstr "Holzrahmenglasnanoplatte"
+
+#: src/_locale_workbench.lua:79
+msgid "Wood Framed Glass Micropanel"
+msgstr "Holzrahmenglasmikropaneel"
+
+#: src/_locale_workbench.lua:80
+msgid "Wood Framed Glass Microslab"
+msgstr "Holzrahmenglasmikroplatte"
+
+#: src/_locale_workbench.lua:81
+msgid "Wood Framed Glass Thin Stair"
+msgstr "Holzrahmenglasflachtreppe"
+
+#: src/_locale_workbench.lua:82
+msgid "Wood Framed Glass Cube"
+msgstr "Holzrahmenglaswürfel"
+
+#: src/_locale_workbench.lua:83
+msgid "Wood Framed Glass Panel"
+msgstr "Holzrahmenglaspaneel"
+
+#: src/_locale_workbench.lua:84
+msgid "Wood Framed Glass Double Panel"
+msgstr "Holzrahmenglasdoppelpaneel"
+
+#: src/_locale_workbench.lua:85
+msgid "Wood Framed Glass Half-Stair"
+msgstr "Holzrahmenglashalbtreppe"
+
+#: src/_locale_workbench.lua:86
+msgid "Gold Block Nanoslab"
+msgstr "Goldblocknanoplatte"
+
+#: src/_locale_workbench.lua:87
+msgid "Gold Block Micropanel"
+msgstr "Goldblockmikropaneel"
+
+#: src/_locale_workbench.lua:88
+msgid "Gold Block Microslab"
+msgstr "Goldblockmikroplatte"
+
+#: src/_locale_workbench.lua:89
+msgid "Gold Block Thin Stair"
+msgstr "Goldblockflachtreppe"
+
+#: src/_locale_workbench.lua:90
+msgid "Gold Block Cube"
+msgstr "Goldblockwürfel"
+
+#: src/_locale_workbench.lua:91
+msgid "Gold Block Panel"
+msgstr "Goldblockpaneel"
+
+#: src/_locale_workbench.lua:92
+msgid "Gold Block Double Panel"
+msgstr "Goldblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:93
+msgid "Gold Block Half-Stair"
+msgstr "Goldblockhalbtreppe"
+
+#: src/_locale_workbench.lua:94
+msgid "Diamond Block Stair"
+msgstr "Diamantblocktreppe"
+
+#: src/_locale_workbench.lua:95
+msgid "Diamond Block Slab"
+msgstr "Diamantblockplatte"
+
+#: src/_locale_workbench.lua:96
+msgid "Inner Diamond Block Stair"
+msgstr "Innere Diamantblocktreppe"
+
+#: src/_locale_workbench.lua:97
+msgid "Outer Diamond Block Stair"
+msgstr "Äußere Diamantblocktreppe"
+
+#: src/_locale_workbench.lua:98
+msgid "Diamond Block Nanoslab"
+msgstr "Diamantblocknanoplatte"
+
+#: src/_locale_workbench.lua:99
+msgid "Diamond Block Micropanel"
+msgstr "Diamantblockmikropaneel"
+
+#: src/_locale_workbench.lua:100
+msgid "Diamond Block Microslab"
+msgstr "Diamantblockmikroplatte"
+
+#: src/_locale_workbench.lua:101
+msgid "Diamond Block Thin Stair"
+msgstr "Diamantblockflachtreppe"
+
+#: src/_locale_workbench.lua:102
+msgid "Diamond Block Cube"
+msgstr "Diamantblockwürfel"
+
+#: src/_locale_workbench.lua:103
+msgid "Diamond Block Panel"
+msgstr "Diamantblockpaneel"
+
+#: src/_locale_workbench.lua:104
+msgid "Diamond Block Double Panel"
+msgstr "Diamantblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:105
+msgid "Diamond Block Half-Stair"
+msgstr "Diamantblockhalbtreppe"
+
+#: src/_locale_workbench.lua:106
+msgid "Apple Tree Stair"
+msgstr "Apfelbaumtreppe"
+
+#: src/_locale_workbench.lua:107
+msgid "Apple Tree Slab"
+msgstr "Apfelbaumplatte"
+
+#: src/_locale_workbench.lua:108
+msgid "Inner Apple Tree Stair"
+msgstr "Innere Apfelbaumtreppe"
+
+#: src/_locale_workbench.lua:109
+msgid "Outer Apple Tree Stair"
+msgstr "Äußere Apfelbaumtreppe"
+
+#: src/_locale_workbench.lua:110
+msgid "Apple Tree Nanoslab"
+msgstr "Apfelbaumnanoplatte"
+
+#: src/_locale_workbench.lua:111
+msgid "Apple Tree Micropanel"
+msgstr "Apfelbaummikropaneel"
+
+#: src/_locale_workbench.lua:112
+msgid "Apple Tree Microslab"
+msgstr "Apfelbaummikroplatte"
+
+#: src/_locale_workbench.lua:113
+msgid "Apple Tree Thin Stair"
+msgstr "Apfelbaumflachtreppe"
+
+#: src/_locale_workbench.lua:114
+msgid "Apple Tree Cube"
+msgstr "Apfelbaumwürfel"
+
+#: src/_locale_workbench.lua:115
+msgid "Apple Tree Panel"
+msgstr "Apfelbaumpaneel"
+
+#: src/_locale_workbench.lua:116
+msgid "Apple Tree Double Panel"
+msgstr "Apfelbaumdoppelpaneel"
+
+#: src/_locale_workbench.lua:117
+msgid "Apple Tree Half-Stair"
+msgstr "Apfelbaumhalbtreppe"
+
+#: src/_locale_workbench.lua:118
+msgid "Jungle Tree Stair"
+msgstr "Dschungelbaumtreppe"
+
+#: src/_locale_workbench.lua:119
+msgid "Jungle Tree Slab"
+msgstr "Dschungelbaumplatte"
+
+#: src/_locale_workbench.lua:120
+msgid "Inner Jungle Tree Stair"
+msgstr "Innere Dschungelbaumtreppe"
+
+#: src/_locale_workbench.lua:121
+msgid "Outer Jungle Tree Stair"
+msgstr "Äußere Dschungelbaumtreppe"
+
+#: src/_locale_workbench.lua:122
+msgid "Jungle Tree Nanoslab"
+msgstr "Dschungelbaumnanoplatte"
+
+#: src/_locale_workbench.lua:123
+msgid "Jungle Tree Micropanel"
+msgstr "Dschungelbaummikropaneel"
+
+#: src/_locale_workbench.lua:124
+msgid "Jungle Tree Microslab"
+msgstr "Dschungelbaummikroplatte"
+
+#: src/_locale_workbench.lua:125
+msgid "Jungle Tree Thin Stair"
+msgstr "Dschungelbaumflachtreppe"
+
+#: src/_locale_workbench.lua:126
+msgid "Jungle Tree Cube"
+msgstr "Dschungelbaumwürfel"
+
+#: src/_locale_workbench.lua:127
+msgid "Jungle Tree Panel"
+msgstr "Dschungelbaumpaneel"
+
+#: src/_locale_workbench.lua:128
+msgid "Jungle Tree Double Panel"
+msgstr "Dschungelbaumdoppelpaneel"
+
+#: src/_locale_workbench.lua:129
+msgid "Jungle Tree Half-Stair"
+msgstr "Dschungelbaumhalbtreppe"
+
+#: src/_locale_workbench.lua:130
+msgid "Pine Tree Stair"
+msgstr "Kiefernbaumtreppe"
+
+#: src/_locale_workbench.lua:131
+msgid "Pine Tree Slab"
+msgstr "Kiefernbaumplatte"
+
+#: src/_locale_workbench.lua:132
+msgid "Inner Pine Tree Stair"
+msgstr "Innere Kiefernbaumtreppe"
+
+#: src/_locale_workbench.lua:133
+msgid "Outer Pine Tree Stair"
+msgstr "Äußere Kiefernbaumtreppe"
+
+#: src/_locale_workbench.lua:134
+msgid "Pine Tree Nanoslab"
+msgstr "Kiefernbaumnanoplatte"
+
+#: src/_locale_workbench.lua:135
+msgid "Pine Tree Micropanel"
+msgstr "Kiefernbaummikropaneel"
+
+#: src/_locale_workbench.lua:136
+msgid "Pine Tree Microslab"
+msgstr "Kiefernbaummikroplatte"
+
+#: src/_locale_workbench.lua:137
+msgid "Pine Tree Thin Stair"
+msgstr "Kiefernbaumflachtreppe"
+
+#: src/_locale_workbench.lua:138
+msgid "Pine Tree Cube"
+msgstr "Kiefernbaumwürfel"
+
+#: src/_locale_workbench.lua:139
+msgid "Pine Tree Panel"
+msgstr "Kiefernbaumpaneel"
+
+#: src/_locale_workbench.lua:140
+msgid "Pine Tree Double Panel"
+msgstr "Kiefernbaumdoppelpaneel"
+
+#: src/_locale_workbench.lua:141
+msgid "Pine Tree Half-Stair"
+msgstr "Kiefernbaumhalbtreppe"
+
+#: src/_locale_workbench.lua:142
+msgid "Cactus Brick Stair"
+msgstr "Kaktusziegeltreppe"
+
+#: src/_locale_workbench.lua:143
+msgid "Cactus Brick Slab"
+msgstr "Kaktusziegelplatte"
+
+#: src/_locale_workbench.lua:144
+msgid "Inner Cactus Brick Stair"
+msgstr "Innere Kaktusziegeltreppe"
+
+#: src/_locale_workbench.lua:145
+msgid "Outer Cactus Brick Stair"
+msgstr "Äußere Kaktusziegeltreppe"
+
+#: src/_locale_workbench.lua:146
+msgid "Cactus Brick Nanoslab"
+msgstr "Kaktusziegelnanoplatte"
+
+#: src/_locale_workbench.lua:147
+msgid "Cactus Brick Micropanel"
+msgstr "Kaktusziegelmikropaneel"
+
+#: src/_locale_workbench.lua:148
+msgid "Cactus Brick Microslab"
+msgstr "Kaktusziegelmikroplatte"
+
+#: src/_locale_workbench.lua:149
+msgid "Cactus Brick Thin Stair"
+msgstr "Kaktusziegelflachtreppe"
+
+#: src/_locale_workbench.lua:150
+msgid "Cactus Brick Cube"
+msgstr "Kaktusziegelwürfel"
+
+#: src/_locale_workbench.lua:151
+msgid "Cactus Brick Panel"
+msgstr "Kaktusziegelpaneel"
+
+#: src/_locale_workbench.lua:152
+msgid "Cactus Brick Double Panel"
+msgstr "Kaktusziegeldoppelpaneel"
+
+#: src/_locale_workbench.lua:153
+msgid "Cactus Brick Half-Stair"
+msgstr "Kaktusziegelhalbtreppe"
+
+#: src/_locale_workbench.lua:154
+msgid "Coal Stone Tile Stair"
+msgstr "Kohlesteinkacheltreppe"
+
+#: src/_locale_workbench.lua:155
+msgid "Coal Stone Tile Slab"
+msgstr "Kohlesteinkachelplatte"
+
+#: src/_locale_workbench.lua:156
+msgid "Inner Coal Stone Tile Stair"
+msgstr "Innere Kohlesteinkacheltreppe"
+
+#: src/_locale_workbench.lua:157
+msgid "Outer Coal Stone Tile Stair"
+msgstr "Äußere Kohlesteinkacheltreppe"
+
+#: src/_locale_workbench.lua:158
+msgid "Coal Stone Tile Nanoslab"
+msgstr "Kohlesteinkachelnanoplatte"
+
+#: src/_locale_workbench.lua:159
+msgid "Coal Stone Tile Micropanel"
+msgstr "Kohlesteinkachelmikropaneel"
+
+#: src/_locale_workbench.lua:160
+msgid "Coal Stone Tile Microslab"
+msgstr "Kohlesteinkachelmikroplatte"
+
+#: src/_locale_workbench.lua:161
+msgid "Coal Stone Tile Thin Stair"
+msgstr "Kohlesteinkachelflachtreppe"
+
+#: src/_locale_workbench.lua:162
+msgid "Coal Stone Tile Cube"
+msgstr "Kohlesteinkachelwürfel"
+
+#: src/_locale_workbench.lua:163
+msgid "Coal Stone Tile Panel"
+msgstr "Kohlesteinkachelpaneel"
+
+#: src/_locale_workbench.lua:164
+msgid "Coal Stone Tile Double Panel"
+msgstr "Kohlesteinkacheldoppelpaneel"
+
+#: src/_locale_workbench.lua:165
+msgid "Coal Stone Tile Half-Stair"
+msgstr "Kohlesteinkachelhalbtreppe"
+
+#: src/_locale_workbench.lua:166
+msgid "Polished Desert Stone Block Stair"
+msgstr "Hochglanzwüstensteinblocktreppe"
+
+#: src/_locale_workbench.lua:167
+msgid "Polished Desert Stone Block Slab"
+msgstr "Hochglanzwüstensteinblockplatte"
+
+#: src/_locale_workbench.lua:168
+msgid "Inner Polished Desert Stone Block Stair"
+msgstr "Innere Hochglanzwüstensteinblocktreppe"
+
+#: src/_locale_workbench.lua:169
+msgid "Outer Polished Desert Stone Block Stair"
+msgstr "Äußere Hochglanzwüstensteinblocktreppe"
+
+#: src/_locale_workbench.lua:170
+msgid "Polished Desert Stone Block Nanoslab"
+msgstr "Hochglanzwüstensteinblocknanoplatte"
+
+#: src/_locale_workbench.lua:171
+msgid "Polished Desert Stone Block Micropanel"
+msgstr "Hochglanzwüstensteinblockmikropaneel"
+
+#: src/_locale_workbench.lua:172
+msgid "Polished Desert Stone Block Microslab"
+msgstr "Hochglanzwüstensteinblockmikroplatte"
+
+#: src/_locale_workbench.lua:173
+msgid "Polished Desert Stone Block Thin Stair"
+msgstr "Hochglanzwüstensteinblockflachtreppe"
+
+#: src/_locale_workbench.lua:174
+msgid "Polished Desert Stone Block Cube"
+msgstr "Hochglanzwüstensteinblockwürfel"
+
+#: src/_locale_workbench.lua:175
+msgid "Polished Desert Stone Block Panel"
+msgstr "Hochglanzwüstensteinblockpaneel"
+
+#: src/_locale_workbench.lua:176
+msgid "Polished Desert Stone Block Double Panel"
+msgstr "Hochglanzwüstensteinblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:177
+msgid "Polished Desert Stone Block Half-Stair"
+msgstr "Hochglanzwüstensteinblockhalbtreppe"
+
+#: src/_locale_workbench.lua:178
+msgid "Hardened Clay Stair"
+msgstr "Gehärtete Tontreppe"
+
+#: src/_locale_workbench.lua:179
+msgid "Hardened Clay Slab"
+msgstr "Gehärtete Tonplatte"
+
+#: src/_locale_workbench.lua:180
+msgid "Inner Hardened Clay Stair"
+msgstr "Innere gehärtete Tontreppe"
+
+#: src/_locale_workbench.lua:181
+msgid "Outer Hardened Clay Stair"
+msgstr "Äußere gehärtete Tontreppe"
+
+#: src/_locale_workbench.lua:182
+msgid "Hardened Clay Nanoslab"
+msgstr "Gehärtete Tonnanoplatte"
+
+#: src/_locale_workbench.lua:183
+msgid "Hardened Clay Micropanel"
+msgstr "Gehärtetes Tonmikropaneel"
+
+#: src/_locale_workbench.lua:184
+msgid "Hardened Clay Microslab"
+msgstr "Gehärtete Tonmikroplatte"
+
+#: src/_locale_workbench.lua:185
+msgid "Hardened Clay Thin Stair"
+msgstr "Gehärtete Tonflachtreppe"
+
+#: src/_locale_workbench.lua:186
+msgid "Hardened Clay Cube"
+msgstr "Gehärteter Tonwürfel"
+
+#: src/_locale_workbench.lua:187
+msgid "Hardened Clay Panel"
+msgstr "Gehärtetes Tonpaneel"
+
+#: src/_locale_workbench.lua:188
+msgid "Hardened Clay Double Panel"
+msgstr "Gehärtetes Tondoppelpaneel"
+
+#: src/_locale_workbench.lua:189
+msgid "Hardened Clay Half-Stair"
+msgstr "Gehärtete Tonhalbtreppe"
+
+#: src/_locale_workbench.lua:190
+msgid "Moon Brick Stair"
+msgstr "Mondziegeltreppe"
+
+#: src/_locale_workbench.lua:191
+msgid "Moon Brick Slab"
+msgstr "Mondziegelplatte"
+
+#: src/_locale_workbench.lua:192
+msgid "Inner Moon Brick Stair"
+msgstr "Innere Mondziegeltreppe"
+
+#: src/_locale_workbench.lua:193
+msgid "Outer Moon Brick Stair"
+msgstr "Äußere Mondziegeltreppe"
+
+#: src/_locale_workbench.lua:194
+msgid "Moon Brick Nanoslab"
+msgstr "Mondziegelnanoplatte"
+
+#: src/_locale_workbench.lua:195
+msgid "Moon Brick Micropanel"
+msgstr "Mondziegelmikropaneel"
+
+#: src/_locale_workbench.lua:196
+msgid "Moon Brick Microslab"
+msgstr "Mondziegelmikroplatte"
+
+#: src/_locale_workbench.lua:197
+msgid "Moon Brick Thin Stair"
+msgstr "Mondziegelflachtreppe"
+
+#: src/_locale_workbench.lua:198
+msgid "Moon Brick Cube"
+msgstr "Mondziegelwürfel"
+
+#: src/_locale_workbench.lua:199
+msgid "Moon Brick Panel"
+msgstr "Mondziegelpaneel"
+
+#: src/_locale_workbench.lua:200
+msgid "Moon Brick Double Panel"
+msgstr "Mondziegeldoppelpaneel"
+
+#: src/_locale_workbench.lua:201
+msgid "Moon Brick Half-Stair"
+msgstr "Mondziegelhalbtreppe"
+
+#: src/_locale_workbench.lua:202
+msgid "Runestone Stair"
+msgstr "Runensteintreppe"
+
+#: src/_locale_workbench.lua:203
+msgid "Runestone Slab"
+msgstr "Runensteinplatte"
+
+#: src/_locale_workbench.lua:204
+msgid "Inner Runestone Stair"
+msgstr "Innere Runensteintreppe"
+
+#: src/_locale_workbench.lua:205
+msgid "Outer Runestone Stair"
+msgstr "Äußere Runensteintreppe"
+
+#: src/_locale_workbench.lua:206
+msgid "Runestone Nanoslab"
+msgstr "Runensteinnanoplatte"
+
+#: src/_locale_workbench.lua:207
+msgid "Runestone Micropanel"
+msgstr "Runensteinmikropaneel"
+
+#: src/_locale_workbench.lua:208
+msgid "Runestone Microslab"
+msgstr "Runensteinmikroplatte"
+
+#: src/_locale_workbench.lua:209
+msgid "Runestone Thin Stair"
+msgstr "Runensteinflachtreppe"
+
+#: src/_locale_workbench.lua:210
+msgid "Runestone Cube"
+msgstr "Runensteinwürfel"
+
+#: src/_locale_workbench.lua:211
+msgid "Runestone Panel"
+msgstr "Runensteinpaneel"
+
+#: src/_locale_workbench.lua:212
+msgid "Runestone Double Panel"
+msgstr "Runensteindoppelpaneel"
+
+#: src/_locale_workbench.lua:213
+msgid "Runestone Half-Stair"
+msgstr "Runensteinhalbtreppe"
+
+#: src/_locale_workbench.lua:214
+msgid "Polished Stone Block Stair"
+msgstr "Hochglanzsteinblocktreppe"
+
+#: src/_locale_workbench.lua:215
+msgid "Polished Stone Block Slab"
+msgstr "Hochglanzsteinblockplatte"
+
+#: src/_locale_workbench.lua:216
+msgid "Inner Polished Stone Block Stair"
+msgstr "Innere Hochglanzsteinblocktreppe"
+
+#: src/_locale_workbench.lua:217
+msgid "Outer Polished Stone Block Stair"
+msgstr "Äußere Hochglanzsteinblocktreppe"
+
+#: src/_locale_workbench.lua:218
+msgid "Polished Stone Block Nanoslab"
+msgstr "Hochglanzsteinblocknanoplatte"
+
+#: src/_locale_workbench.lua:219
+msgid "Polished Stone Block Micropanel"
+msgstr "Hochglanzsteinblockmikropaneel"
+
+#: src/_locale_workbench.lua:220
+msgid "Polished Stone Block Microslab"
+msgstr "Hochglanzsteinblockmikroplatte"
+
+#: src/_locale_workbench.lua:221
+msgid "Polished Stone Block Thin Stair"
+msgstr "Hochglanzsteinblockflachtreppe"
+
+#: src/_locale_workbench.lua:222
+msgid "Polished Stone Block Cube"
+msgstr "Hochglanzsteinblockwürfel"
+
+#: src/_locale_workbench.lua:223
+msgid "Polished Stone Block Panel"
+msgstr "Hochglanzsteinblockpaneel"
+
+#: src/_locale_workbench.lua:224
+msgid "Polished Stone Block Double Panel"
+msgstr "Hochglanzsteinblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:225
+msgid "Polished Stone Block Half-Stair"
+msgstr "Hochglanzsteinblockhalbtreppe"
+
+#: src/_locale_workbench.lua:226
+msgid "Stone Brick Nanoslab"
+msgstr "Steinziegelnanoplatte"
+
+#: src/_locale_workbench.lua:227
+msgid "Stone Brick Micropanel"
+msgstr "Steinziegelmikropaneel"
+
+#: src/_locale_workbench.lua:228
+msgid "Stone Brick Microslab"
+msgstr "Steinziegelmikroplatte"
+
+#: src/_locale_workbench.lua:229
+msgid "Stone Brick Thin Stair"
+msgstr "Steinziegelflachtreppe"
+
+#: src/_locale_workbench.lua:230
+msgid "Stone Brick Cube"
+msgstr "Steinziegelwürfel"
+
+#: src/_locale_workbench.lua:231
+msgid "Stone Brick Panel"
+msgstr "Steinziegelpaneel"
+
+#: src/_locale_workbench.lua:232
+msgid "Stone Brick Double Panel"
+msgstr "Steinziegeldoppelpaneel"
+
+#: src/_locale_workbench.lua:233
+msgid "Stone Brick Half-Stair"
+msgstr "Steinziegelhalbtreppe"
+
+#: src/_locale_workbench.lua:234
+msgid "Stone Block Nanoslab"
+msgstr "Steinblocknanoplatte"
+
+#: src/_locale_workbench.lua:235
+msgid "Stone Block Micropanel"
+msgstr "Steinblockmikropaneel"
+
+#: src/_locale_workbench.lua:236
+msgid "Stone Block Microslab"
+msgstr "Steinblockmikroplatte"
+
+#: src/_locale_workbench.lua:237
+msgid "Stone Block Thin Stair"
+msgstr "Steinblockflachtreppe"
+
+#: src/_locale_workbench.lua:238
+msgid "Stone Block Cube"
+msgstr "Steinblockwürfel"
+
+#: src/_locale_workbench.lua:239
+msgid "Stone Block Panel"
+msgstr "Steinblockpaneel"
+
+#: src/_locale_workbench.lua:240
+msgid "Stone Block Double Panel"
+msgstr "Steinblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:241
+msgid "Stone Block Half-Stair"
+msgstr "Steinblockhalbtreppe"
+
+#: src/_locale_workbench.lua:242
+msgid "Desert Stone Nanoslab"
+msgstr "Wüstensteinnanoplatte"
+
+#: src/_locale_workbench.lua:243
+msgid "Desert Stone Micropanel"
+msgstr "Wüstensteinmikropaneel"
+
+#: src/_locale_workbench.lua:244
+msgid "Desert Stone Microslab"
+msgstr "Wüstensteinmikroplatte"
+
+#: src/_locale_workbench.lua:245
+msgid "Desert Stone Thin Stair"
+msgstr "Wüstensteinflachtreppe"
+
+#: src/_locale_workbench.lua:246
+msgid "Desert Stone Cube"
+msgstr "Wüstensteinwürfel"
+
+#: src/_locale_workbench.lua:247
+msgid "Desert Stone Panel"
+msgstr "Wüstensteinpaneel"
+
+#: src/_locale_workbench.lua:248
+msgid "Desert Stone Double Panel"
+msgstr "Wüstensteindoppelpaneel"
+
+#: src/_locale_workbench.lua:249
+msgid "Desert Stone Half-Stair"
+msgstr "Wüstensteinhalbtreppe"
+
+#: src/_locale_workbench.lua:250
+msgid "Desert Cobblestone Nanoslab"
+msgstr "Wüstenkopfsteinpflasternanoplatte"
+
+#: src/_locale_workbench.lua:251
+msgid "Desert Cobblestone Micropanel"
+msgstr "Wüstenkopfsteinpflastermikropaneel"
+
+#: src/_locale_workbench.lua:252
+msgid "Desert Cobblestone Microslab"
+msgstr "Wüstenkopfsteinpflastermikroplatte"
+
+#: src/_locale_workbench.lua:253
+msgid "Desert Cobblestone Thin Stair"
+msgstr "Wüstenkopfsteinpflasterflachtreppe"
+
+#: src/_locale_workbench.lua:254
+msgid "Desert Cobblestone Cube"
+msgstr "Wüstenkopfsteinpflasterwürfel"
+
+#: src/_locale_workbench.lua:255
+msgid "Desert Cobblestone Panel"
+msgstr "Wüstenkopfsteinpflasterpaneel"
+
+#: src/_locale_workbench.lua:256
+msgid "Desert Cobblestone Double Panel"
+msgstr "Wüstenkopfsteinpflasterdoppelpaneel"
+
+#: src/_locale_workbench.lua:257
+msgid "Desert Cobblestone Half-Stair"
+msgstr "Wüstenkopfsteinpflasterhalbtreppe"
+
+#: src/_locale_workbench.lua:258
+msgid "Desert Stone Brick Nanoslab"
+msgstr "Wüstensteinziegelnanoplatte"
+
+#: src/_locale_workbench.lua:259
+msgid "Desert Stone Brick Micropanel"
+msgstr "Wüstensteinziegelmikropaneel"
+
+#: src/_locale_workbench.lua:260
+msgid "Desert Stone Brick Microslab"
+msgstr "Wüstensteinziegelmikroplatte"
+
+#: src/_locale_workbench.lua:261
+msgid "Desert Stone Brick Thin Stair"
+msgstr "Wüstensteinziegelflachtreppe"
+
+#: src/_locale_workbench.lua:262
+msgid "Desert Stone Brick Cube"
+msgstr "Wüstensteinziegelwürfel"
+
+#: src/_locale_workbench.lua:263
+msgid "Desert Stone Brick Panel"
+msgstr "Wüstensteinziegelpaneel"
+
+#: src/_locale_workbench.lua:264
+msgid "Desert Stone Brick Double Panel"
+msgstr "Wüstensteinziegeldoppelpaneel"
+
+#: src/_locale_workbench.lua:265
+msgid "Desert Stone Brick Half-Stair"
+msgstr "Wüstensteinziegelhalbtreppe"
+
+#: src/_locale_workbench.lua:266
+msgid "Desert Stone Block Nanoslab"
+msgstr "Wüstensteinblocknanoplatte"
+
+#: src/_locale_workbench.lua:267
+msgid "Desert Stone Block Micropanel"
+msgstr "Wüstensteinblockmikropaneel"
+
+#: src/_locale_workbench.lua:268
+msgid "Desert Stone Block Microslab"
+msgstr "Wüstensteinblockmikroplatte"
+
+#: src/_locale_workbench.lua:269
+msgid "Desert Stone Block Thin Stair"
+msgstr "Wüstensteinblockflachtreppe"
+
+#: src/_locale_workbench.lua:270
+msgid "Desert Stone Block Cube"
+msgstr "Wüstensteinblockwürfel"
+
+#: src/_locale_workbench.lua:271
+msgid "Desert Stone Block Panel"
+msgstr "Wüstensteinblockpaneel"
+
+#: src/_locale_workbench.lua:272
+msgid "Desert Stone Block Double Panel"
+msgstr "Wüstensteinblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:273
+msgid "Desert Stone Block Half-Stair"
+msgstr "Wüstensteinblockhalbtreppe"
+
+#: src/_locale_workbench.lua:274
+msgid "Sandstone Nanoslab"
+msgstr "Sandsteinnanoplatte"
+
+#: src/_locale_workbench.lua:275
+msgid "Sandstone Micropanel"
+msgstr "Sandsteinmikropaneel"
+
+#: src/_locale_workbench.lua:276
+msgid "Sandstone Microslab"
+msgstr "Sandsteinmikroplatte"
+
+#: src/_locale_workbench.lua:277
+msgid "Sandstone Thin Stair"
+msgstr "Sandsteinflachtreppe"
+
+#: src/_locale_workbench.lua:278
+msgid "Sandstone Cube"
+msgstr "Sandsteinwürfel"
+
+#: src/_locale_workbench.lua:279
+msgid "Sandstone Panel"
+msgstr "Sandsteinpaneel"
+
+#: src/_locale_workbench.lua:280
+msgid "Sandstone Double Panel"
+msgstr "Sandsteindoppelpaneel"
+
+#: src/_locale_workbench.lua:281
+msgid "Sandstone Half-Stair"
+msgstr "Sandsteinhalbtreppe"
+
+#: src/_locale_workbench.lua:282
+msgid "Sandstone Brick Nanoslab"
+msgstr "Sandsteinziegelnanoplatte"
+
+#: src/_locale_workbench.lua:283
+msgid "Sandstone Brick Micropanel"
+msgstr "Sandsteinziegelmikropaneel"
+
+#: src/_locale_workbench.lua:284
+msgid "Sandstone Brick Microslab"
+msgstr "Sandsteinziegelmikroplatte"
+
+#: src/_locale_workbench.lua:285
+msgid "Sandstone Brick Thin Stair"
+msgstr "Sandsteinziegelflachtreppe"
+
+#: src/_locale_workbench.lua:286
+msgid "Sandstone Brick Cube"
+msgstr "Sandsteinziegelwürfel"
+
+#: src/_locale_workbench.lua:287
+msgid "Sandstone Brick Panel"
+msgstr "Sandsteinziegelpaneel"
+
+#: src/_locale_workbench.lua:288
+msgid "Sandstone Brick Double Panel"
+msgstr "Sandsteinziegeldoppelpaneel"
+
+#: src/_locale_workbench.lua:289
+msgid "Sandstone Brick Half-Stair"
+msgstr "Sandsteinziegelhalbtreppe"
+
+#: src/_locale_workbench.lua:290
+msgid "Sandstone Block Nanoslab"
+msgstr "Sandsteinblocknanoplatte"
+
+#: src/_locale_workbench.lua:291
+msgid "Sandstone Block Micropanel"
+msgstr "Sandsteinblockmikropaneel"
+
+#: src/_locale_workbench.lua:292
+msgid "Sandstone Block Microslab"
+msgstr "Sandsteinblockmikroplatte"
+
+#: src/_locale_workbench.lua:293
+msgid "Sandstone Block Thin Stair"
+msgstr "Sandsteinblockflachtreppe"
+
+#: src/_locale_workbench.lua:294
+msgid "Sandstone Block Cube"
+msgstr "Sandsteinblockwürfel"
+
+#: src/_locale_workbench.lua:295
+msgid "Sandstone Block Panel"
+msgstr "Sandsteinblockpaneel"
+
+#: src/_locale_workbench.lua:296
+msgid "Sandstone Block Double Panel"
+msgstr "Sandsteinblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:297
+msgid "Sandstone Block Half-Stair"
+msgstr "Sandsteinblockhalbtreppe"
+
+#: src/_locale_workbench.lua:298
+msgid "Desert Sandstone Nanoslab"
+msgstr "Wüstensandsteinnanoplatte"
+
+#: src/_locale_workbench.lua:299
+msgid "Desert Sandstone Micropanel"
+msgstr "Wüstensandsteinmikropaneel"
+
+#: src/_locale_workbench.lua:300
+msgid "Desert Sandstone Microslab"
+msgstr "Wüstensandsteinmikroplatte"
+
+#: src/_locale_workbench.lua:301
+msgid "Desert Sandstone Thin Stair"
+msgstr "Wüstensandsteinflachtreppe"
+
+#: src/_locale_workbench.lua:302
+msgid "Desert Sandstone Cube"
+msgstr "Wüstensandsteinwürfel"
+
+#: src/_locale_workbench.lua:303
+msgid "Desert Sandstone Panel"
+msgstr "Wüstensandsteinpaneel"
+
+#: src/_locale_workbench.lua:304
+msgid "Desert Sandstone Double Panel"
+msgstr "Wüstensandsteindoppelpaneel"
+
+#: src/_locale_workbench.lua:305
+msgid "Desert Sandstone Half-Stair"
+msgstr "Wüstensandsteinhalbtreppe"
+
+#: src/_locale_workbench.lua:306
+msgid "Desert Sandstone Brick Nanoslab"
+msgstr "Wüstensandsteinziegelnanoplatte"
+
+#: src/_locale_workbench.lua:307
+msgid "Desert Sandstone Brick Micropanel"
+msgstr "Wüstensandsteinziegelmikropaneel"
+
+#: src/_locale_workbench.lua:308
+msgid "Desert Sandstone Brick Microslab"
+msgstr "Wüstensandsteinziegelmikroplatte"
+
+#: src/_locale_workbench.lua:309
+msgid "Desert Sandstone Brick Thin Stair"
+msgstr "Wüstensandsteinziegelflachtreppe"
+
+#: src/_locale_workbench.lua:310
+msgid "Desert Sandstone Brick Cube"
+msgstr "Wüstensandsteinziegelwürfel"
+
+#: src/_locale_workbench.lua:311
+msgid "Desert Sandstone Brick Panel"
+msgstr "Wüstensandsteinziegelpaneel"
+
+#: src/_locale_workbench.lua:312
+msgid "Desert Sandstone Brick Double Panel"
+msgstr "Wüstensandsteinziegeldoppelpaneel"
+
+#: src/_locale_workbench.lua:313
+msgid "Desert Sandstone Brick Half-Stair"
+msgstr "Wüstensandsteinziegelhalbtreppe"
+
+#: src/_locale_workbench.lua:314
+msgid "Desert Sandstone Block Nanoslab"
+msgstr "Wüstensandsteinblocknanoplatte"
+
+#: src/_locale_workbench.lua:315
+msgid "Desert Sandstone Block Micropanel"
+msgstr "Wüstensandsteinblockmikropaneel"
+
+#: src/_locale_workbench.lua:316
+msgid "Desert Sandstone Block Microslab"
+msgstr "Wüstensandsteinblockmikroplatte"
+
+#: src/_locale_workbench.lua:317
+msgid "Desert Sandstone Block Thin Stair"
+msgstr "Wüstensandsteinblockflachtreppe"
+
+#: src/_locale_workbench.lua:318
+msgid "Desert Sandstone Block Cube"
+msgstr "Wüstensandsteinblockwürfel"
+
+#: src/_locale_workbench.lua:319
+msgid "Desert Sandstone Block Panel"
+msgstr "Wüstensandsteinblockpaneel"
+
+#: src/_locale_workbench.lua:320
+msgid "Desert Sandstone Block Double Panel"
+msgstr "Wüstensandsteinblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:321
+msgid "Desert Sandstone Block Half-Stair"
+msgstr "Wüstensandsteinblockhalbtreppe"
+
+#: src/_locale_workbench.lua:322
+msgid "Silver Sandstone Nanoslab"
+msgstr "Silbersandsteinnanoplatte"
+
+#: src/_locale_workbench.lua:323
+msgid "Silver Sandstone Micropanel"
+msgstr "Silbersandsteinmikropaneel"
+
+#: src/_locale_workbench.lua:324
+msgid "Silver Sandstone Microslab"
+msgstr "Silbersandsteinmikroplatte"
+
+#: src/_locale_workbench.lua:325
+msgid "Silver Sandstone Thin Stair"
+msgstr "Silbersandsteinflachtreppe"
+
+#: src/_locale_workbench.lua:326
+msgid "Silver Sandstone Cube"
+msgstr "Silbersandsteinwürfel"
+
+#: src/_locale_workbench.lua:327
+msgid "Silver Sandstone Panel"
+msgstr "Silbersandsteinpaneel"
+
+#: src/_locale_workbench.lua:328
+msgid "Silver Sandstone Double Panel"
+msgstr "Silbersandsteindoppelpaneel"
+
+#: src/_locale_workbench.lua:329
+msgid "Silver Sandstone Half-Stair"
+msgstr "Silbersandsteinhalbtreppe"
+
+#: src/_locale_workbench.lua:330
+msgid "Silver Sandstone Brick Nanoslab"
+msgstr "Silbersandsteinziegelnanoplatte"
+
+#: src/_locale_workbench.lua:331
+msgid "Silver Sandstone Brick Micropanel"
+msgstr "Silbersandsteinziegelmikropaneel"
+
+#: src/_locale_workbench.lua:332
+msgid "Silver Sandstone Brick Microslab"
+msgstr "Silbersandsteinziegelmikroplatte"
+
+#: src/_locale_workbench.lua:333
+msgid "Silver Sandstone Brick Thin Stair"
+msgstr "Silbersandsteinziegelflachtreppe"
+
+#: src/_locale_workbench.lua:334
+msgid "Silver Sandstone Brick Cube"
+msgstr "Silbersandsteinziegelwürfel"
+
+#: src/_locale_workbench.lua:335
+msgid "Silver Sandstone Brick Panel"
+msgstr "Silbersandsteinziegelpaneel"
+
+#: src/_locale_workbench.lua:336
+msgid "Silver Sandstone Brick Double Panel"
+msgstr "Silbersandsteinziegeldoppelpaneel"
+
+#: src/_locale_workbench.lua:337
+msgid "Silver Sandstone Brick Half-Stair"
+msgstr "Silbersandsteinziegelhalbtreppe"
+
+#: src/_locale_workbench.lua:338
+msgid "Silver Sandstone Block Nanoslab"
+msgstr "Silbersandsteinblocknanoplatte"
+
+#: src/_locale_workbench.lua:339
+msgid "Silver Sandstone Block Micropanel"
+msgstr "Silbersandsteinblockmikropaneel"
+
+#: src/_locale_workbench.lua:340
+msgid "Silver Sandstone Block Microslab"
+msgstr "Silbersandsteinblockmikroplatte"
+
+#: src/_locale_workbench.lua:341
+msgid "Silver Sandstone Block Thin Stair"
+msgstr "Silbersandsteinblockflachtreppe"
+
+#: src/_locale_workbench.lua:342
+msgid "Silver Sandstone Block Cube"
+msgstr "Silbersandsteinblockwürfel"
+
+#: src/_locale_workbench.lua:343
+msgid "Silver Sandstone Block Panel"
+msgstr "Silbersandsteinblockpaneel"
+
+#: src/_locale_workbench.lua:344
+msgid "Silver Sandstone Block Double Panel"
+msgstr "Silbersandsteinblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:345
+msgid "Silver Sandstone Block Half-Stair"
+msgstr "Silbersandsteinblockhalbtreppe"
+
+#: src/_locale_workbench.lua:346
+msgid "Packed Ice Stair"
+msgstr "Packeistreppe"
+
+#: src/_locale_workbench.lua:347
+msgid "Packed Ice Slab"
+msgstr "Packeisplatte"
+
+#: src/_locale_workbench.lua:348
+msgid "Inner Packed Ice Stair"
+msgstr "Innere Packeistreppe"
+
+#: src/_locale_workbench.lua:349
+msgid "Outer Packed Ice Stair"
+msgstr "Äußere Packeistreppe"
+
+#: src/_locale_workbench.lua:350
+msgid "Packed Ice Nanoslab"
+msgstr "Packeisnanoplatte"
+
+#: src/_locale_workbench.lua:351
+msgid "Packed Ice Micropanel"
+msgstr "Packeismikropaneel"
+
+#: src/_locale_workbench.lua:352
+msgid "Packed Ice Microslab"
+msgstr "Packeismikroplatte"
+
+#: src/_locale_workbench.lua:353
+msgid "Packed Ice Thin Stair"
+msgstr "Packeisflachtreppe"
+
+#: src/_locale_workbench.lua:354
+msgid "Packed Ice Cube"
+msgstr "Packeiswürfel"
+
+#: src/_locale_workbench.lua:355
+msgid "Packed Ice Panel"
+msgstr "Packeispaneel"
+
+#: src/_locale_workbench.lua:356
+msgid "Packed Ice Double Panel"
+msgstr "Packeisdoppelpaneel"
+
+#: src/_locale_workbench.lua:357
+msgid "Packed Ice Half-Stair"
+msgstr "Packeishalbtreppe"
+
+#: src/_locale_workbench.lua:358
+msgid "Wooden Tile Stair"
+msgstr "Holzkacheltreppe"
+
+#: src/_locale_workbench.lua:359
+msgid "Wooden Tile Slab"
+msgstr "Holzkachelplatte"
+
+#: src/_locale_workbench.lua:360
+msgid "Inner Wooden Tile Stair"
+msgstr "Innere Holzkacheltreppe"
+
+#: src/_locale_workbench.lua:361
+msgid "Outer Wooden Tile Stair"
+msgstr "Äußere Holzkacheltreppe"
+
+#: src/_locale_workbench.lua:362
+msgid "Wooden Tile Nanoslab"
+msgstr "Holzkachelnanoplatte"
+
+#: src/_locale_workbench.lua:363
+msgid "Wooden Tile Micropanel"
+msgstr "Holzkachelmikropaneel"
+
+#: src/_locale_workbench.lua:364
+msgid "Wooden Tile Microslab"
+msgstr "Holzkachelmikroplatte"
+
+#: src/_locale_workbench.lua:365
+msgid "Wooden Tile Thin Stair"
+msgstr "Holzkachelflachtreppe"
+
+#: src/_locale_workbench.lua:366
+msgid "Wooden Tile Cube"
+msgstr "Holzkachelwürfel"
+
+#: src/_locale_workbench.lua:367
+msgid "Wooden Tile Panel"
+msgstr "Holzkachelpaneel"
+
+#: src/_locale_workbench.lua:368
+msgid "Wooden Tile Double Panel"
+msgstr "Holzkacheldoppelpaneel"
+
+#: src/_locale_workbench.lua:369
+msgid "Wooden Tile Half-Stair"
+msgstr "Holzkachelhalbtreppe"
+
+#: src/_locale_workbench.lua:370
+msgid "Obsidian Block Nanoslab"
+msgstr "Obsidianblocknanoplatte"
+
+#: src/_locale_workbench.lua:371
+msgid "Obsidian Block Micropanel"
+msgstr "Obsidianblockmikropaneel"
+
+#: src/_locale_workbench.lua:372
+msgid "Obsidian Block Microslab"
+msgstr "Obsidianblockmikroplatte"
+
+#: src/_locale_workbench.lua:373
+msgid "Obsidian Block Thin Stair"
+msgstr "Obsidianblockflachtreppe"
+
+#: src/_locale_workbench.lua:374
+msgid "Obsidian Block Cube"
+msgstr "Obsidianblockwürfel"
+
+#: src/_locale_workbench.lua:375
+msgid "Obsidian Block Panel"
+msgstr "Obsidianblockpaneel"
+
+#: src/_locale_workbench.lua:376
+msgid "Obsidian Block Double Panel"
+msgstr "Obsidianblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:377
+msgid "Obsidian Block Half-Stair"
+msgstr "Obsidianblockhalbtreppe"
+
+#: src/_locale_workbench.lua:378
+msgid "Permafrost with Stones Stair"
+msgstr "Permafrost mit Steinentreppe"
+
+#: src/_locale_workbench.lua:379
+msgid "Inner Permafrost with Stones Stair"
+msgstr "Innere Permafrost-mit-Steinen-Treppe"
+
+#: src/_locale_workbench.lua:380
+msgid "Outer Permafrost with Stones Stair"
+msgstr "Äußere Permafrost-mit-Steinen-Treppe"
+
+#: src/_locale_workbench.lua:381
+msgid "Permafrost with Stones Slab"
+msgstr "Permafrost-mit-Steinen-Platte"
+
+#: src/_locale_workbench.lua:382
+msgid "Permafrost with Stones Nanoslab"
+msgstr "Permafrost-mit-Steinen-Nanoplatte"
+
+#: src/_locale_workbench.lua:383
+msgid "Permafrost with Stones Micropanel"
+msgstr "Permafrost-mit-Steinen-Mikropaneel"
+
+#: src/_locale_workbench.lua:384
+msgid "Permafrost with Stones Microslab"
+msgstr "Permafrost-mit-Steinen-Mikroplatte"
+
+#: src/_locale_workbench.lua:385
+msgid "Permafrost with Stones Thin Stair"
+msgstr "Permafrost-mit-Steinen-Flachtreppe"
+
+#: src/_locale_workbench.lua:386
+msgid "Permafrost with Stones Cube"
+msgstr "Permafrost-mit-Steinen-Würfel"
+
+#: src/_locale_workbench.lua:387
+msgid "Permafrost with Stones Panel"
+msgstr "Permafrost-mit-Steinen-Paneel"
+
+#: src/_locale_workbench.lua:388
+msgid "Permafrost with Stones Double Panel"
+msgstr "Permafrost-mit-Steinen-Doppelpaneel"
+
+#: src/_locale_workbench.lua:389
+msgid "Permafrost with Stones Half-Stair"
+msgstr "Permafrost-mit-Steinen-Halbtreppe"
+
+#: src/_locale_workbench.lua:390
+msgid "Permafrost with Moss Stair"
+msgstr "Permafrost-mit-Moos-Treppe"
+
+#: src/_locale_workbench.lua:391
+msgid "Inner Permafrost with Moss Stair"
+msgstr "Innere Permafrost-mit-Moos-Treppe"
+
+#: src/_locale_workbench.lua:392
+msgid "Outer Permafrost with Moss Stair"
+msgstr "Äußere Permafrost-mit-Moos-Treppe"
+
+#: src/_locale_workbench.lua:393
+msgid "Permafrost with Moss Slab"
+msgstr "Permafrost-mit-Moos-Platte"
+
+#: src/_locale_workbench.lua:394
+msgid "Permafrost with Moss Nanoslab"
+msgstr "Permafrost-mit-Moos-Nanoplatte"
+
+#: src/_locale_workbench.lua:395
+msgid "Permafrost with Moss Micropanel"
+msgstr "Permafrost-mit-Moos-Mikropaneel"
+
+#: src/_locale_workbench.lua:396
+msgid "Permafrost with Moss Microslab"
+msgstr "Permafrost-mit-Moos-Mikroplatte"
+
+#: src/_locale_workbench.lua:397
+msgid "Permafrost with Moss Thin Stair"
+msgstr "Permafrost-mit-Moos-Flachtreppe"
+
+#: src/_locale_workbench.lua:398
+msgid "Permafrost with Moss Cube"
+msgstr "Permafrost-mit-Moos-Würfel"
+
+#: src/_locale_workbench.lua:399
+msgid "Permafrost with Moss Panel"
+msgstr "Permafrost-mit-Moos-Paneel"
+
+#: src/_locale_workbench.lua:400
+msgid "Permafrost with Moss Double Panel"
+msgstr "Permafrost-mit-Moos-Doppelpaneel"
+
+#: src/_locale_workbench.lua:401
+msgid "Permafrost with Moss Half-Stair"
+msgstr "Permafrost-mit-Moos-Halbtreppe"
+
+#: src/_locale_workbench.lua:402
+msgid "Ice Nanoslab"
+msgstr "Eisnanoplatte"
+
+#: src/_locale_workbench.lua:403
+msgid "Ice Micropanel"
+msgstr "Eismikropaneel"
+
+#: src/_locale_workbench.lua:404
+msgid "Ice Microslab"
+msgstr "Eismikroplatte"
+
+#: src/_locale_workbench.lua:405
+msgid "Ice Thin Stair"
+msgstr "Eisflachtreppe"
+
+#: src/_locale_workbench.lua:406
+msgid "Ice Cube"
+msgstr "Eiswürfel"
+
+#: src/_locale_workbench.lua:407
+msgid "Ice Panel"
+msgstr "Eispaneel"
+
+#: src/_locale_workbench.lua:408
+msgid "Ice Double Panel"
+msgstr "Eisdoppelpaneel"
+
+#: src/_locale_workbench.lua:409
+msgid "Ice Half-Stair"
+msgstr "Eishalbtreppe"
+
+#: src/_locale_workbench.lua:410
+msgid "Apple Wood Planks Nanoslab"
+msgstr "Apfelbaumplankennanoplatte"
+
+#: src/_locale_workbench.lua:411
+msgid "Apple Wood Planks Micropanel"
+msgstr "Apfelbaumplankenmikropaneel"
+
+#: src/_locale_workbench.lua:412
+msgid "Apple Wood Planks Microslab"
+msgstr "Apfelbaumplankenmikroplatte"
+
+#: src/_locale_workbench.lua:413
+msgid "Apple Wood Planks Thin Stair"
+msgstr "Apfelbaumplankenflachtreppe"
+
+#: src/_locale_workbench.lua:414
+msgid "Apple Wood Planks Cube"
+msgstr "Apfelbaumplankenwürfel"
+
+#: src/_locale_workbench.lua:415
+msgid "Apple Wood Planks Panel"
+msgstr "Apfelbaumplankenpaneel"
+
+#: src/_locale_workbench.lua:416
+msgid "Apple Wood Planks Double Panel"
+msgstr "Apfelbaumplankendoppelpaneel"
+
+#: src/_locale_workbench.lua:417
+msgid "Apple Wood Planks Half-Stair"
+msgstr "Apfelbaumplankenhalbtreppe"
+
+#: src/_locale_workbench.lua:418
+msgid "Tin Block Nanoslab"
+msgstr "Zinnblocknanoplatte"
+
+#: src/_locale_workbench.lua:419
+msgid "Tin Block Micropanel"
+msgstr "Zinnblockmikropaneel"
+
+#: src/_locale_workbench.lua:420
+msgid "Tin Block Microslab"
+msgstr "Zinnblockmikroplatte"
+
+#: src/_locale_workbench.lua:421
+msgid "Tin Block Thin Stair"
+msgstr "Zinnblockflachtreppe"
+
+#: src/_locale_workbench.lua:422
+msgid "Tin Block Cube"
+msgstr "Zinnblockwürfel"
+
+#: src/_locale_workbench.lua:423
+msgid "Tin Block Panel"
+msgstr "Zinnblockpaneel"
+
+#: src/_locale_workbench.lua:424
+msgid "Tin Block Double Panel"
+msgstr "Zinnblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:425
+msgid "Tin Block Half-Stair"
+msgstr "Zinnblockhalbtreppe"
+
+#: src/_locale_workbench.lua:426
+msgid "Obsidian Brick Nanoslab"
+msgstr "Obsidianziegelnanoplatte"
+
+#: src/_locale_workbench.lua:427
+msgid "Obsidian Brick Micropanel"
+msgstr "Obsidianziegelmikropaneel"
+
+#: src/_locale_workbench.lua:428
+msgid "Obsidian Brick Microslab"
+msgstr "Obsidianziegelmikroplatte"
+
+#: src/_locale_workbench.lua:429
+msgid "Obsidian Brick Thin Stair"
+msgstr "Obsidianziegelflachtreppe"
+
+#: src/_locale_workbench.lua:430
+msgid "Obsidian Brick Cube"
+msgstr "Obsidianziegelwürfel"
+
+#: src/_locale_workbench.lua:431
+msgid "Obsidian Brick Panel"
+msgstr "Obsidianziegelpaneel"
+
+#: src/_locale_workbench.lua:432
+msgid "Obsidian Brick Double Panel"
+msgstr "Obsidianziegeldoppelpaneel"
+
+#: src/_locale_workbench.lua:433
+msgid "Obsidian Brick Half-Stair"
+msgstr "Obsidianziegelhalbtreppe"
+
+#: src/_locale_workbench.lua:434
+msgid "Pine Wood Planks Nanoslab"
+msgstr "Kiefernholzplankennanoplatte"
+
+#: src/_locale_workbench.lua:435
+msgid "Pine Wood Planks Micropanel"
+msgstr "Kiefernholzplankenmikropaneel"
+
+#: src/_locale_workbench.lua:436
+msgid "Pine Wood Planks Microslab"
+msgstr "Kiefernholzplankenmikroplatte"
+
+#: src/_locale_workbench.lua:437
+msgid "Pine Wood Planks Thin Stair"
+msgstr "Kiefernholzplankenflachtreppe"
+
+#: src/_locale_workbench.lua:438
+msgid "Pine Wood Planks Cube"
+msgstr "Kiefernholzplankenwürfel"
+
+#: src/_locale_workbench.lua:439
+msgid "Pine Wood Planks Panel"
+msgstr "Kiefernholzplankenpaneel"
+
+#: src/_locale_workbench.lua:440
+msgid "Pine Wood Planks Double Panel"
+msgstr "Kiefernholzplankendoppelpaneel"
+
+#: src/_locale_workbench.lua:441
+msgid "Pine Wood Planks Half-Stair"
+msgstr "Kiefernholzplankenhalbtreppe"
+
+#: src/_locale_workbench.lua:442
+msgid "Jungle Wood Planks Nanoslab"
+msgstr "Dschungelholzplankennanoplatte"
+
+#: src/_locale_workbench.lua:443
+msgid "Jungle Wood Planks Micropanel"
+msgstr "Dschungelholzplankenmikropaneel"
+
+#: src/_locale_workbench.lua:444
+msgid "Jungle Wood Planks Microslab"
+msgstr "Dschungelholzplankenmikroplatte"
+
+#: src/_locale_workbench.lua:445
+msgid "Jungle Wood Planks Thin Stair"
+msgstr "Dschungelholzplankenflachtreppe"
+
+#: src/_locale_workbench.lua:446
+msgid "Jungle Wood Planks Cube"
+msgstr "Dschungelholzplankenwürfel"
+
+#: src/_locale_workbench.lua:447
+msgid "Jungle Wood Planks Panel"
+msgstr "Dschungelholzplankenpaneel"
+
+#: src/_locale_workbench.lua:448
+msgid "Jungle Wood Planks Double Panel"
+msgstr "Dschungelholzplankendoppelpaneel"
+
+#: src/_locale_workbench.lua:449
+msgid "Jungle Wood Planks Half-Stair"
+msgstr "Dschungelholzplankenhalbtreppe"
+
+#: src/_locale_workbench.lua:450
+msgid "Obsidian Nanoslab"
+msgstr "Obsidiannanoplatte"
+
+#: src/_locale_workbench.lua:451
+msgid "Obsidian Micropanel"
+msgstr "Obsidianmikropaneel"
+
+#: src/_locale_workbench.lua:452
+msgid "Obsidian Microslab"
+msgstr "Obsidianmikroplatte"
+
+#: src/_locale_workbench.lua:453
+msgid "Obsidian Thin Stair"
+msgstr "Obsidianflachtreppe"
+
+#: src/_locale_workbench.lua:454
+msgid "Obsidian Cube"
+msgstr "Obsidianwürfel"
+
+#: src/_locale_workbench.lua:455
+msgid "Obsidian Panel"
+msgstr "Obsidianpaneel"
+
+#: src/_locale_workbench.lua:456
+msgid "Obsidian Double Panel"
+msgstr "Obsidiandoppelpaneel"
+
+#: src/_locale_workbench.lua:457
+msgid "Obsidian Half-Stair"
+msgstr "Obsidianhalbtreppe"
+
+#: src/_locale_workbench.lua:458
+msgid "Stone Nanoslab"
+msgstr "Steinnanoplatte"
+
+#: src/_locale_workbench.lua:459
+msgid "Stone Micropanel"
+msgstr "Steinmikropaneel"
+
+#: src/_locale_workbench.lua:460
+msgid "Stone Microslab"
+msgstr "Steinmikroplatte"
+
+#: src/_locale_workbench.lua:461
+msgid "Stone Thin Stair"
+msgstr "Steinflachtreppe"
+
+#: src/_locale_workbench.lua:462
+msgid "Stone Cube"
+msgstr "Steinwürfel"
+
+#: src/_locale_workbench.lua:463
+msgid "Stone Panel"
+msgstr "Steinpaneel"
+
+#: src/_locale_workbench.lua:464
+msgid "Stone Double Panel"
+msgstr "Steindoppelpaneel"
+
+#: src/_locale_workbench.lua:465
+msgid "Stone Half-Stair"
+msgstr "Steinhalbtreppe"
+
+#: src/_locale_workbench.lua:466
+msgid "Permafrost Stair"
+msgstr "Permafrosttreppe"
+
+#: src/_locale_workbench.lua:467
+msgid "Permafrost Slab"
+msgstr "Permafrostplatte"
+
+#: src/_locale_workbench.lua:468
+msgid "Inner Permafrost Stair"
+msgstr "Innere Permafrosttreppe"
+
+#: src/_locale_workbench.lua:469
+msgid "Outer Permafrost Stair"
+msgstr "Äußere Permafrosttreppe"
+
+#: src/_locale_workbench.lua:470
+msgid "Permafrost Nanoslab"
+msgstr "Permafrostnanoplatte"
+
+#: src/_locale_workbench.lua:471
+msgid "Permafrost Micropanel"
+msgstr "Permafrostmikropaneel"
+
+#: src/_locale_workbench.lua:472
+msgid "Permafrost Microslab"
+msgstr "Permafrostmikroplatte"
+
+#: src/_locale_workbench.lua:473
+msgid "Permafrost Thin Stair"
+msgstr "Permafrostflachtreppe"
+
+#: src/_locale_workbench.lua:474
+msgid "Permafrost Cube"
+msgstr "Permafrostwürfel"
+
+#: src/_locale_workbench.lua:475
+msgid "Permafrost Panel"
+msgstr "Permafrostpaneel"
+
+#: src/_locale_workbench.lua:476
+msgid "Permafrost Double Panel"
+msgstr "Permafrostdoppelpaneel"
+
+#: src/_locale_workbench.lua:477
+msgid "Permafrost Half-Stair"
+msgstr "Permafrosthalbtreppe"
+
+#: src/_locale_workbench.lua:478
+msgid "Cactus Stair"
+msgstr "Kaktustreppe"
+
+#: src/_locale_workbench.lua:479
+msgid "Cactus Slab"
+msgstr "Kaktusplatte"
+
+#: src/_locale_workbench.lua:480
+msgid "Inner Cactus Stair"
+msgstr "Innere Kaktustreppe"
+
+#: src/_locale_workbench.lua:481
+msgid "Outer Cactus Stair"
+msgstr "Äußere Kaktustreppe"
+
+#: src/_locale_workbench.lua:482
+msgid "Cactus Nanoslab"
+msgstr "Kaktusnanoplatte"
+
+#: src/_locale_workbench.lua:483
+msgid "Cactus Micropanel"
+msgstr "Kaktusmikropaneel"
+
+#: src/_locale_workbench.lua:484
+msgid "Cactus Microslab"
+msgstr "Kaktusmikroplatte"
+
+#: src/_locale_workbench.lua:485
+msgid "Cactus Thin Stair"
+msgstr "Kaktusflachtreppe"
+
+#: src/_locale_workbench.lua:486
+msgid "Cactus Cube"
+msgstr "Kaktuswürfel"
+
+#: src/_locale_workbench.lua:487
+msgid "Cactus Panel"
+msgstr "Kaktuspaneel"
+
+#: src/_locale_workbench.lua:488
+msgid "Cactus Double Panel"
+msgstr "Kaktusdoppelpaneel"
+
+#: src/_locale_workbench.lua:489
+msgid "Cactus Half-Stair"
+msgstr "Kaktushalbtreppe"
+
+#: src/_locale_workbench.lua:490
+msgid "Bronze Block Nanoslab"
+msgstr "Bronzeblocknanoplatte"
+
+#: src/_locale_workbench.lua:491
+msgid "Bronze Block Micropanel"
+msgstr "Bronzeblockmikropaneel"
+
+#: src/_locale_workbench.lua:492
+msgid "Bronze Block Microslab"
+msgstr "Bronzeblockmikroplatte"
+
+#: src/_locale_workbench.lua:493
+msgid "Bronze Block Thin Stair"
+msgstr "Bronzeblockflachtreppe"
+
+#: src/_locale_workbench.lua:494
+msgid "Bronze Block Cube"
+msgstr "Bronzeblockwürfel"
+
+#: src/_locale_workbench.lua:495
+msgid "Bronze Block Panel"
+msgstr "Bronzeblockpaneel"
+
+#: src/_locale_workbench.lua:496
+msgid "Bronze Block Double Panel"
+msgstr "Bronzeblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:497
+msgid "Bronze Block Half-Stair"
+msgstr "Bronzeblockhalbtreppe"
+
+#: src/_locale_workbench.lua:498
+msgid "Acacia Tree Stair"
+msgstr "Akazienbaumtreppe"
+
+#: src/_locale_workbench.lua:499
+msgid "Acacia Tree Slab"
+msgstr "Akazienbaumplatte"
+
+#: src/_locale_workbench.lua:500
+msgid "Inner Acacia Tree Stair"
+msgstr "Innere Akazienbaumtreppe"
+
+#: src/_locale_workbench.lua:501
+msgid "Outer Acacia Tree Stair"
+msgstr "Äußere Akazienbaumtreppe"
+
+#: src/_locale_workbench.lua:502
+msgid "Acacia Tree Nanoslab"
+msgstr "Akazienbaumnanoplatte"
+
+#: src/_locale_workbench.lua:503
+msgid "Acacia Tree Micropanel"
+msgstr "Akazienbaummikropaneel"
+
+#: src/_locale_workbench.lua:504
+msgid "Acacia Tree Microslab"
+msgstr "Akazienbaummikroplatte"
+
+#: src/_locale_workbench.lua:505
+msgid "Acacia Tree Thin Stair"
+msgstr "Akazienbaumflachtreppe"
+
+#: src/_locale_workbench.lua:506
+msgid "Acacia Tree Cube"
+msgstr "Akazienbaumwürfel"
+
+#: src/_locale_workbench.lua:507
+msgid "Acacia Tree Panel"
+msgstr "Akazienbaumpaneel"
+
+#: src/_locale_workbench.lua:508
+msgid "Acacia Tree Double Panel"
+msgstr "Akazienbaumdoppelpaneel"
+
+#: src/_locale_workbench.lua:509
+msgid "Acacia Tree Half-Stair"
+msgstr "Akazienbaumhalbtreppe"
+
+#: src/_locale_workbench.lua:510
+msgid "Acacia Wood Planks Nanoslab"
+msgstr "Akazienholzplankennanoplatte"
+
+#: src/_locale_workbench.lua:511
+msgid "Acacia Wood Planks Micropanel"
+msgstr "Akazienholzplankenmikropaneel"
+
+#: src/_locale_workbench.lua:512
+msgid "Acacia Wood Planks Microslab"
+msgstr "Akazienholzplankenmikroplatte"
+
+#: src/_locale_workbench.lua:513
+msgid "Acacia Wood Planks Thin Stair"
+msgstr "Akazienholzplankenflachtreppe"
+
+#: src/_locale_workbench.lua:514
+msgid "Acacia Wood Planks Cube"
+msgstr "Akazienholzplankenwürfel"
+
+#: src/_locale_workbench.lua:515
+msgid "Acacia Wood Planks Panel"
+msgstr "Akazienholzplankenpaneel"
+
+#: src/_locale_workbench.lua:516
+msgid "Acacia Wood Planks Double Panel"
+msgstr "Akazienholzplankendoppelpaneel"
+
+#: src/_locale_workbench.lua:517
+msgid "Acacia Wood Planks Half-Stair"
+msgstr "Akazienholzplankenhalbtreppe"
+
+#: src/_locale_workbench.lua:518
+msgid "Aspen Tree Stair"
+msgstr "Espenbaumtreppe"
+
+#: src/_locale_workbench.lua:519
+msgid "Aspen Tree Slab"
+msgstr "Espenbaumplatte"
+
+#: src/_locale_workbench.lua:520
+msgid "Inner Aspen Tree Stair"
+msgstr "Innere Espenbaumtreppe"
+
+#: src/_locale_workbench.lua:521
+msgid "Outer Aspen Tree Stair"
+msgstr "Äußere Espenbaumtreppe"
+
+#: src/_locale_workbench.lua:522
+msgid "Aspen Tree Nanoslab"
+msgstr "Espenbaumnanoplatte"
+
+#: src/_locale_workbench.lua:523
+msgid "Aspen Tree Micropanel"
+msgstr "Espenbaummikropaneel"
+
+#: src/_locale_workbench.lua:524
+msgid "Aspen Tree Microslab"
+msgstr "Espenbaummikroplatte"
+
+#: src/_locale_workbench.lua:525
+msgid "Aspen Tree Thin Stair"
+msgstr "Espenbaumflachtreppe"
+
+#: src/_locale_workbench.lua:526
+msgid "Aspen Tree Cube"
+msgstr "Espenbaumwürfel"
+
+#: src/_locale_workbench.lua:527
+msgid "Aspen Tree Panel"
+msgstr "Espenbaumpaneel"
+
+#: src/_locale_workbench.lua:528
+msgid "Aspen Tree Double Panel"
+msgstr "Espenbaumdoppelpaneel"
+
+#: src/_locale_workbench.lua:529
+msgid "Aspen Tree Half-Stair"
+msgstr "Espenbaumhalbtreppe"
+
+#: src/_locale_workbench.lua:530
+msgid "Aspen Wood Planks Nanoslab"
+msgstr "Espenholzplankennanoplatte"
+
+#: src/_locale_workbench.lua:531
+msgid "Aspen Wood Planks Micropanel"
+msgstr "Espenholzplankenmikropaneel"
+
+#: src/_locale_workbench.lua:532
+msgid "Aspen Wood Planks Microslab"
+msgstr "Espenholzplankenmikroplatte"
+
+#: src/_locale_workbench.lua:533
+msgid "Aspen Wood Planks Thin Stair"
+msgstr "Espenholzplankenflachtreppe"
+
+#: src/_locale_workbench.lua:534
+msgid "Aspen Wood Planks Cube"
+msgstr "Espenholzplankenwürfel"
+
+#: src/_locale_workbench.lua:535
+msgid "Aspen Wood Planks Panel"
+msgstr "Espenholzplankenpaneel"
+
+#: src/_locale_workbench.lua:536
+msgid "Aspen Wood Planks Double Panel"
+msgstr "Espenholzplankendoppelpaneel"
+
+#: src/_locale_workbench.lua:537
+msgid "Aspen Wood Planks Half-Stair"
+msgstr "Espenholzplankenhalbtreppe"
+
+#: src/_locale_workbench.lua:538
+msgid "Glass Nanoslab"
+msgstr "Glasnanoplatte"
+
+#: src/_locale_workbench.lua:539
+msgid "Glass Micropanel"
+msgstr "Glasmikropaneel"
+
+#: src/_locale_workbench.lua:540
+msgid "Glass Microslab"
+msgstr "Glasmikroplatte"
+
+#: src/_locale_workbench.lua:541
+msgid "Glass Thin Stair"
+msgstr "Glasflachtreppe"
+
+#: src/_locale_workbench.lua:542
+msgid "Glass Cube"
+msgstr "Glaswürfel"
+
+#: src/_locale_workbench.lua:543
+msgid "Glass Panel"
+msgstr "Glaspaneel"
+
+#: src/_locale_workbench.lua:544
+msgid "Glass Double Panel"
+msgstr "Glasdoppelpaneel"
+
+#: src/_locale_workbench.lua:545
+msgid "Glass Half-Stair"
+msgstr "Glashalbtreppe"
+
+#: src/_locale_workbench.lua:546
+msgid "Coal Block Stair"
+msgstr "Kohleblocktreppe"
+
+#: src/_locale_workbench.lua:547
+msgid "Coal Block Slab"
+msgstr "Kohleblockplatte"
+
+#: src/_locale_workbench.lua:548
+msgid "Inner Coal Block Stair"
+msgstr "Innere Kohleblocktreppe"
+
+#: src/_locale_workbench.lua:549
+msgid "Outer Coal Block Stair"
+msgstr "Äußere Kohleblocktreppe"
+
+#: src/_locale_workbench.lua:550
+msgid "Coal Block Nanoslab"
+msgstr "Kohleblocknanoplatte"
+
+#: src/_locale_workbench.lua:551
+msgid "Coal Block Micropanel"
+msgstr "Kohleblockmikropaneel"
+
+#: src/_locale_workbench.lua:552
+msgid "Coal Block Microslab"
+msgstr "Kohleblockmikroplatte"
+
+#: src/_locale_workbench.lua:553
+msgid "Coal Block Thin Stair"
+msgstr "Kohleblockflachtreppe"
+
+#: src/_locale_workbench.lua:554
+msgid "Coal Block Cube"
+msgstr "Kohleblockwürfel"
+
+#: src/_locale_workbench.lua:555
+msgid "Coal Block Panel"
+msgstr "Kohleblockpaneel"
+
+#: src/_locale_workbench.lua:556
+msgid "Coal Block Double Panel"
+msgstr "Kohleblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:557
+msgid "Coal Block Half-Stair"
+msgstr "Kohleblockhalbtreppe"
+
+#: src/_locale_workbench.lua:558
+msgid "Steel Block Nanoslab"
+msgstr "Stahlblocknanoplatte"
+
+#: src/_locale_workbench.lua:559
+msgid "Steel Block Micropanel"
+msgstr "Stahlblockmikropaneel"
+
+#: src/_locale_workbench.lua:560
+msgid "Steel Block Microslab"
+msgstr "Stahlblockmikroplatte"
+
+#: src/_locale_workbench.lua:561
+msgid "Steel Block Thin Stair"
+msgstr "Stahlblockflachtreppe"
+
+#: src/_locale_workbench.lua:562
+msgid "Steel Block Cube"
+msgstr "Stahlblockwürfel"
+
+#: src/_locale_workbench.lua:563
+msgid "Steel Block Panel"
+msgstr "Stahlblockpaneel"
+
+#: src/_locale_workbench.lua:564
+msgid "Steel Block Double Panel"
+msgstr "Stahlblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:565
+msgid "Steel Block Half-Stair"
+msgstr "Stahlblockhalbtreppe"
+
+#: src/_locale_workbench.lua:566
+msgid "Copper Block Nanoslab"
+msgstr "Kupferblocknanoplatte"
+
+#: src/_locale_workbench.lua:567
+msgid "Copper Block Micropanel"
+msgstr "Kupferblockmikropaneel"
+
+#: src/_locale_workbench.lua:568
+msgid "Copper Block Microslab"
+msgstr "Kupferblockmikroplatte"
+
+#: src/_locale_workbench.lua:569
+msgid "Copper Block Thin Stair"
+msgstr "Kupferblockflachtreppe"
+
+#: src/_locale_workbench.lua:570
+msgid "Copper Block Cube"
+msgstr "Kupferblockwürfel"
+
+#: src/_locale_workbench.lua:571
+msgid "Copper Block Panel"
+msgstr "Kupferblockpaneel"
+
+#: src/_locale_workbench.lua:572
+msgid "Copper Block Double Panel"
+msgstr "Kupferblockdoppelpaneel"
+
+#: src/_locale_workbench.lua:573
+msgid "Copper Block Half-Stair"
+msgstr "Kupferblockhalbtreppe"
+
+#: src/_locale_workbench.lua:574
+msgid "Obsidian Glass Nanoslab"
+msgstr "Obsidianglasnanoplatte"
+
+#: src/_locale_workbench.lua:575
+msgid "Obsidian Glass Micropanel"
+msgstr "Obsidianglasmikropaneel"
+
+#: src/_locale_workbench.lua:576
+msgid "Obsidian Glass Microslab"
+msgstr "Obsidianglasmikroplatte"
+
+#: src/_locale_workbench.lua:577
+msgid "Obsidian Glass Thin Stair"
+msgstr "Obsidianglasflachtreppe"
+
+#: src/_locale_workbench.lua:578
+msgid "Obsidian Glass Cube"
+msgstr "Obsidianglaswürfel"
+
+#: src/_locale_workbench.lua:579
+msgid "Obsidian Glass Panel"
+msgstr "Obsidianglaspaneel"
+
+#: src/_locale_workbench.lua:580
+msgid "Obsidian Glass Double Panel"
+msgstr "Obsidianglasdoppelpaneel"
+
+#: src/_locale_workbench.lua:581
+msgid "Obsidian Glass Half-Stair"
+msgstr "Obsidianglashalbtreppe"
 
 #. ~ Used in the mailbox donor list. Will be displayed as item icon followed by this string. @1 = item count
 #: src/mailbox.lua:65
@@ -938,112 +3274,98 @@ msgstr "Lautsprecher"
 msgid "Rope"
 msgstr "Seil"
 
-#. ~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:19
-msgid "@1 Nanoslab"
-msgstr "@1nanoplatte"
+#. ~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench.
+#: src/workbench.lua:25
+msgid "Nanoslab"
+msgstr "Nanoplatte"
 
-#. ~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:21
-msgid "@1 Micropanel"
-msgstr "@1mikropaneel"
+#. ~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench.
+#: src/workbench.lua:27
+msgid "Micropanel"
+msgstr "Mikropaneel"
 
-#. ~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:23
-msgid "@1 Microslab"
-msgstr "@1mikroplatte"
+#. ~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench.
+#: src/workbench.lua:29
+msgid "Microslab"
+msgstr "Mikroplatte"
 
-#. ~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:26
-msgid "@1 Thin Stair"
-msgstr "@1flachtreppe"
+#. ~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench.
+#: src/workbench.lua:32
+msgid "Thin Stair"
+msgstr "Flachtreppe"
 
-#. ~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:28
-msgid "@1 Cube"
-msgstr "@1würfel"
+#. ~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench.
+#: src/workbench.lua:34
+msgid "Cube"
+msgstr "Würfel"
 
-#. ~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:30
-msgid "@1 Panel"
-msgstr "@1paneel"
+#. ~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench.
+#: src/workbench.lua:36
+msgid "Panel"
+msgstr "Paneel"
 
-#. ~ Block name of a block with 1/2 the height of a full block. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:32 src/workbench.lua:409 src/workbench.lua:416
-#: handlers/registration.lua:84 handlers/registration.lua:92
-msgid "@1 Slab"
-msgstr "@1platte"
-
-#. ~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:35
-msgid "@1 Double Panel"
-msgstr "@1doppelpaneel"
-
-#. ~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
+#. ~ Block name of a block with 1/2 the height of a full block.
 #: src/workbench.lua:38
-msgid "@1 Half-Stair"
-msgstr "@1halbtreppe"
+msgid "Slab"
+msgstr "Platte"
 
-#. ~ Block name of a 'traditional' stair-shaped block. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:41 src/workbench.lua:398 src/workbench.lua:415
-#: handlers/registration.lua:75 handlers/registration.lua:91
-msgid "@1 Stair"
-msgstr "@1treppe"
+#. ~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench.
+#: src/workbench.lua:41
+msgid "Double Panel"
+msgstr "Doppelpaneel"
+
+#. ~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench.
+#: src/workbench.lua:44
+msgid "Half-Stair"
+msgstr "Halbtreppe"
+
+#. ~ Block name of a 'traditional' stair-shaped block.
+#: src/workbench.lua:47
+msgid "Stair"
+msgstr "Treppe"
 
 #. ~ Label shown in work bench menu where you can cut a block to create smaller versions of it
-#: src/workbench.lua:128
+#: src/workbench.lua:134
 msgid "Cut"
 msgstr "Zuschnitt"
 
 #. ~ Label shown in work bench menu where you can repair an item
-#: src/workbench.lua:130
+#: src/workbench.lua:136
 msgid "Repair"
 msgstr "Reparatur"
 
 #. ~ Button in work bench menu for the crafting grid
-#: src/workbench.lua:134
+#: src/workbench.lua:140
 msgid "Crafting"
 msgstr "Fertigung"
 
 #. ~ Button in work bench menu for its inventory
-#: src/workbench.lua:136
+#: src/workbench.lua:142
 msgid "Storage"
 msgstr "Lager"
 
 #. ~ Button to return to main page in work bench menu
-#: src/workbench.lua:157 src/workbench.lua:165
+#: src/workbench.lua:163 src/workbench.lua:171
 msgid "Back"
 msgstr "Zurück"
 
-#: src/workbench.lua:197 src/workbench.lua:324
+#: src/workbench.lua:203 src/workbench.lua:342
 msgid "Work Bench"
 msgstr "Werkbank"
 
 #. ~ Work bench tooltip
-#: src/workbench.lua:326
+#: src/workbench.lua:344
 msgid ""
 "For cutting blocks, repairing tools with a hammer, crafting and storing items"
 msgstr ""
 "Für Blockzuschnitt, Werkzeugreparatur mit Hammer, Fertigung und Lagerung"
 
-#. ~ Block name of a stair-shaped block, inner corner. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:402 src/workbench.lua:418 handlers/registration.lua:78
-#: handlers/registration.lua:94
-msgid "Inner @1 Stair"
-msgstr "Innere @1treppe"
-
-#. ~ Block name of a stair-shaped block, outer corner. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:405 src/workbench.lua:419 handlers/registration.lua:80
-#: handlers/registration.lua:95
-msgid "Outer @1 Stair"
-msgstr "Äußere @1treppe"
-
 #. ~ Hammer tooltip
-#: src/workbench.lua:564
+#: src/workbench.lua:605
 msgid "Repairs tools at the work bench"
 msgstr "Repariert Werkzeuge an der Werkbank"
 
-#: src/workbench.lua:646
+#: src/workbench.lua:687
 msgid "Hammer"
 msgstr "Hammer"
 
