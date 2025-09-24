@@ -8,7 +8,10 @@ local S = minetest.get_translator("xdecor")
 local T = S
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 
-local GENERATE_TRANSLATABLE_STRING_LIST = true
+-- Set to true to print all the raw English strings
+-- of registered cut nodes into console.
+-- (Requires Luanti 5.14.0 or later to work.)
+local GENERATE_TRANSLATABLE_STRING_LIST = false
 
 -- Nodeboxes definitions
 workbench.defs = {
@@ -381,11 +384,23 @@ local function register_cut_raw(node, workbench_def)
 						groups, custom_tiles.stair_inner, "", def.sounds, nil, T("Inner "..def.description.." Stair"))
 					stairs.register_stair_outer(item_name, node,
 						groups, custom_tiles.stair_outer, "", def.sounds, nil, T("Outer "..def.description.." Stair"))
+
+					if GENERATE_TRANSLATABLE_STRING_LIST then
+						local raw_desc = minetest.strip_escapes(def.description)
+						print(("S(%q)"):format(raw_desc .. " Stair"))
+						print(("S(%q)"):format("Inner " .. raw_desc .. " Stair"))
+						print(("S(%q)"):format("Outer " .. raw_desc .. " Stair"))
+					end
 				end
 				if custom_tiles.slab then
 					stairs.register_slab(item_name, node,
 						groups, custom_tiles.slab, T(def.description.." Slab"),
 						def.sounds)
+
+					if GENERATE_TRANSLATABLE_STRING_LIST then
+						local raw_desc = minetest.strip_escapes(def.description)
+						print(("S(%q)"):format(raw_desc .. " Slab"))
+					end
 				end
 			else
 				stairs.register_stair_and_slab(item_name, node,
@@ -395,6 +410,14 @@ local function register_cut_raw(node, workbench_def)
 					def.sounds, nil,
 					T("Inner "..def.description.." Stair"),
 					T("Outer "..def.description.." Stair"))
+
+				if GENERATE_TRANSLATABLE_STRING_LIST then
+					local raw_desc = minetest.strip_escapes(def.description)
+					print(("S(%q)"):format(raw_desc .. " Stair"))
+					print(("S(%q)"):format(raw_desc .. " Slab"))
+					print(("S(%q)"):format("Inner " .. raw_desc .. " Stair"))
+					print(("S(%q)"):format("Outer " .. raw_desc .. " Stair"))
+				end
 			end
 		end
 
@@ -429,9 +452,9 @@ local function register_cut_raw(node, workbench_def)
 		})
 
 		if GENERATE_TRANSLATABLE_STRING_LIST then
-			local desc = minetest.get_translated_string("de", S("Work Bench"))
-			--desc = def.description
-			print(("S(%q)"):format(tostring(desc)))
+			local raw_desc = minetest.strip_escapes(def.description)
+			local raw_modifier = minetest.strip_escapes(workbench_def[4])
+			print(("S(%q)"):format(raw_desc .. " " .. raw_modifier))
 		end
 
 	elseif item_name and mod_name then
