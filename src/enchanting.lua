@@ -275,6 +275,15 @@ minetest.register_entity("xdecor:book_open", {
 		textures = {"xdecor_book_open.png"},
 		static_save = false,
 	},
+
+	on_activate = function(self)
+		self.object:set_armor_groups({immortal=1})
+	end,
+
+	-- Minetest Game support: Prevent entity being pushed or damaged by TNT explosion
+	on_blast = function()
+		return false, false, {}
+	end,
 })
 
 minetest.register_lbm({
