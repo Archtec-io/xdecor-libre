@@ -2,7 +2,7 @@
 │   Copyright (c) 2015-2021 kilbith <jeanpatrick.guerrero@gmail.com>   │
 │                                                                      │
 │   Code: Modified BSD License                                         │
-│   Textures: CC0 (credits: Gambit, kilbith, Cisoun)                   │
+│   Textures: CC0 (credits: Gambit, kilbith, Cisoun, Wuzzy)            │
 │                                                                      │
 │   Textures (radio and speaker) by                                    │
 │        MCL <temp1@cubesoftware.xyz> (CC BY 4.0 Int'l)                │
@@ -24,6 +24,13 @@
 │          opengameart.org/content/funny-comic-cartoon-bounce-sound    │
 │     - xdecor_enchanting.ogg - by Kostas17, edit by Wuzzy - CC BY 3.0 │
 │          freesound.org/people/Kostas17/sounds/542825/                │
+│                                                                      │
+│    Translations:                                                     │
+│     - German: Wuzzy                                                  │
+│     - Italian: Zughy                                                 │
+│     - Spanish: josemunozrwx                                          │
+│     - French: Louis Royer                                            │
+│                                                                      │
 └──────────────────────────────────────────────────────────────────────┘
 
 -- Modified BSD License --

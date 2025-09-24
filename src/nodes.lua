@@ -107,6 +107,7 @@ local function register_storage(name, desc, def)
 end
 
 register_storage("cabinet", S("Wooden Cabinet"), {
+	--~ Tooltip for block that stores items
 	_tt_help = S("24 inventory slots"),
 	on_rotate = screwdriver.rotate_simple,
 	tiles = {
@@ -118,6 +119,7 @@ register_storage("cabinet", S("Wooden Cabinet"), {
 
 register_storage("cabinet_half", S("Half Wooden Cabinet"), {
 	inv_size = 8,
+	--~ Tooltip for block that stores items
 	_tt_help = S("8 inventory slots"),
 	node_box = xdecor.nodebox.slab_y(0.5, 0.5),
 	on_rotate = screwdriver.rotate_simple,
@@ -339,10 +341,6 @@ xdecor.register("cushion_block", {
 	is_ground_content = false,
 })
 
-local function door_access(name)
-	return name:find("prison")
-end
-
 local xdecor_doors = {
 	japanese = {
 		recipe = {
@@ -364,6 +362,7 @@ local xdecor_doors = {
 		sound_close = "xpanes_steel_bar_door_close",
 		gain_open = 0.18,
 		gain_close = 0.16,
+		protected = true,
 	},
 	rusty_prison = {
 		recipe = {
@@ -377,6 +376,7 @@ local xdecor_doors = {
 		sound_close = "xpanes_steel_bar_door_close",
 		gain_open = 0.21,
 		gain_close = 0.19,
+		protected = true,
 	},
 	screen = {
 		recipe = {
@@ -437,7 +437,7 @@ for name, def in pairs(xdecor_doors) do
 		sound_close = def.sound_close,
 		gain_open = def.gain_open,
 		gain_close = def.gain_close,
-		protected = door_access(name),
+		protected = def.protected,
 		groups = {choppy = 2, cracky = 2, oddly_breakable_by_hand = 1, door = 1, node = 1},
 		recipe = def.recipe,
 		mesecons = mesecons_register,
@@ -446,6 +446,7 @@ end
 
 xdecor.register("enderchest", {
 	description = S("Ender Chest"),
+	--~ Ender chest tooltip
 	_tt_help = S("Interdimensional inventory"),
 	tiles = {
 		"xdecor_enderchest_top.png", "xdecor_enderchest_top.png",
@@ -637,20 +638,25 @@ for l, desc in pairs(xdecor_lightbox) do
 	})
 end
 
+-- Potted flowers
 local xdecor_potted = {
+	-- Based on the original Minetest Game flowers
 	dandelion_white = S("Potted White Dandelion"),
 	dandelion_yellow = S("Potted Yellow Dandelion"),
-	geranium = S("Potted Geranium"),
-	rose = S("Potted Rose"),
-	tulip = S("Potted Tulip"),
+	geranium = S("Potted Blue Geranium"),
+	rose = S("Potted Red Rose"),
+	tulip = S("Potted Orange Tulip"),
 	viola = S("Potted Viola"),
+	-- Based on the flowers added in Minetest Game 5.0.0
+	tulip_black = S("Potted Black Tulip"),
+	chrysanthemum_green = S("Potted Green Chrysanthemum"),
 }
 
 for f, desc in pairs(xdecor_potted) do
 	xdecor.register("potted_" .. f, {
 		description = desc,
 		walkable = false,
-		groups = {snappy = 3, flammable = 3, plant = 1, flower = 1},
+		groups = {snappy = 3, flammable = 3, plant = 1, flower = 1, potted_flower = 1},
 		is_ground_content = false,
 		tiles = {"xdecor_" .. f .. "_pot.png"},
 		inventory_image = "xdecor_" .. f .. "_pot.png",
@@ -662,13 +668,16 @@ for f, desc in pairs(xdecor_potted) do
 		selection_box = xdecor.nodebox.slab_y(0.3)
 	})
 
-	minetest.register_craft({
-		output = "xdecor:potted_" .. f,
-		recipe = {
-			{"default:clay_brick", "flowers:" .. f, "default:clay_brick"},
-			{"", "default:clay_brick", ""}
-		}
-	})
+	-- Register recipe only if the matching flower exists
+	if minetest.registered_items["flowers:" .. f] then
+		minetest.register_craft({
+			output = "xdecor:potted_" .. f,
+			recipe = {
+				{"default:clay_brick", "flowers:" .. f, "default:clay_brick"},
+				{"", "default:clay_brick", ""}
+			}
+		})
+	end
 end
 
 local painting_box = {
@@ -775,7 +784,12 @@ local function register_hard_node(name, desc, def)
 		tiles = def.tiles or {"xdecor_" .. name .. ".png"},
 		groups = def.groups or {cracky = 1},
 		is_ground_content = false,
-		sounds = def.sounds or default.node_sound_stone_defaults()
+		sounds = def.sounds or default.node_sound_stone_defaults(),
+		-- Use a default rotation to avoid annoying rotation
+		-- on normal placement.
+		-- The nodes can still be rotated by e.g. the screwdriver
+		-- because xdecor.register uses 'facedir' by default.
+		place_param2 = 0,
 	})
 end
 
@@ -808,6 +822,7 @@ register_hard_node("wood_tile_x", S("Wooden Tile"), {
 xdecor.register_legacy_aliases("wood_tile", "wood_tile_x")
 
 xdecor.register("table", {
+	--~ Furniture
 	description = S("Table"),
 	tiles = {"xdecor_wood.png"},
 	groups = {choppy = 2, oddly_breakable_by_hand = 1, flammable = 2},
@@ -940,6 +955,7 @@ xdecor.register("woodframed_glass", {
 
 local devices = {
 	{ "radio", S("Radio"), default.node_sound_metal_defaults() },
+	--~ as in "loudspeaker"
 	{ "speaker", S("Speaker"), default.node_sound_metal_defaults() },
 }
 for _, v in pairs(devices) do

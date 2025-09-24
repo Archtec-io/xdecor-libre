@@ -120,7 +120,9 @@ function hive.blast(pos)
 end
 
 xdecor.register("hive", {
+	--~ Beehive
 	description = S("Artificial Hive"),
+	--~ Tooltip of artificial hive
 	_tt_help = S("Bees live here and produce honey"),
 	tiles = {"xdecor_hive_top.png", "xdecor_hive_top.png",
 		 "xdecor_hive_side.png", "xdecor_hive_side.png",
@@ -171,6 +173,7 @@ minetest.register_craftitem("xdecor:honey", {
 		food_honey = 1,
 		food_sugar = 1,
 		flammable = 2,
+		xdecor_soup_ingredient = 1,
 	},
 })
 
@@ -187,6 +190,7 @@ minetest.register_craft({
 
 if minetest.get_modpath("unified_inventory") then
 	unified_inventory.register_craft_type("xdecor:hive", {
+		--~ Tooltip for honey in crafting guide of the Unified Inventory mod
 		description = S("Made by bees"),
 		icon = "hive_bee.png",
 		width = 1,

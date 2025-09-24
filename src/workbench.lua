@@ -7,29 +7,44 @@ local min, ceil = math.min, math.ceil
 local S = minetest.get_translator("xdecor")
 local T = S
 local FS = function(...) return minetest.formspec_escape(S(...)) end
+local NS = function(s) return s end
 
 -- Set to true to print all the raw English strings
 -- of registered cut nodes into console.
 -- (Requires Luanti 5.14.0 or later to work.)
 local GENERATE_TRANSLATABLE_STRING_LIST = false
 
+local DEFAULT_HAMMER_REPAIR = 500
+local DEFAULT_HAMMER_REPAIR_COST = 700
+
+
 -- Nodeboxes definitions
 workbench.defs = {
 	-- Name Yield Nodeboxes (X Y Z W H L)  Description
-	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }}, T("Nanoslab")},
-	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }}, T("Micropanel")},
-	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, T("Microslab")},
+	--~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench.
+	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }}, NS("Nanoslab")},
+	--~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench.
+	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }}, NS("Micropanel")},
+	--~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench.
+	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, NS("Microslab")},
 	{"thinstair",   8,  {{ 0, 7,  0, 16, 1, 8  },
-			{ 0, 15, 8, 16, 1, 8  }}, T("Thin Stair")},
-	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, T("Cube")},
-	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, T("Panel")},
-	{"slab",        2,  nil, T("Slab") },
+	--~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench.
+			{ 0, 15, 8, 16, 1, 8  }}, NS("Thin Stair")},
+	--~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench.
+	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, NS("Cube")},
+	--~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench.
+	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, NS("Panel")},
+	--~ Block name of a block with 1/2 the height of a full block.
+	{"slab",        2,  nil, NS("Slab") },
 	{"doublepanel", 2,  {{ 0, 0,  0, 16, 8, 8  },
-			{ 0, 8,  8, 16, 8, 8  }}, T("Double Panel")},
+	--~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench.
+			{ 0, 8,  8, 16, 8, 8  }}, NS("Double Panel")},
 	{"halfstair",   2,  {{ 0, 0,  0, 8,  8, 16 },
-			{ 0, 8,  8, 8,  8, 8  }}, T("Half-Stair")},
+	--~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench.
+			{ 0, 8,  8, 8,  8, 8  }}, NS("Half-Stair")},
 	{"stair_outer", 1,  nil, nil},
-	{"stair",       1,  nil, T("Stair")},
+	--~ Block name of a 'traditional' stair-shaped block.
+	{"stair",       1,  nil, NS("Stair")},
 	{"stair_inner", 1,  nil, nil},
 }
 
@@ -40,7 +55,7 @@ end
 
 -- Tools allowed to be repaired
 function workbench:repairable(stack)
-	-- Explicitly registeded as repairable: Overrides everything else
+	-- Explicitly registered as repairable: Overrides everything else
 	if custom_repairable[stack] then
 		return true
 	end
@@ -114,11 +129,16 @@ function workbench:get_output(inv, input, name)
 	inv:set_list("forms", output)
 end
 
-local main_fs = "label[0.9,1.23;"..FS("Cut").."]"
+local main_fs = ""..
+	--~ Label shown in work bench menu where you can cut a block to create smaller versions of it
+	"label[0.9,1.23;"..FS("Cut").."]"
+	--~ Label shown in work bench menu where you can repair an item
 	.."label[0.9,2.23;"..FS("Repair").."]"
 	..[[ box[-0.05,1;2.05,0.9;#555555]
 	box[-0.05,2;2.05,0.9;#555555] ]]
+	--~ Button in work bench menu for the crafting grid
 	.."button[0,0;2,1;craft;"..FS("Crafting").."]"
+	--~ Button in work bench menu for its inventory
 	.."button[2,0;2,1;storage;"..FS("Storage").."]"
 	..[[ image[3,1;1,1;gui_arrow.png]
 	image[0,1;1,1;worktable_saw.png]
@@ -139,6 +159,7 @@ local main_fs = "label[0.9,1.23;"..FS("Cut").."]"
 ]]
 
 local crafting_fs = "image[5,1;1,1;gui_furnace_arrow_bg.png^[transformR270]"
+	--~ Button to return to main page in work bench menu
 	.."button[0,0;1.5,1;back;< "..FS("Back").."]"
 	..[[ list[current_player;craft;2,0;3,3;]
 	list[current_player;craftpreview;6,1;1,1;]
@@ -216,9 +237,11 @@ function workbench.timer(pos)
 		return
 	end
 
+	local hammerdef = hammer:get_definition()
+
 	-- Tool's wearing range: 0-65535; 0 = new condition
-	tool:add_wear(-500)
-	hammer:add_wear(700)
+	tool:add_wear(-hammerdef._xdecor_hammer_repair or DEFAULT_HAMMER_REPAIR)
+	hammer:add_wear(hammerdef._xdecor_hammer_repair_cost or DEFAULT_HAMMER_REPAIR_COST)
 
 	inv:set_stack("tool", 1, tool)
 	inv:set_stack("hammer", 1, hammer)
@@ -230,7 +253,7 @@ function workbench.allow_put(pos, listname, index, stack, player)
 	local stackname = stack:get_name()
 	if (listname == "tool" and workbench:repairable(stackname)) or
 	   (listname == "input" and workbench:cuttable(stackname)) or
-	   (listname == "hammer" and stackname == "xdecor:hammer") or
+	   (listname == "hammer" and minetest.get_item_group(stackname, "repair_hammer") == 1) or
 	    listname == "storage" then
 		return stack:get_count()
 	end
@@ -252,10 +275,22 @@ end
 function workbench.allow_move(pos, from_list, from_index, to_list, to_index, count, player)
 	if (to_list == "storage" and from_list ~= "forms") then
 		return count
-	elseif (to_list == "hammer" and from_list == "tool") or (to_list == "tool" and from_list == "hammer") then
+	elseif (to_list == "hammer" and (from_list == "tool" or from_list == "storage")) then
 		local inv = minetest.get_inventory({type="node", pos=pos})
 		local stack = inv:get_stack(from_list, from_index)
-		if stack:get_name() == "xdecor:hammer" then
+		if minetest.get_item_group(stack:get_name(), "repair_hammer") == 1 then
+			return count
+		end
+	elseif (to_list == "tool") then
+		local inv = minetest.get_inventory({type="node", pos=pos})
+		local stack = inv:get_stack(from_list, from_index)
+		if workbench:repairable(stack:get_name()) then
+			return count
+		end
+	elseif (to_list == "input") then
+		local inv = minetest.get_inventory({type="node", pos=pos})
+		local stack = inv:get_stack(from_list, from_index)
+		if workbench:cuttable(stack:get_name()) then
 			return count
 		end
 	end
@@ -305,6 +340,7 @@ end
 
 xdecor.register("workbench", {
 	description = S("Work Bench"),
+	--~ Work bench tooltip
 	_tt_help = S("For cutting blocks, repairing tools with a hammer, crafting and storing items"),
 	groups = {cracky = 2, choppy = 2, oddly_breakable_by_hand = 1},
 	is_ground_content = false,
@@ -335,7 +371,6 @@ local function register_cut_raw(node, workbench_def)
 	if item_name and workbench_def[3] then
 		local groups = {}
 		local tiles
-		groups.not_in_creative_inventory = 1
 
 		for k, v in pairs(def.groups) do
 			if k ~= "wood" and k ~= "stone" and k ~= "level" then
@@ -374,19 +409,19 @@ local function register_cut_raw(node, workbench_def)
 			end
 		end
 
+		local raw_desc = minetest.strip_escapes(def.description)
 		if not minetest.registered_nodes["stairs:slab_" .. item_name] then
 			if custom_tiles and (custom_tiles.slab or custom_tiles.stair) then
 				if custom_tiles.stair then
 					stairs.register_stair(item_name, node,
-						groups, custom_tiles.stair, T(def.description.." Stair"),
+						groups, custom_tiles.stair, T(raw_desc .." Stair"),
 						def.sounds)
 					stairs.register_stair_inner(item_name, node,
-						groups, custom_tiles.stair_inner, "", def.sounds, nil, T("Inner "..def.description.." Stair"))
+						groups, custom_tiles.stair_inner, "", def.sounds, nil, T("Inner "..raw_desc.." Stair"))
 					stairs.register_stair_outer(item_name, node,
-						groups, custom_tiles.stair_outer, "", def.sounds, nil, T("Outer "..def.description.." Stair"))
+						groups, custom_tiles.stair_outer, "", def.sounds, nil, T("Outer "..raw_desc.." Stair"))
 
 					if GENERATE_TRANSLATABLE_STRING_LIST then
-						local raw_desc = minetest.strip_escapes(def.description)
 						print(("S(%q)"):format(raw_desc .. " Stair"))
 						print(("S(%q)"):format("Inner " .. raw_desc .. " Stair"))
 						print(("S(%q)"):format("Outer " .. raw_desc .. " Stair"))
@@ -394,25 +429,23 @@ local function register_cut_raw(node, workbench_def)
 				end
 				if custom_tiles.slab then
 					stairs.register_slab(item_name, node,
-						groups, custom_tiles.slab, T(def.description.." Slab"),
+						groups, custom_tiles.slab, T(raw_desc.." Slab"),
 						def.sounds)
 
 					if GENERATE_TRANSLATABLE_STRING_LIST then
-						local raw_desc = minetest.strip_escapes(def.description)
 						print(("S(%q)"):format(raw_desc .. " Slab"))
 					end
 				end
 			else
 				stairs.register_stair_and_slab(item_name, node,
 					groups, tiles,
-					T(def.description.." Stair"),
-					T(def.description.." Slab"),
+					T(raw_desc.." Stair"),
+					T(raw_desc.." Slab"),
 					def.sounds, nil,
-					T("Inner "..def.description.." Stair"),
-					T("Outer "..def.description.." Stair"))
+					T("Inner "..raw_desc.." Stair"),
+					T("Outer "..raw_desc.." Stair"))
 
 				if GENERATE_TRANSLATABLE_STRING_LIST then
-					local raw_desc = minetest.strip_escapes(def.description)
 					print(("S(%q)"):format(raw_desc .. " Stair"))
 					print(("S(%q)"):format(raw_desc .. " Slab"))
 					print(("S(%q)"):format("Inner " .. raw_desc .. " Stair"))
@@ -434,17 +467,29 @@ local function register_cut_raw(node, workbench_def)
 			minetest.log("error", "[xdecor] register_cut_raw: Refusing to register node "..cutnodename.." becaut it was already registered!")
 			return false
 		end
+
+		-- Add groups to identify node as a cut node
+		local cutgroups = table.copy(groups)
+		-- Marks it as a cut node
+		cutgroups["xdecor_cut"] = 1
+		-- Specifies the cut type (nanoslab, panel, etc.)
+		cutgroups["xdecor_cut_"..workbench_def[1]] = 1
+
+		-- Also hide cut nodes from creative inv
+		cutgroups.not_in_creative_inventory = 1
+
+		local raw_modifier = minetest.strip_escapes(workbench_def[4])
 		minetest.register_node(":" .. cutnodename, {
 			-- Base node description (e.g. "Stone") concatenated with a space, then a modifier (e.g. "Nanoslab"),
 			-- e.g. "Stone Nanoslab".
-			description = T(def.description .. " " .. workbench_def[4]),
+			description = T(raw_desc .. " " .. raw_modifier),
 			paramtype = "light",
 			paramtype2 = "facedir",
 			drawtype = "nodebox",
 			sounds = def.sounds,
 			tiles = tiles_special_cut,
 			use_texture_alpha = def.use_texture_alpha,
-			groups = groups,
+			groups = cutgroups,
 			is_ground_content = def.is_ground_content,
 			node_box = xdecor.pixelbox(16, workbench_def[3]),
 			sunlight_propagates = true,
@@ -452,8 +497,6 @@ local function register_cut_raw(node, workbench_def)
 		})
 
 		if GENERATE_TRANSLATABLE_STRING_LIST then
-			local raw_desc = minetest.strip_escapes(def.description)
-			local raw_modifier = minetest.strip_escapes(workbench_def[4])
 			print(("S(%q)"):format(raw_desc .. " " .. raw_modifier))
 		end
 
@@ -472,7 +515,7 @@ end
 
 function workbench:register_cut(nodename, cutlist)
 	if registered_cuttable_nodes[nodename] then
-		minetest.log("error", "[xdecor] Workbench: Tried to register cut for node "..node..", but it was already registered!")
+		minetest.log("error", "[xdecor] Workbench: Tried to register cut for node "..nodename..", but it was already registered!")
 		return false
 	end
 	local ok = true
@@ -495,28 +538,7 @@ function workbench:register_special_cut(nodename, cutlist)
 	special_cuts[nodename] = cutlist
 end
 
--- Craft items
-
-minetest.register_tool("xdecor:hammer", {
-	description = S("Hammer"),
-	_tt_help = S("Repairs tools at the work bench"),
-	inventory_image = "xdecor_hammer.png",
-	wield_image = "xdecor_hammer.png",
-	on_use = function() do
-		return end
-	end
-})
-
--- Recipes
-
-minetest.register_craft({
-	output = "xdecor:hammer",
-	recipe = {
-		{"default:steel_ingot", "group:stick", "default:steel_ingot"},
-		{"", "group:stick", ""}
-	}
-})
-
+-- Workbench craft
 minetest.register_craft({
 	output = "xdecor:workbench",
 	recipe = {
@@ -550,7 +572,51 @@ end
 workbench:register_special_cut("xdecor:cushion_block", { slab = "xdecor:cushion" })
 workbench:register_special_cut("xdecor:cabinet", { slab = "xdecor:cabinet_half" })
 
---[[ EXPERIMENTAL PUBLIC FUNCTION:
+--[[ API FUNCTIONS ]]
+
+--[[ Register a custom hammer (for repairing).
+A hammer repair items at the work bench. The workbench repeatedly
+checks if a hammer and a repairable tool are in the slots. The hammer
+will repair the tool in regular intervals. This is called a "step".
+In each step, the hammer reduces the wear of the repairable
+tool but increases its own wear, each by a fixed amount.
+
+This function allows you to register a custom hammer with custom
+name, item image and wear stats.
+
+Arguments:
+* name: Internal itemname
+* def: Definition table:
+    * description: Item `description`
+    * image: Inventory image and wield image
+    * groups: Item groups (MUST contain at least `repair_hammer = 1`)
+    * repair: How much item wear the hammer repairs per step
+    * repair_cost: How much item wear the hammer takes itself per step
+
+Note: Mind the implication of repair_cost! If repair_cost is lower than
+repair, this means practically infinite durability if you have two
+hammers that repair each other. If repair_cost is higher than repair,
+then hammers will break eventually.
+]]
+function xdecor.register_hammer(name, def)
+	minetest.register_tool(name, {
+		description = def.description,
+		--~ Hammer tooltip
+		_tt_help = S("Repairs tools at the work bench"),
+		inventory_image = def.image,
+		wield_image = def.image,
+		on_use = function() do
+			return end
+		end,
+		groups = def.groups,
+		_xdecor_hammer_repair = def.repair or DEFAULT_HAMMER_REPAIR,
+		_xdecor_hammer_repair_cost = def.repair_cost or DEFAULT_HAMMER_REPAIR_COST,
+	})
+end
+
+--[[ API FUNCTIONS ]]
+
+--[[
 Registers various 'cut' node variants for the node with the given nodename,
 which will be available in the workbench.
 This must only be called once per node. Calling it again is an error.
@@ -567,7 +633,8 @@ The following nodes will be registered:
 * <nodename>_halfstair
 
 You MUST make sure these names are not already taken before
-calling this function. Failing to do so is an error.
+calling this function. Call xdecor.can_cut to do this.
+Failing to do so is an error.
 
 Additionally, a slab, stair, inner stair and outer stair
 will be registered by using the `stairs` mod if the slab
@@ -580,3 +647,55 @@ returns false (and writes to error log) if any error occurred.
 xdecor.register_cut = function(nodename)
 	return workbench:register_cut(nodename)
 end
+
+-- Returns true if cut nodes have been registered for the given node
+xdecor.is_cut_registered = function(nodename)
+	return registered_cuttable_nodes[nodename] == true
+end
+
+--[[ Returns true if cut node variants can be registered
+for the node AND this node doesn't already have
+cut nodes registered. ]]
+xdecor.can_cut = function(nodename)
+	-- Node already has cut variants: Fail
+	if xdecor.is_cut_registered(nodename) then
+		return false
+	end
+	-- Check group
+	if minetest.get_item_group(nodename, "not_cuttable") == 1 then
+		return false
+	end
+	for w=1, #workbench.defs do
+		local wdef = workbench.defs[w]
+		local cut = wdef[1]
+		if cut ~= "stair" and cut ~= "slab" and cut ~= "stair_inner" and cut ~= "stair_outer" then
+			if minetest.registered_nodes[nodename .. "_" ..cut] then
+				-- There already exists a node with one of the required names: Fail
+				return false
+			end
+		end
+	end
+	-- All tests passed: Success!
+	return true
+end
+
+--[[ END OF API FUNCTIONS ]]
+
+
+-- Register xdecor's built-in hammer
+xdecor.register_hammer("xdecor:hammer", {
+	description = S("Hammer"),
+	image = "xdecor_hammer.png",
+	groups = { repair_hammer = 1 },
+	repair = DEFAULT_HAMMER_REPAIR,
+	repair_cost = DEFAULT_HAMMER_REPAIR_COST,
+})
+
+-- Hammer recipes
+minetest.register_craft({
+	output = "xdecor:hammer",
+	recipe = {
+		{"default:steel_ingot", "group:stick", "default:steel_ingot"},
+		{"", "group:stick", ""}
+	}
+})

@@ -1,8 +1,14 @@
 local cauldron, sounds = {}, {}
 local S = minetest.get_translator("xdecor")
 
+-- Set to true to print soup ingredients, heater nodes and bowls to console
+local DEBUG_RECOGNIZED_ITEMS = false
+
+--~ cauldron hint
 local hint_fire = S("Light a fire below to heat it up")
+--~ cauldron hint
 local hint_eat = S("Use a bowl to eat the soup")
+--~ cauldron hint
 local hint_recipe = S("Drop foods inside to make a soup")
 
 local infotexts = {
@@ -21,12 +27,29 @@ local function set_infotext(meta, node)
 	end
 end
 
--- Add more ingredients here that make a soup.
+-- HACKY list of soup ingredients.
+-- For items without a valid 'xdecor_soup_ingredient' group present, the cauldron
+-- will check part of the itemname after the ':' contains any of those words.
+-- If it does, the item counts as an ingredient, UNLESS the item is in the
+-- non_ingredients blacklist below.
 local ingredients_list = {
 	"apple", "mushroom", "honey", "pumpkin", "egg", "bread", "meat",
 	"chicken", "carrot", "potato", "melon", "rhubarb", "cucumber",
 	"corn", "beans", "berries", "grapes", "tomato", "wheat"
 }
+
+-- Blacklist of items that cannot be soup ingredients, in case they
+-- would otherwise match the ingredients_list above.
+-- Note the group 'xdecor_soup_ingredient' still takes precedence.
+local non_ingredients = {
+	-- Minetest Game: default
+	"default:apple_mark", "default:blueberry_bush_leaves_with_berries",
+	-- Minetest Game: farming
+	"farming:seed_wheat",
+	"farming:wheat_1", "farming:wheat_2", "farming:wheat_3", "farming:wheat_4",
+	"farming:wheat_5", "farming:wheat_6", "farming:wheat_7", "farming:wheat_8",
+}
+local non_ingredients_keyed = table.key_value_swap(non_ingredients)
 
 cauldron.cbox = {
 	{0,  0, 0,  16, 16, 0},
@@ -36,12 +59,29 @@ cauldron.cbox = {
 	{0,  0, 0,  16, 8,  16}
 }
 
--- Returns true if the node at pos is above fire
+-- Returns true is given item is a node that can heat fire and can heat up the cauldron
+local function is_heater(itemstring)
+	-- Dedicated group to add custom cauldron-heating nodes
+	return minetest.get_item_group(itemstring, "xdecor_cauldron_heater") == 1 or
+		-- Also, all fire nodes count as heaters
+		minetest.get_item_group(itemstring, "fire") ~= 0
+end
+
+-- Returns true if given item is a bowl that is compatible with taking soup from
+-- the cauldron
+local function is_bowl(itemstring)
+	-- Recommended: The item has this group
+	return minetest.get_item_group(itemstring, "xdecor_soup_bowl") == 1
+		-- Two items are hardcoded
+		or itemstring == "farming:bowl" or itemstring == "x_farming:bowl"
+end
+
+-- Returns true if the node at pos is above heater
 local function is_heated(pos)
 	local below_node = {x = pos.x, y = pos.y - 1, z = pos.z}
 	local nn = minetest.get_node(below_node).name
-	-- Check fire group
-	if minetest.get_item_group(nn, "fire") ~= 0 then
+	-- Check heater status
+	if is_heater(nn) then
 		return true
 	else
 		return false
@@ -109,9 +149,9 @@ function cauldron.filling(pos, node, clicker, itemstack)
 					itemstack:take_item()
 					inv:add_item("main", bucket_item)
 				else
-					minetest.chat_send_player(clicker:get_player_name(),
-						S("No room in your inventory to add a bucket of water."))
-					return itemstack
+					-- No space: Drop bucket on ground
+					itemstack:take_item()
+					minetest.add_item(clicker:get_pos(), bucket_item)
 				end
 			else
 				itemstack:replace(bucket_item)
@@ -159,6 +199,47 @@ local function eatable(itemstring)
 	return string.format("%q", string.dump(on_use_def)):find("item_eat")
 end
 
+-- Checks if the given item can be used as ingredient for the soup
+local function is_ingredient(itemstring)
+	-- This group takes precedence over everything else, allowing
+	-- mods to explicitly mark items as soup ingredient or not.
+	local gval = minetest.get_item_group(itemstring, "xdecor_soup_ingredient")
+	-- 1: This item is a soup ingredient
+	if gval == 1 then
+		return true
+	-- -1: This item is NOT a soup ingredient
+	-- This should be used in case the heuristic below fails.
+	elseif gval == -1 then
+		return false
+	end
+
+	-- Otherwise, we determine on whether this item is a soup ingredient
+	-- based on its itemstring (admittedly kinda hacky ...)
+
+	-- But first check if our item is in the blacklist
+	if non_ingredients_keyed[itemstring] then
+		return false
+	end
+
+	-- Eatable items count as ingredient by default
+	if eatable(itemstring) then
+		return true
+	end
+	-- We check if the part of the itemstring after the colon
+	-- contains one of the words in ingredients_list.
+	-- If yes, this is an ingredient. Otherwise it isn't.
+	local basename = itemstring:match(":([%w_]+)")
+	if not basename then
+		return false
+	end
+	for _, ingredient in ipairs(ingredients_list) do
+		if basename:find(ingredient) then
+			return true
+		end
+	end
+	return false
+end
+
 function cauldron.boiling_timer(pos)
 	-- Cool down cauldron if there is no fire
 	local node = minetest.get_node(pos)
@@ -192,13 +273,12 @@ function cauldron.boiling_timer(pos)
 	for _, obj in pairs(objs) do
 		if obj and not obj:is_player() and obj:get_luaentity().itemstring then
 			local itemstring = obj:get_luaentity().itemstring
-			local food = itemstring:match(":([%w_]+)")
+			local item = ItemStack(itemstring)
+			local itemname = item:get_name()
 
-			for _, ingredient in ipairs(ingredients_list) do
-				if food and (eatable(itemstring) or food:find(ingredient)) then
-					ingredients[#ingredients + 1] = food
-					break
-				end
+			if is_ingredient(itemname) then
+				local basename = itemstring:match(":([%w_]+)")
+				table.insert(ingredients, basename)
 			end
 		end
 	end
@@ -221,21 +301,31 @@ function cauldron.take_soup(pos, node, clicker, itemstack)
 	local wield_item = clicker:get_wielded_item()
 	local item_name = wield_item:get_name()
 
-	if item_name == "xdecor:bowl" or item_name == "farming:bowl" then
+	if is_bowl(item_name) then
+		local soup_bowl = ItemStack("xdecor:bowl_soup 1")
+		-- For bowls from other mods, remember the original bowl name
+		-- to restore it after eating the soup.
+		if item_name ~= "xdecor:bowl" then
+			local imeta = soup_bowl:get_meta()
+			imeta:set_string("original_bowl", item_name)
+		end
+		-- Add item to inventory, if possible
 		if wield_item:get_count() > 1 then
-			if inv:room_for_item("main", "xdecor:bowl_soup 1") then
+			if inv:room_for_item("main", soup_bowl) then
 				itemstack:take_item()
-				inv:add_item("main", "xdecor:bowl_soup 1")
+				inv:add_item("main", soup_bowl)
 			else
-				minetest.chat_send_player(clicker:get_player_name(),
-					S("No room in your inventory to add a bowl of soup."))
-				return itemstack
+				-- No space: Drop soup bowl on ground
+				itemstack:take_item()
+				minetest.add_item(clicker:get_pos(), soup_bowl)
 			end
 		else
-			itemstack:replace("xdecor:bowl_soup 1")
+			itemstack:replace(soup_bowl)
 		end
 
 		minetest.set_node(pos, {name = "xdecor:cauldron_empty", param2 = node.param2})
+
+		minetest.log("action", "[xdecor] "..clicker:get_player_name().." fills their bowl ("..item_name..") with soup from the cauldron at "..minetest.pos_to_string(pos))
 	end
 
 	return itemstack
@@ -243,6 +333,7 @@ end
 
 xdecor.register("cauldron_empty", {
 	description = S("Cauldron"),
+	--~ Cauldron tooltip
 	_tt_help = S("For storing water and cooking soup"),
 	groups = {cracky=2, oddly_breakable_by_hand=1,cauldron=1},
 	is_ground_content = false,
@@ -396,19 +487,36 @@ xdecor.register("cauldron_soup", {
 -- Craft items
 
 minetest.register_craftitem("xdecor:bowl", {
+	--~ Item that can hold soup
 	description = S("Bowl"),
 	inventory_image = "xdecor_bowl.png",
 	wield_image = "xdecor_bowl.png",
-	groups = {food_bowl = 1, flammable = 2},
+	groups = {food_bowl = 1, xdecor_soup_bowl = 1, flammable = 2},
 })
 
 minetest.register_craftitem("xdecor:bowl_soup", {
 	description = S("Bowl of soup"),
 	inventory_image = "xdecor_bowl_soup.png",
 	wield_image = "xdecor_bowl_soup.png",
-	groups = {},
+	groups = {
+		-- The soup itself is NOT an ingredient for the soup
+		xdecor_soup_ingredient = -1,
+	},
 	stack_max = 1,
-	on_use = minetest.item_eat(30, "xdecor:bowl")
+	on_use = function(itemstack, user, pointed_thing)
+		-- Eat the soup and replace item with the original bowl item
+		-- (`xdecor:bowl` by default)
+		local imeta = itemstack:get_meta()
+		local empty_bowl = imeta:get_string("original_bowl")
+		if empty_bowl == "" then
+			empty_bowl = "xdecor:bowl"
+		end
+		if not minetest.registered_items[empty_bowl] then
+			minetest.log("warning", "[xdecor] original_bowl of xdecor:bowl_soup was '"..empty_bowl.."', an unknown item. Falling back to xdecor:bowl")
+			empty_bowl = "xdecor:bowl"
+		end
+		return minetest.do_item_eat(30, empty_bowl, itemstack, user, pointed_thing)
+	end,
 })
 
 -- Recipes
@@ -450,3 +558,33 @@ minetest.register_lbm({
 		set_infotext(meta, node)
 	end,
 })
+
+if DEBUG_RECOGNIZED_ITEMS then
+	-- Print all soup ingredients, heater nodes and bowls
+	-- in console
+	minetest.register_on_mods_loaded(function()
+		local ingredients = {}
+		local heaters = {}
+		local bowls = {}
+		for k,v in pairs(minetest.registered_items) do
+			if is_ingredient(k) then
+				table.insert(ingredients, k)
+			end
+			if is_heater(k) then
+				table.insert(heaters, k)
+			end
+			if is_bowl(k) then
+				table.insert(bowls, k)
+			end
+		end
+		table.sort(ingredients)
+		table.sort(heaters)
+		table.sort(bowls)
+		local str_i = table.concat(ingredients, ", ")
+		local str_h = table.concat(heaters, ", ")
+		local str_b = table.concat(bowls, ", ")
+		minetest.log("action", "[xdecor] List of ingredients for soup: "..str_i)
+		minetest.log("action", "[xdecor] List of nodes that can heat cauldron: "..str_h)
+		minetest.log("action", "[xdecor] List of bowls able to take soup from cauldron: "..str_b)
+	end)
+end

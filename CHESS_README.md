@@ -13,6 +13,8 @@ the FIDE Laws of Chess from January 2023. However, for a
 computer version of Chess, there are still some details
 that might need explanation.
 
+
+
 ## Objective
 
 Chess is played between two players on a chessboard. One player plays
@@ -29,9 +31,9 @@ You need a chessboard to play. Craft yourself a chessboard like this:
     BWB
     sss
 
-B = Black Dye
-W = White Dye
-s = Wooden Slab (from apple tree)
+* B = Black Dye
+* W = White Dye
+* s = Wooden Slab (from apple tree)
 
 Place the chessboard and examine it. You will see a close-up of the chessboard.
 
@@ -64,7 +66,7 @@ It is written in a figurine long algebraic notation (see appendix).
 
 The two boxes below the list of moves is where all the captured pieces
 go. This has no gameplay significance but it may serve as a visual
-aid to see how badly hurt the player's “armies” are.
+aid to see how badly hurt the player’s “armies” are.
 
 The top right corner is used for starting a new game. Press
 “New Game” to start a new game. This ends the current game.
@@ -120,14 +122,14 @@ a capturing move are identical. Only for the pawn it is different
 
 If the square of the king is attacked, he and the player playing him
 is considered to be in “check”.
-While a player is in check, any move which would their own
+While a player is in check, any move which would leave their own
 king under attack is not allowed.
 
 #### How to actually move
 
-Each move can be made by either clicking on the piece and then clicking again
-on the destination. The destination is either an empty square or a square
-occupied by an opponent’s piece (which will be captured).
+Each move can be made by clicking on the piece to pick it up and then
+clicking again on the destination. The destination is either an empty
+square or a square occupied by an opponent’s piece (which will be captured).
 You can also do the same via drag-and-drop.
 
 Once you made a valid move by placing the piece to its destination, it is
@@ -180,12 +182,12 @@ possible squares it can theoretically reach. The dots are empty
 squares.
 
 Unlike the other pieces, pieces are never “in the way” of the knight.
-You might say the knight can “jump over” them, if you will.
+You might say the knight can “jump over” other pieces.
 
 #### King
 
 The king can move exactly one square in any direction: horizontally,
-vertically or diagonally. Also, the king can never move to any square that
+vertically or diagonally. However, the king can never move to any square that
 is attacked by an opponent’s piece.
 
 The king also has a special move called “Castling”.
@@ -237,7 +239,7 @@ The pawn’s basic moves are:
 A pawn can never move backwards.
 
 In both cases, the destination square must be empty as well as any crossed square.
-The pawn cannot capture by a single or double step, however.
+The pawn cannot capture by doing a single or double step, however.
 
 The capturing move of the pawn is different. To capture, the pawn has to
 move one step diagonally towards the opponent’s side, either left or right.
@@ -259,9 +261,9 @@ had made a single step instead. This will be considered as a
 capturing move and the opposing pawn will be removed from the board.
 
 
-Consider this example: Here, “w” represents a white pawn, “b” a black pawn and “.”
-an empty square. White moves upwards and Black downwards. Consider this starting
-position:
+Consider this example: Here, “w” represents a white pawn in its starting
+position, “b” a black pawn and “.” an empty square. White moves upwards
+and Black downwards. Consider this starting position:
 
     b.
     ..
@@ -281,7 +283,7 @@ pawn is captured and removed.
     .b
     ..
 
-Remember! An 'en passant' capture is only possible in the move directly after
+Remember! An ‘en passant’ capture is only possible in the move directly after
 a pawn’s double step. So if the chance for a particular en passant capture
 is not taken, it will be gone from that point on.
 
@@ -298,7 +300,7 @@ Just click the corresponding button. These buttons only work for the
 current player. Promotion is mandatory and no other moves are possible
 until it is completed.
 
-Once a piece was selected, the pawn will be replaced replaced, which
+Once a piece was selected, the pawn will be replaced, which
 immediately activates its powers. This ends the move.
 
 ### The end of the game
@@ -340,13 +342,27 @@ the game ends in a draw:
 This is called a “dead position”. For example, a board with only a white
 and a black king is a draw. 
 
-NOTE: In general, a dead position is any position from which neither player can
-give checkmate, no matter how they move, but only those 4 cases above
-lead to an instant draw in X-Decor-libre because it is tricky to
-determine whether any position is “dead”.
+(Nerd info: In Chess, any position from which neither player can give
+checkmate is known as a dead position. But in X-Decor-libre, only the
+situations listed above lead to an instant draw.
 
-However, dead positions are still guaranteed to end the game eventually
-due to the 75-move rule.
+This deviates from the FIDE Laws of Chess, article 5.2.2,
+which states that *any* dead position must end the game immediately
+in a draw.
+
+X-Decor-libre deviates from the FIDE Laws of Chess here because of
+performance; calculating if any given position is ‘dead’ is
+computationally expensive.
+
+Dead positions are still guaranteed to end the game in X-Decor-libre
+eventually due to the 75-move rule.)
+
+#### 75-move rule
+If in the last 75 consecutive moves of each player, no piece was captured
+and no pawn was moved, the game ends in a draw.
+
+Exception: If the last move has lead to a checkmate. In this case, checkmate
+takes precedence.
 
 #### 50-move rule
 If in the last 50 consecutive moves of each player, no piece was
@@ -373,26 +389,24 @@ Note the tooltip.
 Note the latter icon is no guarantee you can actually draw the
 game in the next move, only that such a draw claim is plausible.
 
-#### 75-move rule
-If in the last 75 consecutive moves of each player, no piece was captured
-and no pawn was moved, the game automatically ends in a draw.
+#### Fivefold repetition rule
+If the current position on the chessboard has appeared at least 5 times,
+the game ends in a draw.
 
-Exception: If the last move has lead to a checkmate. In this case, checkmate
-takes precedence.
+Two positions are considered to be the same if the chessboard has the
+same pieces of the same color on the same squares, it is the same
+player’s turn, the castling rights of both players are the same and
+the vulnerability of pawns to en passant captures (if any) is also
+the same.
+
+A pawn is considered “vulnerable” to an en passant capture immediately
+after a double step turn, no matter if it is actually in danger of
+being captured that way.
 
 #### Threefold repetition rule
-If the current position has appeared at least 3 times in the game
+If the current position has appeared at least 3 times in the game,
 the current player can invoke the threefold repetition rule to draw
 the game instantly.
-
-Two positions are considered to be the same “same” if a position in which
-the chessboard has the same pieces of the same color on the same squares,
-it is the same player's turn, the castling rights are the same
-and the vulnerability of pawns to en passant captures (if any) is the same.
-
-Pawns are considered “vulnerable” to an en passant capture immediately
-after a double step turn, no matter if is actually in danger of
-being captured that way.
 
 This rule can also be invoked when you think your *next* move will
 lead to the 3rd (or more) repeated position in the game. This
@@ -401,14 +415,10 @@ works similar as for the 50-move rule.
 Like for the 50-move rule, a button appears on the bottom right
 once this rule can be invoked.
 
-If the 3 same position has already occurred, the icon will
+If the 3 same positions have already occurred, the icon will
 represent 3 chess squares stacked on top of each other.
 If the game-drawing move still has to be made, the top
 square is a “ghost square”.
-
-#### Fivefold repetition rule
-If the same position (as defined above) has appeared at for
-least 5 times, the game is drawn.
 
 #### No agreeing to draw
 
@@ -446,13 +456,13 @@ icons are used for the chess pieces. “longform” means the start
 and end coordinates are shown in full.
 
 Square coordinates are important in any Chess notation. In algebraic notation,
-each square is assigned coordinated with a letter from a to h,
+each square is assigned coordinates with a letter from a to h,
 followed by a number from 1 to 8.
 Provided that the player playing White is on the “bottom” side of the chessboard,
 the squares are numbered from the bottom left square in ascending order.
 The horizontal lines (“ranks”) are numbered 1 to 8, starting from the bottom.
 The vertical lines (“files”) are numbered a to h, starting from the left.
-So from White's viewpoint, the bottom-left square is a1. The square above it
+So from White’s viewpoint, the bottom-left square is a1. The square above it
 is a2, then a3, a4, ... a8. The square right of a1 is b1, then c1, d1, ... h1.
 The top-right square is h8.
 
@@ -501,11 +511,11 @@ If the game came to an end, the game result is written in a final separate line 
 
 #### Example
 
-    1.  d2—d4    e7—e6
+    1.  d2–d4    e7–e6
     2. ♔e1–d2   ♛d8–h4
     3.  d4–d5    e6×d5
     ...
-    8. d8×d8♖   ♞b8-c6
+    8. d8×d8♖   ♞b8–c6
     9. e2–e4	 d4×e3 e.p.
 
 Explanation of the moves:
@@ -513,9 +523,28 @@ Explanation of the moves:
 * 1.: First fullmove: White moves pawn from d2 to d4, Black moves pawn from e7 to e6
 * 2.: Second fullmove: White moves king from e1 to d2, Black moves queen from d8 to h4
 * 3.: Third fullmove: White moves pawn from d4 to d5, Black moves pawn from d6 to d5 and captures
-* 8.: Eight fullmove: White moves pawn from d7 to d8, captures a piece and promotes it to rook, Black moves knight from b8 to c6
+* 8.: Eighth fullmove: White moves pawn from d7 to d8, captures a piece and promotes it to rook, Black moves knight from b8 to c6
 * 9.: Ninth fullmove: White moves pawn from e2 to e4, black moves pawn from d4 to e3 and captures en passant
 
 #### Other symbols
 
 Other symbols are not used. So there are no special symbols for check and checkmate and no comments for moves considered good or bad.
+
+
+
+## Notworthy differences from The FIDE Laws of Chess (2023)
+
+X-Decor-libre tries to be as faithful to the FIDE Laws of Chess
+of 2023 as much as possible, but there are a few differences,
+mostly for technical reasons:
+
+* Players cannot agree to draw (Articles 5.2.3 and 9.1.1)
+* Only a few select obvious dead positions (like King vs King)
+  lead to an instant draw (Article 5.2.2)
+* Resigning always leads to an instant loss, even if the
+  opponent cannot give checkmate under any series of legal moves
+  (Article 5.1.2)
+* Pieces are never considered “touched”, Article 4 does not apply
+* There is no direct time limit, but the chessboard will unlock
+  if nobody made a move in 5 minutes. This allows everyone to reset
+  or dig the chessboard, which aborts the game without a result.
