@@ -26,30 +26,58 @@ local DEFAULT_HAMMER_REPAIR_COST = 700
 -- Nodeboxes definitions
 workbench.defs = {
 	-- Name Yield Nodeboxes (X Y Z W H L)  Description  LegacyDescription
-	--~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench.
-	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }}, NS("Nanoslab"), NS("@1 Nanoslab")},
-	--~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench.
-	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }}, NS("Micropanel"), NS("@1 Micropanel")},
-	--~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench.
-	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, NS("Microslab"), NS("@1 Microslab")},
-	{"thinstair",   8,  {{ 0, 7,  0, 16, 1, 8  },
-	--~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench.
-			{ 0, 15, 8, 16, 1, 8  }}, NS("Thin Stair"), NS("@1 Thin Stair")},
-	--~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench.
-	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, NS("Cube"), NS("@1 Cube")},
-	--~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench.
-	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, NS("Panel"), NS("@1 Panel")},
-	--~ Block name of a block with 1/2 the height of a full block.
-	{"slab",        2,  nil, NS("Slab"), NS("@1 Slab") },
-	{"doublepanel", 2,  {{ 0, 0,  0, 16, 8, 8  },
-	--~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench.
-			{ 0, 8,  8, 16, 8, 8  }}, NS("Double Panel"), NS("@1 Double Panel")},
+	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }},
+		--~ Part of a block name for a tiny slab with 1/16 height and 1/4 area. E.g. "Stone Nanoslab"
+		NS("Nanoslab"),
+		--~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+		NS("@1 Nanoslab")},
+	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }},
+		--~ Part of a block name for a tiny slab with 1/16 height and 1/2 area. E.g. "Stone Micropanel"
+		NS("Micropanel"),
+		--~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+		NS("@1 Micropanel")},
+	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }},
+		--~ Part of a block name for a tiny slab with 1/16 height and full area. E.g. "Stone Microslab"
+		NS("Microslab"),
+		--~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+		NS("@1 Microslab")},
+	{"thinstair",   8,  {{ 0, 7,  0, 16, 1, 8  }, { 0, 15, 8, 16, 1, 8  }},
+		--~ Part of a block name of a thin stair, a stair-like block where the "steps" are thinner. E.g. "Stone Thin Stair"
+		NS("Thin Stair"),
+		--~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+		NS("@1 Thin Stair")},
+	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }},
+		--~ Part of a block name of a tiny cube-shaped block with 1/2 the side length of a full block. E.g. "Stone Cube"
+		NS("Cube"),
+		--~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+		NS("@1 Cube")},
+	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }},
+		--~ Part of a block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. E.g. "Stone Panel"
+		NS("Panel"),
+		--~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+		NS("@1 Panel")},
+	{"slab",        2,  nil,
+		--~ Part of block name of a block with 1/2 the height of a full block. E.g. "Stone Slab"
+		NS("Slab"),
+		--~ Block name of a block with 1/2 the height of a full block. (@1 = base block name, e.g. "Stone")
+		NS("@1 Slab") },
+	{"doublepanel", 2,  {{ 0, 0,  0, 16, 8, 8  }, { 0, 8,  8, 16, 8, 8  }},
+		--~ Block name of a stair-like block variant with a lower piece cut away. E.g. "Stone Double Panel"
+			NS("Double Panel"),
+			--~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+			NS("@1 Double Panel")},
 	{"halfstair",   2,  {{ 0, 0,  0, 8,  8, 16 },
-	--~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench.
-			{ 0, 8,  8, 8,  8, 8  }}, NS("Half-Stair"), NS("@1 Half-Stair")},
+			{ 0, 8,  8, 8,  8, 8  }},
+			--~ Part of a block name for a stair where 1/2 has been cut away sideways. Can be obtained by work bench. E.g. "Stone Half-Stair"
+			NS("Half-Stair"),
+			--~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+			NS("@1 Half-Stair")},
 	{"stair_outer", 1,  nil, nil},
-	--~ Block name of a 'traditional' stair-shaped block.
-	{"stair",       1,  nil, NS("Stair"), NS("@1 Stair")},
+	{"stair",       1,  nil,
+			--~ Block name of a 'traditional' stair-shaped block. E.g. "Stone Stair"
+			NS("Stair"),
+			--~ Block name of a 'traditional' stair-shaped block. (@1 = base block name, e.g. "Stone")
+			NS("@1 Stair")},
 	{"stair_inner", 1,  nil, nil},
 }
 
