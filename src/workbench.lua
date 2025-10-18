@@ -5,7 +5,6 @@ local special_cuts = {}
 screwdriver = screwdriver or {}
 local min, ceil = math.min, math.ceil
 local S = minetest.get_translator("xdecor")
-local T = S
 local FS = function(...) return minetest.formspec_escape(S(...)) end
 local NS = function(s) return s end
 
@@ -364,9 +363,17 @@ xdecor.register("workbench", {
 	allow_metadata_inventory_move = workbench.allow_move
 })
 
-local function register_cut_raw(node, workbench_def)
+local function register_cut_raw(node, workbench_def, textdomain)
 	local mod_name, item_name = node:match("^(.-):(.*)")
 	local def = minetest.registered_nodes[node]
+
+	-- Special translation symbol
+	local T
+	if textdomain then
+		T = minetest.get_translator(textdomain)
+	else
+		T = function(s) return s end
+	end
 
 	if item_name and workbench_def[3] then
 		local groups = {}
@@ -513,14 +520,14 @@ local function register_cut_raw(node, workbench_def)
 	return true
 end
 
-function workbench:register_cut(nodename)
+function workbench:register_cut(nodename, textdomain)
 	if registered_cuttable_nodes[nodename] then
 		minetest.log("error", "[xdecor] Workbench: Tried to register cut for node "..nodename..", but it was already registered!")
 		return false
 	end
 	local ok = true
 	for _, d in ipairs(workbench.defs) do
-		local ok = register_cut_raw(nodename, d)
+		local ok = register_cut_raw(nodename, d, textdomain)
 		if not ok then
 			ok = false
 		end
@@ -564,7 +571,7 @@ do
 
 	for i = 1, #cuttable_nodes do
 		local node = cuttable_nodes[i]
-		workbench:register_cut(node)
+		workbench:register_cut(node, "xdecor")
 	end
 end
 
@@ -641,11 +648,17 @@ will be registered by using the `stairs` mod if the slab
 node does not exist yet. Refer to the `stairs` mod documentation
 for details.
 
+Parameters:
+* nodename: Name of node to be cut
+* textdomain: Translation textdomain for registered node
+  descriptions (if not provided, node descriptions will
+  be untranslatable)
+
 Returns true if all nodes were registered successfully,
 returns false (and writes to error log) if any error occurred.
 ]]
-xdecor.register_cut = function(nodename)
-	return workbench:register_cut(nodename)
+xdecor.register_cut = function(nodename, textdomain)
+	return workbench:register_cut(nodename, textdomain)
 end
 
 -- Returns true if cut nodes have been registered for the given node
