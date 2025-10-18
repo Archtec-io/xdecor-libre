@@ -13,37 +13,43 @@ local NS = function(s) return s end
 -- (Requires Luanti 5.14.0 or later to work.)
 local GENERATE_TRANSLATABLE_STRING_LIST = false
 
+if GENERATE_TRANSLATABLE_STRING_LIST and not minetest.strip_escapes then
+	minetest.log("warning", "[xdecor] GENERATE_TRANSLATABLE_STRING_LIST is set to true but minetest.strip_escapes is missing! "..
+		"This would malform the output, so GENERATE_TRANSLATABLE_STRING_LIST will be forced to false.")
+	GENERATE_TRANSLATABLE_STRING_LIST = false
+end
+
 local DEFAULT_HAMMER_REPAIR = 500
 local DEFAULT_HAMMER_REPAIR_COST = 700
 
 
 -- Nodeboxes definitions
 workbench.defs = {
-	-- Name Yield Nodeboxes (X Y Z W H L)  Description
+	-- Name Yield Nodeboxes (X Y Z W H L)  Description  LegacyDescription
 	--~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench.
-	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }}, NS("Nanoslab")},
+	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }}, NS("Nanoslab"), NS("@1 Nanoslab")},
 	--~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench.
-	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }}, NS("Micropanel")},
+	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }}, NS("Micropanel"), NS("@1 Micropanel")},
 	--~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench.
-	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, NS("Microslab")},
+	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, NS("Microslab"), NS("@1 Microslab")},
 	{"thinstair",   8,  {{ 0, 7,  0, 16, 1, 8  },
 	--~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench.
-			{ 0, 15, 8, 16, 1, 8  }}, NS("Thin Stair")},
+			{ 0, 15, 8, 16, 1, 8  }}, NS("Thin Stair"), NS("@1 Thin Stair")},
 	--~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench.
-	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, NS("Cube")},
+	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, NS("Cube"), NS("@1 Cube")},
 	--~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench.
-	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, NS("Panel")},
+	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, NS("Panel"), NS("@1 Panel")},
 	--~ Block name of a block with 1/2 the height of a full block.
-	{"slab",        2,  nil, NS("Slab") },
+	{"slab",        2,  nil, NS("Slab"), NS("@1 Slab") },
 	{"doublepanel", 2,  {{ 0, 0,  0, 16, 8, 8  },
 	--~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench.
-			{ 0, 8,  8, 16, 8, 8  }}, NS("Double Panel")},
+			{ 0, 8,  8, 16, 8, 8  }}, NS("Double Panel"), NS("@1 Double Panel")},
 	{"halfstair",   2,  {{ 0, 0,  0, 8,  8, 16 },
 	--~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench.
-			{ 0, 8,  8, 8,  8, 8  }}, NS("Half-Stair")},
+			{ 0, 8,  8, 8,  8, 8  }}, NS("Half-Stair"), NS("@1 Half-Stair")},
 	{"stair_outer", 1,  nil, nil},
 	--~ Block name of a 'traditional' stair-shaped block.
-	{"stair",       1,  nil, NS("Stair")},
+	{"stair",       1,  nil, NS("Stair"), NS("@1 Stair")},
 	{"stair_inner", 1,  nil, nil},
 }
 
@@ -416,18 +422,29 @@ local function register_cut_raw(node, workbench_def, textdomain)
 			end
 		end
 
-		local raw_desc = minetest.strip_escapes(def.description)
-
+		local core_desc, modifier
 		local desc_stair, desc_stair_inner, desc_stair_outer, desc_slab, desc_cut
-		desc_stair = T(raw_desc .. " Stair")
-		desc_stair_inner = T("Inner " .. raw_desc .. " Stair")
-		desc_stair_outer = T("Outer " .. raw_desc .. " Stair")
-		desc_slab = T(raw_desc .. " Slab")
+		if minetest.strip_escapes then
+			core_desc = minetest.strip_escapes(def.description)
+			modifier = minetest.strip_escapes(workbench_def[4])
 
-		local raw_modifier = minetest.strip_escapes(workbench_def[4])
-		-- Base node description (e.g. "Stone") concatenated with a space,
-		-- then a modifier (e.g. "Nanoslab"), e.g. "Stone Nanoslab".
-		desc_cut = T(raw_desc .. " " .. raw_modifier)
+			desc_stair = T(core_desc .. " Stair")
+			desc_stair_inner = T("Inner " .. core_desc .. " Stair")
+			desc_stair_outer = T("Outer " .. core_desc .. " Stair")
+			desc_slab = T(core_desc .. " Slab")
+			-- Base node description (e.g. "Stone") concatenated with a space,
+			-- then a modifier (e.g. "Nanoslab"), e.g. "Stone Nanoslab".
+			desc_cut = T(core_desc .. " " .. modifier)
+		else
+			core_desc = def.description
+			modifier = workbench_def[4]
+
+			desc_stair = S("@1 Stair", core_desc)
+			desc_stair_inner = S("Inner @1 Stair", core_desc)
+			desc_stair_outer = S("Outer @1 Stair", core_desc)
+			desc_slab = S("@1 Slab", core_desc)
+			desc_cut = S(workbench_def[5], core_desc)
+		end
 
 		if not minetest.registered_nodes["stairs:slab_" .. item_name] then
 			if custom_tiles and (custom_tiles.slab or custom_tiles.stair) then
@@ -441,9 +458,9 @@ local function register_cut_raw(node, workbench_def, textdomain)
 						groups, custom_tiles.stair_outer, "", def.sounds, nil, desc_stair_outer)
 
 					if GENERATE_TRANSLATABLE_STRING_LIST then
-						print(("S(%q)"):format(raw_desc .. " Stair"))
-						print(("S(%q)"):format("Inner " .. raw_desc .. " Stair"))
-						print(("S(%q)"):format("Outer " .. raw_desc .. " Stair"))
+						print(("S(%q)"):format(core_desc .. " Stair"))
+						print(("S(%q)"):format("Inner " .. core_desc .. " Stair"))
+						print(("S(%q)"):format("Outer " .. core_desc .. " Stair"))
 					end
 				end
 				if custom_tiles.slab then
@@ -452,7 +469,7 @@ local function register_cut_raw(node, workbench_def, textdomain)
 						def.sounds)
 
 					if GENERATE_TRANSLATABLE_STRING_LIST then
-						print(("S(%q)"):format(raw_desc .. " Slab"))
+						print(("S(%q)"):format(core_desc .. " Slab"))
 					end
 				end
 			else
@@ -465,10 +482,10 @@ local function register_cut_raw(node, workbench_def, textdomain)
 					desc_stair_outer)
 
 				if GENERATE_TRANSLATABLE_STRING_LIST then
-					print(("S(%q)"):format(raw_desc .. " Stair"))
-					print(("S(%q)"):format(raw_desc .. " Slab"))
-					print(("S(%q)"):format("Inner " .. raw_desc .. " Stair"))
-					print(("S(%q)"):format("Outer " .. raw_desc .. " Stair"))
+					print(("S(%q)"):format(core_desc .. " Stair"))
+					print(("S(%q)"):format(core_desc .. " Slab"))
+					print(("S(%q)"):format("Inner " .. core_desc .. " Stair"))
+					print(("S(%q)"):format("Outer " .. core_desc .. " Stair"))
 				end
 			end
 		end
@@ -513,7 +530,7 @@ local function register_cut_raw(node, workbench_def, textdomain)
 		})
 
 		if GENERATE_TRANSLATABLE_STRING_LIST then
-			print(("S(%q)"):format(raw_desc .. " " .. raw_modifier))
+			print(("S(%q)"):format(core_desc .. " " .. modifier))
 		end
 
 	elseif item_name and mod_name then
