@@ -608,23 +608,6 @@ minetest.register_craft({
 	}
 })
 
--- Register default cuttable blocks (loaded from a list
--- of hardcoded node names)
-local cuttable_nodes = dofile(minetest.get_modpath("xdecor").."/src/cuttable_node_list.lua")
-
-for i = 1, #cuttable_nodes do
-	local nodename = cuttable_nodes[i]
-	if xdecor.can_cut(nodename) then
-		workbench:register_cut(nodename)
-	else
-		minetest.log("action", "[xdecor] Tried to register cut for default node '"..nodename.."' but it was not allowed")
-	end
-end
-
--- Special cuts for cushion block and cabinet
-workbench:register_special_cut("xdecor:cushion_block", { slab = "xdecor:cushion" })
-workbench:register_special_cut("xdecor:cabinet", { slab = "xdecor:cabinet_half" })
-
 --[[ API FUNCTIONS ]]
 
 --[[ Register a custom hammer (for repairing).
@@ -758,3 +741,21 @@ minetest.register_craft({
 		{"", "group:stick", ""}
 	}
 })
+
+-- Register default cuttable blocks (loaded from a list
+-- of hardcoded node names)
+local cuttable_nodes = dofile(minetest.get_modpath("xdecor").."/src/cuttable_node_list.lua")
+
+for i = 1, #cuttable_nodes do
+	local nodename = cuttable_nodes[i]
+	if xdecor.can_cut(nodename) then
+		workbench:register_cut(nodename)
+	else
+		minetest.log("action", "[xdecor] Tried to register cut for default node '"..nodename.."' but it was not allowed")
+	end
+end
+
+-- Special cuts for cushion block and cabinet
+workbench:register_special_cut("xdecor:cushion_block", { slab = "xdecor:cushion" })
+workbench:register_special_cut("xdecor:cabinet", { slab = "xdecor:cabinet_half" })
+
