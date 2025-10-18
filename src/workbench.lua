@@ -417,16 +417,28 @@ local function register_cut_raw(node, workbench_def, textdomain)
 		end
 
 		local raw_desc = minetest.strip_escapes(def.description)
+
+		local desc_stair, desc_stair_inner, desc_stair_outer, desc_slab, desc_cut
+		desc_stair = T(raw_desc .. " Stair")
+		desc_stair_inner = T("Inner " .. raw_desc .. " Stair")
+		desc_stair_outer = T("Outer " .. raw_desc .. " Stair")
+		desc_slab = T(raw_desc .. " Slab")
+
+		local raw_modifier = minetest.strip_escapes(workbench_def[4])
+		-- Base node description (e.g. "Stone") concatenated with a space,
+		-- then a modifier (e.g. "Nanoslab"), e.g. "Stone Nanoslab".
+		desc_cut = T(raw_desc .. " " .. raw_modifier)
+
 		if not minetest.registered_nodes["stairs:slab_" .. item_name] then
 			if custom_tiles and (custom_tiles.slab or custom_tiles.stair) then
 				if custom_tiles.stair then
 					stairs.register_stair(item_name, node,
-						groups, custom_tiles.stair, T(raw_desc .." Stair"),
+						groups, custom_tiles.stair, desc_stair,
 						def.sounds)
 					stairs.register_stair_inner(item_name, node,
-						groups, custom_tiles.stair_inner, "", def.sounds, nil, T("Inner "..raw_desc.." Stair"))
+						groups, custom_tiles.stair_inner, "", def.sounds, nil, desc_stair_inner)
 					stairs.register_stair_outer(item_name, node,
-						groups, custom_tiles.stair_outer, "", def.sounds, nil, T("Outer "..raw_desc.." Stair"))
+						groups, custom_tiles.stair_outer, "", def.sounds, nil, desc_stair_outer)
 
 					if GENERATE_TRANSLATABLE_STRING_LIST then
 						print(("S(%q)"):format(raw_desc .. " Stair"))
@@ -436,7 +448,7 @@ local function register_cut_raw(node, workbench_def, textdomain)
 				end
 				if custom_tiles.slab then
 					stairs.register_slab(item_name, node,
-						groups, custom_tiles.slab, T(raw_desc.." Slab"),
+						groups, custom_tiles.slab, desc_slab,
 						def.sounds)
 
 					if GENERATE_TRANSLATABLE_STRING_LIST then
@@ -446,11 +458,11 @@ local function register_cut_raw(node, workbench_def, textdomain)
 			else
 				stairs.register_stair_and_slab(item_name, node,
 					groups, tiles,
-					T(raw_desc.." Stair"),
-					T(raw_desc.." Slab"),
+					desc_stair,
+					desc_slab,
 					def.sounds, nil,
-					T("Inner "..raw_desc.." Stair"),
-					T("Outer "..raw_desc.." Stair"))
+					desc_stair_inner,
+					desc_stair_outer)
 
 				if GENERATE_TRANSLATABLE_STRING_LIST then
 					print(("S(%q)"):format(raw_desc .. " Stair"))
@@ -485,11 +497,8 @@ local function register_cut_raw(node, workbench_def, textdomain)
 		-- Also hide cut nodes from creative inv
 		cutgroups.not_in_creative_inventory = 1
 
-		local raw_modifier = minetest.strip_escapes(workbench_def[4])
 		minetest.register_node(":" .. cutnodename, {
-			-- Base node description (e.g. "Stone") concatenated with a space, then a modifier (e.g. "Nanoslab"),
-			-- e.g. "Stone Nanoslab".
-			description = T(raw_desc .. " " .. raw_modifier),
+			description = desc_cut,
 			paramtype = "light",
 			paramtype2 = "facedir",
 			drawtype = "nodebox",
