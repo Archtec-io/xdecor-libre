@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Luanti textdomain xdecor\n"
 "Report-Msgid-Bugs-To: Wuzzy@disroot.org\n"
 "POT-Creation-Date: 2025-10-18 10:42+0200\n"
-"PO-Revision-Date: 2025-09-24 16:35+0200\n"
+"PO-Revision-Date: 2025-10-18 10:47+0200\n"
 "Last-Translator: Wuzzy <Wuzzy@disroot.org>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -964,9 +964,8 @@ msgid "Nanoslab"
 msgstr "Nanoplatte"
 
 #: src/workbench.lua:30
-#, fuzzy
 msgid "@1 Nanoslab"
-msgstr "Nanoplatte"
+msgstr "@1nanoplatte"
 
 #. ~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench.
 #: src/workbench.lua:32
@@ -974,9 +973,8 @@ msgid "Micropanel"
 msgstr "Mikropaneel"
 
 #: src/workbench.lua:32
-#, fuzzy
 msgid "@1 Micropanel"
-msgstr "Mikropaneel"
+msgstr "@1mikropaneel"
 
 #. ~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench.
 #: src/workbench.lua:34
@@ -984,9 +982,8 @@ msgid "Microslab"
 msgstr "Mikroplatte"
 
 #: src/workbench.lua:34
-#, fuzzy
 msgid "@1 Microslab"
-msgstr "Mikroplatte"
+msgstr "@1mikroplatte"
 
 #. ~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench.
 #: src/workbench.lua:37
@@ -994,9 +991,8 @@ msgid "Thin Stair"
 msgstr "Flachtreppe"
 
 #: src/workbench.lua:37
-#, fuzzy
 msgid "@1 Thin Stair"
-msgstr "Flachtreppe"
+msgstr "@1flachtreppe"
 
 #. ~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench.
 #: src/workbench.lua:39
@@ -1004,9 +1000,8 @@ msgid "Cube"
 msgstr "Würfel"
 
 #: src/workbench.lua:39
-#, fuzzy
 msgid "@1 Cube"
-msgstr "Würfel"
+msgstr "@1würfel"
 
 #. ~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench.
 #: src/workbench.lua:41
@@ -1014,9 +1009,8 @@ msgid "Panel"
 msgstr "Paneel"
 
 #: src/workbench.lua:41
-#, fuzzy
 msgid "@1 Panel"
-msgstr "Paneel"
+msgstr "@1paneel"
 
 #. ~ Block name of a block with 1/2 the height of a full block.
 #: src/workbench.lua:43
@@ -1029,9 +1023,8 @@ msgid "Double Panel"
 msgstr "Doppelpaneel"
 
 #: src/workbench.lua:46
-#, fuzzy
 msgid "@1 Double Panel"
-msgstr "Doppelpaneel"
+msgstr "@1doppelpaneel"
 
 #. ~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench.
 #: src/workbench.lua:49
@@ -1039,9 +1032,8 @@ msgid "Half-Stair"
 msgstr "Halbtreppe"
 
 #: src/workbench.lua:49
-#, fuzzy
 msgid "@1 Half-Stair"
-msgstr "Halbtreppe"
+msgstr "@1halbtreppe"
 
 #. ~ Block name of a 'traditional' stair-shaped block.
 #: src/workbench.lua:52
