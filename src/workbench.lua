@@ -749,7 +749,7 @@ local cuttable_nodes = dofile(minetest.get_modpath("xdecor").."/src/cuttable_nod
 for i = 1, #cuttable_nodes do
 	local nodename = cuttable_nodes[i]
 	if xdecor.can_cut(nodename) then
-		workbench:register_cut(nodename)
+		workbench:register_cut(nodename, "_xdecor_cut_nodes")
 	else
 		minetest.log("action", "[xdecor] Tried to register cut for default node '"..nodename.."' but it was not allowed")
 	end
