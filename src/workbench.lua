@@ -571,7 +571,9 @@ do
 
 	for i = 1, #cuttable_nodes do
 		local node = cuttable_nodes[i]
-		workbench:register_cut(node, "xdecor")
+		-- Register cut with a special textdomain to keep
+		-- the locale files clean
+		workbench:register_cut(node, "_xdecor_cut_nodes")
 	end
 end
 
