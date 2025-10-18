@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Luanti textdomain xdecor\n"
 "Report-Msgid-Bugs-To: Wuzzy@disroot.org\n"
-"POT-Creation-Date: 2025-10-18 10:42+0200\n"
+"POT-Creation-Date: 2025-10-18 11:01+0200\n"
 "PO-Revision-Date: 2025-08-18 06:34+0200\n"
 "Last-Translator: Zughy\n"
 "Language-Team: \n"
@@ -13,23 +13,25 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.6\n"
 
+#. ~ Block name of a 'traditional' stair-shaped block. (@1 = base block name, e.g. "Stone")
 #: handlers/registration.lua:75 handlers/registration.lua:91
-#: src/workbench.lua:52 src/workbench.lua:442
+#: src/workbench.lua:80 src/workbench.lua:470
 msgid "@1 Stair"
 msgstr ""
 
 #: handlers/registration.lua:78 handlers/registration.lua:94
-#: src/workbench.lua:443
+#: src/workbench.lua:471
 msgid "Inner @1 Stair"
 msgstr ""
 
 #: handlers/registration.lua:80 handlers/registration.lua:95
-#: src/workbench.lua:444
+#: src/workbench.lua:472
 msgid "Outer @1 Stair"
 msgstr ""
 
+#. ~ Block name of a block with 1/2 the height of a full block. (@1 = base block name, e.g. "Stone")
 #: handlers/registration.lua:84 handlers/registration.lua:92
-#: src/workbench.lua:43 src/workbench.lua:445
+#: src/workbench.lua:63 src/workbench.lua:473
 msgid "@1 Slab"
 msgstr ""
 
@@ -961,129 +963,137 @@ msgstr ""
 msgid "Rope"
 msgstr "Corda"
 
-#. ~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench.
-#: src/workbench.lua:30
+#. ~ Part of a block name for a tiny slab with 1/16 height and 1/4 area. E.g. "Stone Nanoslab"
+#: src/workbench.lua:31
 msgid "Nanoslab"
 msgstr ""
 
-#: src/workbench.lua:30
+#. ~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:33
 msgid "@1 Nanoslab"
 msgstr ""
 
-#. ~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench.
-#: src/workbench.lua:32
+#. ~ Part of a block name for a tiny slab with 1/16 height and 1/2 area. E.g. "Stone Micropanel"
+#: src/workbench.lua:36
 msgid "Micropanel"
 msgstr ""
 
-#: src/workbench.lua:32
+#. ~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:38
 msgid "@1 Micropanel"
 msgstr ""
 
-#. ~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench.
-#: src/workbench.lua:34
+#. ~ Part of a block name for a tiny slab with 1/16 height and full area. E.g. "Stone Microslab"
+#: src/workbench.lua:41
 msgid "Microslab"
 msgstr ""
 
-#: src/workbench.lua:34
+#. ~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:43
 msgid "@1 Microslab"
 msgstr ""
 
-#. ~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench.
-#: src/workbench.lua:37
+#. ~ Part of a block name of a thin stair, a stair-like block where the "steps" are thinner. E.g. "Stone Thin Stair"
+#: src/workbench.lua:46
 msgid "Thin Stair"
 msgstr ""
 
-#: src/workbench.lua:37
+#. ~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:48
 msgid "@1 Thin Stair"
 msgstr ""
 
-#. ~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench.
-#: src/workbench.lua:39
+#. ~ Part of a block name of a tiny cube-shaped block with 1/2 the side length of a full block. E.g. "Stone Cube"
+#: src/workbench.lua:51
 msgid "Cube"
 msgstr ""
 
-#: src/workbench.lua:39
+#. ~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:53
 msgid "@1 Cube"
 msgstr ""
 
-#. ~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench.
-#: src/workbench.lua:41
+#. ~ Part of a block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. E.g. "Stone Panel"
+#: src/workbench.lua:56
 msgid "Panel"
 msgstr ""
 
-#: src/workbench.lua:41
+#. ~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:58
 msgid "@1 Panel"
 msgstr ""
 
-#. ~ Block name of a block with 1/2 the height of a full block.
-#: src/workbench.lua:43
+#. ~ Part of block name of a block with 1/2 the height of a full block. E.g. "Stone Slab"
+#: src/workbench.lua:61
 msgid "Slab"
 msgstr ""
 
-#. ~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench.
-#: src/workbench.lua:46
+#. ~ Block name of a stair-like block variant with a lower piece cut away. E.g. "Stone Double Panel"
+#: src/workbench.lua:66
 msgid "Double Panel"
 msgstr ""
 
-#: src/workbench.lua:46
+#. ~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:68
 msgid "@1 Double Panel"
 msgstr ""
 
-#. ~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench.
-#: src/workbench.lua:49
+#. ~ Part of a block name for a stair where 1/2 has been cut away sideways. Can be obtained by work bench. E.g. "Stone Half-Stair"
+#: src/workbench.lua:72
 msgid "Half-Stair"
 msgstr ""
 
-#: src/workbench.lua:49
+#. ~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:74
 msgid "@1 Half-Stair"
 msgstr ""
 
-#. ~ Block name of a 'traditional' stair-shaped block.
-#: src/workbench.lua:52
+#. ~ Block name of a 'traditional' stair-shaped block. E.g. "Stone Stair"
+#: src/workbench.lua:78
 msgid "Stair"
 msgstr ""
 
 #. ~ Label shown in work bench menu where you can cut a block to create smaller versions of it
-#: src/workbench.lua:139
+#: src/workbench.lua:167
 msgid "Cut"
 msgstr "Tagliare"
 
 #. ~ Label shown in work bench menu where you can repair an item
-#: src/workbench.lua:141
+#: src/workbench.lua:169
 msgid "Repair"
 msgstr "Riparare"
 
 #. ~ Button in work bench menu for the crafting grid
-#: src/workbench.lua:145
+#: src/workbench.lua:173
 msgid "Crafting"
 msgstr "Fabbricare"
 
 #. ~ Button in work bench menu for its inventory
-#: src/workbench.lua:147
+#: src/workbench.lua:175
 msgid "Storage"
 msgstr "Conservare"
 
 #. ~ Button to return to main page in work bench menu
-#: src/workbench.lua:168 src/workbench.lua:176
+#: src/workbench.lua:196 src/workbench.lua:204
 msgid "Back"
 msgstr "Indietro"
 
-#: src/workbench.lua:208 src/workbench.lua:347
+#: src/workbench.lua:236 src/workbench.lua:375
 msgid "Work Bench"
 msgstr "Banco da lavoro"
 
 #. ~ Work bench tooltip
-#: src/workbench.lua:349
+#: src/workbench.lua:377
 msgid ""
 "For cutting blocks, repairing tools with a hammer, crafting and storing items"
 msgstr ""
 
 #. ~ Hammer tooltip
-#: src/workbench.lua:640
+#: src/workbench.lua:668
 msgid "Repairs tools at the work bench"
 msgstr ""
 
-#: src/workbench.lua:728
+#: src/workbench.lua:756
 msgid "Hammer"
 msgstr "Martello"
 
