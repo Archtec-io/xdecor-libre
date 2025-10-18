@@ -513,7 +513,7 @@ local function register_cut_raw(node, workbench_def)
 	return true
 end
 
-function workbench:register_cut(nodename, cutlist)
+function workbench:register_cut(nodename)
 	if registered_cuttable_nodes[nodename] then
 		minetest.log("error", "[xdecor] Workbench: Tried to register cut for node "..nodename..", but it was already registered!")
 		return false
