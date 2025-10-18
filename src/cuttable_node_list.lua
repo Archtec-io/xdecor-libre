@@ -97,4 +97,23 @@ local cuttable_nodes = {
 	"default:wood",
 }
 
+if minetest.get_modpath("wool") ~= nil then
+-- 'wool' from Minetest Game (as of Minetest Game commit ac2bc0f52118230eb4dd50567c30a47e9bd3a31e)
+	table.insert(cuttable_nodes, "wool:black")
+	table.insert(cuttable_nodes, "wool:blue")
+	table.insert(cuttable_nodes, "wool:brown")
+	table.insert(cuttable_nodes, "wool:cyan")
+	table.insert(cuttable_nodes, "wool:dark_green")
+	table.insert(cuttable_nodes, "wool:dark_grey")
+	table.insert(cuttable_nodes, "wool:green")
+	table.insert(cuttable_nodes, "wool:grey")
+	table.insert(cuttable_nodes, "wool:magenta")
+	table.insert(cuttable_nodes, "wool:orange")
+	table.insert(cuttable_nodes, "wool:pink")
+	table.insert(cuttable_nodes, "wool:red")
+	table.insert(cuttable_nodes, "wool:violet")
+	table.insert(cuttable_nodes, "wool:white")
+	table.insert(cuttable_nodes, "wool:yellow")
+end
+
 return cuttable_nodes
