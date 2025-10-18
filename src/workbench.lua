@@ -547,24 +547,16 @@ minetest.register_craft({
 	}
 })
 
--- Register default cuttable blocks
-do
-	local cuttable_nodes = {}
+-- Register default cuttable blocks (loaded from a list
+-- of hardcoded node names)
+local cuttable_nodes = dofile(minetest.get_modpath("xdecor").."/src/cuttable_node_list.lua")
 
-	-- Nodes allowed to be cut:
-	-- Only the regular, solid blocks without metas or explosivity
-	-- from the xdecor or default mods.
-	for nodename, def in pairs(minetest.registered_nodes) do
-		local nodenamesplit = string.split(nodename, ":")
-		local modname = nodenamesplit[1]
-		if (modname == "xdecor" or modname == "default") and xdecor.stairs_valid_def(def) then
-			cuttable_nodes[#cuttable_nodes + 1] = nodename
-		end
-	end
-
-	for i = 1, #cuttable_nodes do
-		local node = cuttable_nodes[i]
-		workbench:register_cut(node)
+for i = 1, #cuttable_nodes do
+	local nodename = cuttable_nodes[i]
+	if xdecor.can_cut(nodename) then
+		workbench:register_cut(nodename)
+	else
+		minetest.log("action", "[xdecor] Tried to register cut for default node '"..nodename.."' but it was not allowed")
 	end
 end
 
