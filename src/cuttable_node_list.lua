@@ -97,6 +97,11 @@ local cuttable_nodes = {
 	"default:wood",
 }
 
+-- 'farming' from Minetest Game (as of Minetest Game commit ac2bc0f52118230eb4dd50567c30a47e9bd3a31e)
+if minetest.get_modpath("farming") ~= nil then
+	table.insert(cuttable_nodes, "farming:straw")
+end
+
 if minetest.get_modpath("wool") ~= nil then
 -- 'wool' from Minetest Game (as of Minetest Game commit ac2bc0f52118230eb4dd50567c30a47e9bd3a31e)
 	table.insert(cuttable_nodes, "wool:black")
