@@ -5,8 +5,19 @@ local special_cuts = {}
 screwdriver = screwdriver or {}
 local min, ceil = math.min, math.ceil
 local S = minetest.get_translator("xdecor")
-local NS = function(s) return s end
 local FS = function(...) return minetest.formspec_escape(S(...)) end
+local NS = function(s) return s end
+
+-- Set to true to print all the raw English strings
+-- of registered cut nodes into console.
+-- (Requires Luanti 5.14.0 or later to work.)
+local GENERATE_TRANSLATABLE_STRING_LIST = false
+
+if GENERATE_TRANSLATABLE_STRING_LIST and not minetest.strip_escapes then
+	minetest.log("warning", "[xdecor] GENERATE_TRANSLATABLE_STRING_LIST is set to true but minetest.strip_escapes is missing! "..
+		"This would malform the output, so GENERATE_TRANSLATABLE_STRING_LIST will be forced to false.")
+	GENERATE_TRANSLATABLE_STRING_LIST = false
+end
 
 local DEFAULT_HAMMER_REPAIR = 500
 local DEFAULT_HAMMER_REPAIR_COST = 700
@@ -14,31 +25,59 @@ local DEFAULT_HAMMER_REPAIR_COST = 700
 
 -- Nodeboxes definitions
 workbench.defs = {
-	-- Name Yield Nodeboxes (X Y Z W H L)  Description
-	--~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }}, NS("@1 Nanoslab")},
-	--~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }}, NS("@1 Micropanel")},
-	--~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }}, NS("@1 Microslab")},
-	{"thinstair",   8,  {{ 0, 7,  0, 16, 1, 8  },
-	--~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-			{ 0, 15, 8, 16, 1, 8  }}, NS("@1 Thin Stair")},
-	--~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }}, NS("@1 Cube")},
-	--~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }}, NS("@1 Panel")},
-	--~ Block name of a block with 1/2 the height of a full block. @1 = original block name (e.g. "Stone")
-	{"slab",        2,  nil, NS("@1 Slab") },
-	{"doublepanel", 2,  {{ 0, 0,  0, 16, 8, 8  },
-	--~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-			{ 0, 8,  8, 16, 8, 8  }}, NS("@1 Double Panel")},
+	-- Name Yield Nodeboxes (X Y Z W H L)  Description  LegacyDescription
+	{"nanoslab",    16, {{ 0, 0,  0, 8,  1, 8  }},
+		--~ Part of a block name for a tiny slab with 1/16 height and 1/4 area. E.g. "Stone Nanoslab"
+		NS("Nanoslab"),
+		--~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+		NS("@1 Nanoslab")},
+	{"micropanel",  16, {{ 0, 0,  0, 16, 1, 8  }},
+		--~ Part of a block name for a tiny slab with 1/16 height and 1/2 area. E.g. "Stone Micropanel"
+		NS("Micropanel"),
+		--~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+		NS("@1 Micropanel")},
+	{"microslab",   8,  {{ 0, 0,  0, 16, 1, 16 }},
+		--~ Part of a block name for a tiny slab with 1/16 height and full area. E.g. "Stone Microslab"
+		NS("Microslab"),
+		--~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+		NS("@1 Microslab")},
+	{"thinstair",   8,  {{ 0, 7,  0, 16, 1, 8  }, { 0, 15, 8, 16, 1, 8  }},
+		--~ Part of a block name of a thin stair, a stair-like block where the "steps" are thinner. E.g. "Stone Thin Stair"
+		NS("Thin Stair"),
+		--~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+		NS("@1 Thin Stair")},
+	{"cube",        4,  {{ 0, 0,  0, 8,  8, 8 }},
+		--~ Part of a block name of a tiny cube-shaped block with 1/2 the side length of a full block. E.g. "Stone Cube"
+		NS("Cube"),
+		--~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+		NS("@1 Cube")},
+	{"panel",       4,  {{ 0, 0,  0, 16, 8, 8 }},
+		--~ Part of a block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. E.g. "Stone Panel"
+		NS("Panel"),
+		--~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+		NS("@1 Panel")},
+	{"slab",        2,  nil,
+		--~ Part of block name of a block with 1/2 the height of a full block. E.g. "Stone Slab"
+		NS("Slab"),
+		--~ Block name of a block with 1/2 the height of a full block. (@1 = base block name, e.g. "Stone")
+		NS("@1 Slab") },
+	{"doublepanel", 2,  {{ 0, 0,  0, 16, 8, 8  }, { 0, 8,  8, 16, 8, 8  }},
+		--~ Block name of a stair-like block variant with a lower piece cut away. E.g. "Stone Double Panel"
+			NS("Double Panel"),
+			--~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+			NS("@1 Double Panel")},
 	{"halfstair",   2,  {{ 0, 0,  0, 8,  8, 16 },
-	--~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-			{ 0, 8,  8, 8,  8, 8  }}, NS("@1 Half-Stair")},
+			{ 0, 8,  8, 8,  8, 8  }},
+			--~ Part of a block name for a stair where 1/2 has been cut away sideways. Can be obtained by work bench. E.g. "Stone Half-Stair"
+			NS("Half-Stair"),
+			--~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+			NS("@1 Half-Stair")},
 	{"stair_outer", 1,  nil, nil},
-	--~ Block name of a 'traditional' stair-shaped block. @1 = original block name (e.g. "Stone")
-	{"stair",       1,  nil, NS("@1 Stair")},
+	{"stair",       1,  nil,
+			--~ Block name of a 'traditional' stair-shaped block. E.g. "Stone Stair"
+			NS("Stair"),
+			--~ Block name of a 'traditional' stair-shaped block. (@1 = base block name, e.g. "Stone")
+			NS("@1 Stair")},
 	{"stair_inner", 1,  nil, nil},
 }
 
@@ -358,9 +397,17 @@ xdecor.register("workbench", {
 	allow_metadata_inventory_move = workbench.allow_move
 })
 
-local function register_cut_raw(node, workbench_def)
+local function register_cut_raw(node, workbench_def, textdomain)
 	local mod_name, item_name = node:match("^(.-):(.*)")
 	local def = minetest.registered_nodes[node]
+
+	-- Special translation symbol
+	local T
+	if textdomain then
+		T = minetest.get_translator(textdomain)
+	else
+		T = function(s) return s end
+	end
 
 	if item_name and workbench_def[3] then
 		local groups = {}
@@ -403,32 +450,71 @@ local function register_cut_raw(node, workbench_def)
 			end
 		end
 
+		local core_desc, modifier
+		local desc_stair, desc_stair_inner, desc_stair_outer, desc_slab, desc_cut
+		if minetest.strip_escapes then
+			core_desc = minetest.strip_escapes(def.description)
+			modifier = minetest.strip_escapes(workbench_def[4])
+
+			desc_stair = T(core_desc .. " Stair")
+			desc_stair_inner = T("Inner " .. core_desc .. " Stair")
+			desc_stair_outer = T("Outer " .. core_desc .. " Stair")
+			desc_slab = T(core_desc .. " Slab")
+			-- Base node description (e.g. "Stone") concatenated with a space,
+			-- then a modifier (e.g. "Nanoslab"), e.g. "Stone Nanoslab".
+			desc_cut = T(core_desc .. " " .. modifier)
+		else
+			core_desc = def.description
+			modifier = workbench_def[4]
+
+			desc_stair = S("@1 Stair", core_desc)
+			desc_stair_inner = S("Inner @1 Stair", core_desc)
+			desc_stair_outer = S("Outer @1 Stair", core_desc)
+			desc_slab = S("@1 Slab", core_desc)
+			desc_cut = S(workbench_def[5], core_desc)
+		end
+
 		if not minetest.registered_nodes["stairs:slab_" .. item_name] then
 			if custom_tiles and (custom_tiles.slab or custom_tiles.stair) then
 				if custom_tiles.stair then
 					stairs.register_stair(item_name, node,
-						groups, custom_tiles.stair, S("@1 Stair", def.description),
+						groups, custom_tiles.stair, desc_stair,
 						def.sounds)
 					stairs.register_stair_inner(item_name, node,
-						--~ Block name of a stair-shaped block, inner corner. @1 = original block name (e.g. "Stone")
-						groups, custom_tiles.stair_inner, "", def.sounds, nil, S("Inner @1 Stair", def.description))
+						groups, custom_tiles.stair_inner, "", def.sounds, nil, desc_stair_inner)
 					stairs.register_stair_outer(item_name, node,
-						--~ Block name of a stair-shaped block, outer corner. @1 = original block name (e.g. "Stone")
-						groups, custom_tiles.stair_outer, "", def.sounds, nil, S("Outer @1 Stair", def.description))
+						groups, custom_tiles.stair_outer, "", def.sounds, nil, desc_stair_outer)
+
+					if GENERATE_TRANSLATABLE_STRING_LIST then
+						print(("S(%q)"):format(core_desc .. " Stair"))
+						print(("S(%q)"):format("Inner " .. core_desc .. " Stair"))
+						print(("S(%q)"):format("Outer " .. core_desc .. " Stair"))
+					end
 				end
 				if custom_tiles.slab then
 					stairs.register_slab(item_name, node,
-						groups, custom_tiles.slab, S("@1 Slab", def.description),
+						groups, custom_tiles.slab, desc_slab,
 						def.sounds)
+
+					if GENERATE_TRANSLATABLE_STRING_LIST then
+						print(("S(%q)"):format(core_desc .. " Slab"))
+					end
 				end
 			else
 				stairs.register_stair_and_slab(item_name, node,
 					groups, tiles,
-					S("@1 Stair", def.description),
-					S("@1 Slab", def.description),
+					desc_stair,
+					desc_slab,
 					def.sounds, nil,
-					S("Inner @1 Stair", def.description),
-					S("Outer @1 Stair", def.description))
+					desc_stair_inner,
+					desc_stair_outer)
+
+				if GENERATE_TRANSLATABLE_STRING_LIST then
+					print(("S(%q)"):format(core_desc .. " Stair"))
+					print(("S(%q)"):format(core_desc .. " Slab"))
+					print(("S(%q)"):format("Inner " .. core_desc .. " Stair"))
+					print(("S(%q)"):format("Outer " .. core_desc .. " Stair"))
+				end
 			end
 		end
 
@@ -457,7 +543,7 @@ local function register_cut_raw(node, workbench_def)
 		cutgroups.not_in_creative_inventory = 1
 
 		minetest.register_node(":" .. cutnodename, {
-			description = S(workbench_def[4], def.description),
+			description = desc_cut,
 			paramtype = "light",
 			paramtype2 = "facedir",
 			drawtype = "nodebox",
@@ -470,6 +556,10 @@ local function register_cut_raw(node, workbench_def)
 			sunlight_propagates = true,
 			on_place = minetest.rotate_node
 		})
+
+		if GENERATE_TRANSLATABLE_STRING_LIST then
+			print(("S(%q)"):format(core_desc .. " " .. modifier))
+		end
 
 	elseif item_name and mod_name then
 		minetest.register_alias_force(
@@ -484,14 +574,14 @@ local function register_cut_raw(node, workbench_def)
 	return true
 end
 
-function workbench:register_cut(nodename, cutlist)
+function workbench:register_cut(nodename, textdomain)
 	if registered_cuttable_nodes[nodename] then
 		minetest.log("error", "[xdecor] Workbench: Tried to register cut for node "..nodename..", but it was already registered!")
 		return false
 	end
 	local ok = true
 	for _, d in ipairs(workbench.defs) do
-		local ok = register_cut_raw(nodename, d)
+		local ok = register_cut_raw(nodename, d, textdomain)
 		if not ok then
 			ok = false
 		end
@@ -517,31 +607,6 @@ minetest.register_craft({
 		{"group:wood", "group:wood"}
 	}
 })
-
--- Register default cuttable blocks
-do
-	local cuttable_nodes = {}
-
-	-- Nodes allowed to be cut:
-	-- Only the regular, solid blocks without metas or explosivity
-	-- from the xdecor or default mods.
-	for nodename, def in pairs(minetest.registered_nodes) do
-		local nodenamesplit = string.split(nodename, ":")
-		local modname = nodenamesplit[1]
-		if (modname == "xdecor" or modname == "default") and xdecor.stairs_valid_def(def) then
-			cuttable_nodes[#cuttable_nodes + 1] = nodename
-		end
-	end
-
-	for i = 1, #cuttable_nodes do
-		local node = cuttable_nodes[i]
-		workbench:register_cut(node)
-	end
-end
-
--- Special cuts for cushion block and cabinet
-workbench:register_special_cut("xdecor:cushion_block", { slab = "xdecor:cushion" })
-workbench:register_special_cut("xdecor:cabinet", { slab = "xdecor:cabinet_half" })
 
 --[[ API FUNCTIONS ]]
 
@@ -612,11 +677,17 @@ will be registered by using the `stairs` mod if the slab
 node does not exist yet. Refer to the `stairs` mod documentation
 for details.
 
+Parameters:
+* nodename: Name of node to be cut
+* textdomain: Translation textdomain for registered node
+  descriptions (if not provided, node descriptions will
+  be untranslatable)
+
 Returns true if all nodes were registered successfully,
 returns false (and writes to error log) if any error occurred.
 ]]
-xdecor.register_cut = function(nodename)
-	return workbench:register_cut(nodename)
+xdecor.register_cut = function(nodename, textdomain)
+	return workbench:register_cut(nodename, textdomain)
 end
 
 -- Returns true if cut nodes have been registered for the given node
@@ -670,3 +741,21 @@ minetest.register_craft({
 		{"", "group:stick", ""}
 	}
 })
+
+-- Register default cuttable blocks (loaded from a list
+-- of hardcoded node names)
+local cuttable_nodes = dofile(minetest.get_modpath("xdecor").."/src/cuttable_node_list.lua")
+
+for i = 1, #cuttable_nodes do
+	local nodename = cuttable_nodes[i]
+	if xdecor.can_cut(nodename) then
+		workbench:register_cut(nodename, "_xdecor_cut_nodes")
+	else
+		minetest.log("action", "[xdecor] Tried to register cut for default node '"..nodename.."' but it was not allowed")
+	end
+end
+
+-- Special cuts for cushion block and cabinet
+workbench:register_special_cut("xdecor:cushion_block", { slab = "xdecor:cushion" })
+workbench:register_special_cut("xdecor:cabinet", { slab = "xdecor:cabinet_half" })
+

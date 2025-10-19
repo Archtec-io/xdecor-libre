@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Luanti textdomain xdecor\n"
 "Report-Msgid-Bugs-To: Wuzzy@disroot.org\n"
-"POT-Creation-Date: 2025-08-26 16:34+0200\n"
-"PO-Revision-Date: 2025-08-26 22:53+0200\n"
+"POT-Creation-Date: 2025-10-18 11:01+0200\n"
+"PO-Revision-Date: 2025-10-18 10:47+0200\n"
 "Last-Translator: Wuzzy <Wuzzy@disroot.org>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -13,11 +13,33 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.6\n"
 
+#. ~ Block name of a 'traditional' stair-shaped block. (@1 = base block name, e.g. "Stone")
+#: handlers/registration.lua:75 handlers/registration.lua:91
+#: src/workbench.lua:80 src/workbench.lua:470
+msgid "@1 Stair"
+msgstr "@1treppe"
+
+#: handlers/registration.lua:78 handlers/registration.lua:94
+#: src/workbench.lua:471
+msgid "Inner @1 Stair"
+msgstr "Innere @1treppe"
+
+#: handlers/registration.lua:80 handlers/registration.lua:95
+#: src/workbench.lua:472
+msgid "Outer @1 Stair"
+msgstr "Äußere @1treppe"
+
+#. ~ Block name of a block with 1/2 the height of a full block. (@1 = base block name, e.g. "Stone")
+#: handlers/registration.lua:84 handlers/registration.lua:92
+#: src/workbench.lua:63 src/workbench.lua:473
+msgid "@1 Slab"
+msgstr "@1platte"
+
 #: src/chessbot_random.lua:51
 msgid "Random Computer"
 msgstr "Zufallscomputer"
 
-#: src/chessbot_weak.lua:119
+#: src/chessbot_weak.lua:125
 msgid "Weak Computer"
 msgstr "Schwacher Computer"
 
@@ -30,62 +52,62 @@ msgid "Chess Debug"
 msgstr "Schachdebug"
 
 #. ~ Chess: Game mode selection prompt
-#: src/chess.lua:1237 src/chess.lua:1238
+#: src/chess.lua:1284 src/chess.lua:1285
 msgid "Select a game mode"
 msgstr "Wählen Sie einen Spielmodus"
 
 #. ~ Chess: Game mode selection prompt
-#: src/chess.lua:1240
+#: src/chess.lua:1287
 msgid "Select a mode:"
 msgstr "Modus wählen:"
 
 #. ~ Chess game mode (player vs bot)
-#: src/chess.lua:1242
+#: src/chess.lua:1289
 msgid "Singleplayer"
 msgstr "Einzelspieler"
 
 #. ~ Chess game mode (player vs player)
-#: src/chess.lua:1244
+#: src/chess.lua:1291
 msgid "Multiplayer"
 msgstr "Mehrspieler"
 
 #. ~ Chess game mode
-#: src/chess.lua:1247
+#: src/chess.lua:1294
 msgid "Bot vs Bot"
 msgstr "Bot vs. Bot"
 
 #. ~ Chess: player is in check
-#: src/chess.lua:1767
+#: src/chess.lua:1814
 msgid "check"
 msgstr "Schach"
 
 #. ~ Chess: player has been checkmated
-#: src/chess.lua:1769
+#: src/chess.lua:1816
 msgid "checkmate"
 msgstr "Schachmatt"
 
 #. ~ Chess: player has resigned
-#: src/chess.lua:1771
+#: src/chess.lua:1818
 msgid "resigned"
 msgstr "aufgegeben"
 
 #. ~ Chess: player has won
-#: src/chess.lua:1773
+#: src/chess.lua:1820
 msgid "winner"
 msgstr "Sieger"
 
 #. ~ Chess: player has lost
-#: src/chess.lua:1775
+#: src/chess.lua:1822
 msgid "loser"
 msgstr "Verlierer"
 
 #. ~ Chess: player has a draw
-#: src/chess.lua:1777
+#: src/chess.lua:1824
 msgid "draw"
 msgstr "Remis"
 
 #. ~ Chess: Shown when black player can promote a pawn. Space for text is limited.
-#: src/chess.lua:1822
+#: src/chess.lua:1869
 msgid ""
 "PROMOTION\n"
 "FOR BLACK!"
@@ -94,12 +116,12 @@ msgstr ""
 "FÜR SCHWARZ!"
 
 #. ~ Chess: Prompt for player who must select to which piece to promote their pawn. Space for text is limited.
-#: src/chess.lua:1828 src/chess.lua:1844
+#: src/chess.lua:1875 src/chess.lua:1891
 msgid "Promote pawn to:"
 msgstr "Bauer umwandeln zu:"
 
 #. ~ Chess: Shown when white player can promote a pawn. Space for text is limited.
-#: src/chess.lua:1839
+#: src/chess.lua:1886
 msgid ""
 "PROMOTION\n"
 "FOR WHITE!"
@@ -108,7 +130,7 @@ msgstr ""
 "FÜR WEISS!"
 
 #. ~ Chess: Shown when white player wants to use the 50-move rule or threefold-repetition rule to claim a draw. Space for text is limited.
-#: src/chess.lua:1857
+#: src/chess.lua:1904
 msgid ""
 "DRAW CLAIM\n"
 "BY WHITE!"
@@ -117,7 +139,7 @@ msgstr ""
 "VON WEISS!"
 
 #. ~ Chess: Shown when black player wants to use the 50-move rule or threefold-repetition rule to claim a draw. Space for text is limited.
-#: src/chess.lua:1860
+#: src/chess.lua:1907
 msgid ""
 "DRAW CLAIM\n"
 "BY BLACK!"
@@ -126,7 +148,7 @@ msgstr ""
 "VON SCHWARZ!"
 
 #. ~ Chess message
-#: src/chess.lua:1867
+#: src/chess.lua:1914
 msgid ""
 "The player has invoked the 50-move rule for the next move. The next move "
 "might draw the game."
@@ -135,7 +157,7 @@ msgstr ""
 "nächste Zug könnte die Partie remis enden lassen."
 
 #. ~ Chess message
-#: src/chess.lua:1873
+#: src/chess.lua:1920
 msgid ""
 "The player has invoked the threefold-repetition rule for the next move. The "
 "next move might draw the game."
@@ -144,72 +166,72 @@ msgstr ""
 "anwenden. Der nächste Zug könnte die Partie remis enden lassen."
 
 #. ~ Chess button
-#: src/chess.lua:1880
+#: src/chess.lua:1927
 msgid "New game"
 msgstr "Neues Spiel"
 
 #. ~ Resign (give up) in Chess
-#: src/chess.lua:1887
+#: src/chess.lua:1934
 msgid "Resign"
 msgstr "Aufgeben"
 
 #. ~ Chess: Prompt to select a player color
-#: src/chess.lua:1893
+#: src/chess.lua:1940
 msgid "Select a color:"
 msgstr "Farbe wählen:"
 
 #. ~ White Chess player
-#: src/chess.lua:1897
+#: src/chess.lua:1944
 msgid "White"
 msgstr "Weiß"
 
 #. ~ Black Chess player
-#: src/chess.lua:1899
+#: src/chess.lua:1946
 msgid "Black"
 msgstr "Schwarz"
 
 #. ~ Chess message
-#: src/chess.lua:1911
+#: src/chess.lua:1958
 msgid "Invoke the 50-move rule for your next move"
 msgstr "50-Züge-Regel für den nächsten Zug anwenden"
 
 #. ~ Chess message
-#: src/chess.lua:1918
+#: src/chess.lua:1965
 msgid "Invoke the 50-move rule and draw the game"
 msgstr "50-Züge-Regel anwenden und die Partie remis enden lassen"
 
 #. ~ Chess message
-#: src/chess.lua:1931
+#: src/chess.lua:1978
 msgid "Invoke the threefold repetition rule and draw the game"
 msgstr "Stellungswiederholungsregel anwenden und die Partie remis enden lassen"
 
 #. ~ Chess message
-#: src/chess.lua:1938
+#: src/chess.lua:1985
 msgid "Invoke the threefold repetition rule for your next move"
 msgstr "Stellungswiederholungsregel für den nächsten Zug anwenden"
 
 #. ~ Chess message. @1 = opponent name
-#: src/chess.lua:2069 src/chess.lua:2094
+#: src/chess.lua:2116 src/chess.lua:2141
 msgid "You have checkmated @1. You win!"
 msgstr "Sie haben @1 schachmatt gesetzt. Sieg!"
 
 #. ~ Chess message. @1 = opponent name
-#: src/chess.lua:2071 src/chess.lua:2096
+#: src/chess.lua:2118 src/chess.lua:2143
 msgid "You were checkmated by @1. You lose!"
 msgstr "Sie wurden von @1 schachmatt gesetzt. Niederlage!"
 
 #. ~ Chess message
-#: src/chess.lua:2081 src/chess.lua:2106
+#: src/chess.lua:2128 src/chess.lua:2153
 msgid "The game ended up in a stalemate! It's a draw!"
 msgstr "Das Partie endete in einem Patt. Das ist ein Remis!"
 
 #. ~ Chess message
-#: src/chess.lua:2119
+#: src/chess.lua:2166
 msgid "The game ended up in a dead position! It's a draw!"
 msgstr "Das Partie endete in einer toten Stellung. Das ist ein Remis!"
 
 #. ~ Chess message
-#: src/chess.lua:2133
+#: src/chess.lua:2180
 msgid ""
 "No piece was captured and no pawn was moved for 75 consecutive moves of each "
 "player. It's a draw!"
@@ -218,26 +240,26 @@ msgstr ""
 "kein Bauer gezogen. Es ist ein Remis!"
 
 #. ~ Chess message
-#: src/chess.lua:2154 src/chess.lua:3132
+#: src/chess.lua:2203 src/chess.lua:3187
 msgid "You have drawn the game by invoking the 50-move rule."
 msgstr ""
 "Sie haben die Partie remis enden lassen, indem Sie die 50-Züge-Regel "
 "angewandt haben."
 
 #. ~ Chess message. @1 = player name
-#: src/chess.lua:2157 src/chess.lua:3135
+#: src/chess.lua:2206 src/chess.lua:3190
 msgid "@1 has drawn the game by invoking the 50-move rule."
 msgstr "@1 hat die Partie mittels der 50-Züge Regel remis enden lassen."
 
 #. ~ Chess message shown when player has invoked a rule to claim a draw and had to make a game-drawing move but instead made a different move
-#: src/chess.lua:2170 src/chess.lua:2279
+#: src/chess.lua:2221 src/chess.lua:2334
 msgid "You have failed to make a game-drawing move. The game continues."
 msgstr ""
 "Sie haben keinen Zug gemacht, der die Partie remis enden lässt. Die Partie "
 "geht weiter."
 
 #. ~ Chess message shown when player (name = @1) has invoked the 50-move rule to claim a draw and had to make a game-drawing move but instead made a different move
-#: src/chess.lua:2173
+#: src/chess.lua:2224
 msgid ""
 "@1 made a draw claim using the 50-move rule but it was false. The game "
 "continues."
@@ -246,25 +268,25 @@ msgstr ""
 "Partie geht weiter."
 
 #. ~ Chess message when a fivefold repetition has happened
-#: src/chess.lua:2243
+#: src/chess.lua:2294
 msgid "The exact same position has occured 5 times. It's a draw!"
 msgstr "Die exakt gleiche Stellung ist 5 mal aufgetreten. Das ist ein Remis!"
 
 #. ~ Chess message
-#: src/chess.lua:2264 src/chess.lua:3180
+#: src/chess.lua:2317 src/chess.lua:3235
 msgid "You have drawn the game by invoking the threefold repetition rule."
 msgstr ""
 "Sie haben die Partie remis enden lassen, indem Sie die "
 "Stellungswiederholungsregel angewandt haben."
 
 #. ~ Chess message. @1 = player name
-#: src/chess.lua:2267 src/chess.lua:3183
+#: src/chess.lua:2320 src/chess.lua:3238
 msgid "@1 has drawn the game by invoking the threefold repetition rule."
 msgstr ""
 "@1 hat die Partie remis mittels der Stellungswiederholungsregel enden lassen."
 
 #. ~ Chess message shown when player (name = @1) has invoked the threefold repetition rule to claim a draw and had to make a game-drawing move but instead made a different move
-#: src/chess.lua:2282
+#: src/chess.lua:2337
 msgid ""
 "@1 made a draw claim using the threefold repetition rule but it was false. "
 "The game continues."
@@ -272,41 +294,41 @@ msgstr ""
 "@1 hat ein Remis mittels der Stellungswiederholungsregel beansprucht aber "
 "lag falsch. Die Partie geht weiter."
 
-#: src/chess.lua:2295 src/chess.lua:3424
+#: src/chess.lua:2350 src/chess.lua:3479
 msgid "Chess Board"
 msgstr "Schachbrett"
 
 #. ~ Chess message when player tries to move with someone else's pieces
-#: src/chess.lua:2389
+#: src/chess.lua:2444
 msgid "Someone else plays white pieces!"
 msgstr "Jemand anderes spielt Weiß!"
 
 #. ~ Chess message
-#: src/chess.lua:2400 src/chess.lua:2420
+#: src/chess.lua:2455 src/chess.lua:2475
 msgid "It's not your turn!"
 msgstr "Sie sind nicht am Zug!"
 
 #. ~ Chess message when player tries to move with someone else's pieces
-#: src/chess.lua:2410
+#: src/chess.lua:2465
 msgid "Someone else plays black pieces!"
 msgstr "Jemand anderes spielt Schwarz!"
 
 #. ~ Chess message
-#: src/chess.lua:2427
+#: src/chess.lua:2482
 msgid "Black cannot move first!"
 msgstr "Schwarz darf nicht zuerst ziehen!"
 
 #. ~ number of seconds
-#: src/chess.lua:2964
+#: src/chess.lua:3019
 msgid "@1 s"
 msgstr "@1 s"
 
 #. ~ number of minutes and seconds
-#: src/chess.lua:2968
+#: src/chess.lua:3023
 msgid "@1 min @2 s"
 msgstr "@1 min @2 s"
 
-#: src/chess.lua:3041
+#: src/chess.lua:3096
 msgid ""
 "You can't reset the chessboard, a game has been started. Try again in @1."
 msgstr ""
@@ -314,46 +336,46 @@ msgstr ""
 "gestartet. Versuchen Sie es erneut in @1."
 
 #. ~ Chess message when player tried to resign too early
-#: src/chess.lua:3053
+#: src/chess.lua:3108
 msgid "Resigning is not possible yet."
 msgstr "Aufgeben ist noch nicht möglich."
 
 #. ~ Chess message when player resigned (gave up)
-#: src/chess.lua:3084
+#: src/chess.lua:3139
 msgid "You have resigned."
 msgstr "Sie haben aufgegeben."
 
 #. ~ Chess message when player resigned (gave up). @1 = opponent name
-#: src/chess.lua:3087
+#: src/chess.lua:3142
 msgid "@1 has resigned. You win!"
 msgstr "@1 hat aufgegeben. Sie haben gewonnen!"
 
 #. ~ Chess message
-#: src/chess.lua:3093
+#: src/chess.lua:3148
 msgid "You can't resign, you're not playing in this game."
 msgstr "Sie können nicht aufgeben, Sie spielen nicht in dieser Partie."
 
 #. ~ Chess message
-#: src/chess.lua:3121 src/chess.lua:3168
+#: src/chess.lua:3176 src/chess.lua:3223
 msgid "You can't claim a draw, it's not your turn!"
 msgstr "Sie können kein Remis beanspruchen, Sie sind nicht am Zug!"
 
-#: src/chess.lua:3205
+#: src/chess.lua:3260
 msgid "You're only a spectator in this game of Chess."
 msgstr "Sie sind nur Zuschauer bei dieser Schachpartie."
 
 #. ~ Chess message when player tried to promote a pawn when it's not legal
-#: src/chess.lua:3212
+#: src/chess.lua:3267
 msgid "This isn't the time for promotion."
 msgstr "Jetzt ist nicht die Zeit für eine Umwandlung."
 
 #. ~ Chess message when player tried to promote a pawn when it's not their turn
-#: src/chess.lua:3216 src/chess.lua:3223
+#: src/chess.lua:3271 src/chess.lua:3278
 msgid "It's not your turn! This promotion is meant for the other player."
 msgstr "Sie sind nicht am Zug! Diese Umwandlung ist für den anderen Spieler."
 
 #. ~ Shown when player tried to dig a chessboard but is not allowed to. @1 = time
-#: src/chess.lua:3271
+#: src/chess.lua:3326
 msgid ""
 "You can't dig the chessboard, a game has been started. Reset it first or dig "
 "it again in @1."
@@ -362,7 +384,7 @@ msgstr ""
 "Setzen Sie es zuerst zurück oder bauen Sie es in @1 erneut ab."
 
 #. ~ Shown when player tried to dig a chessboard but is not allowed to. @1 = time
-#: src/chess.lua:3277
+#: src/chess.lua:3332
 msgid ""
 "You can't dig the chessboard, a game has been started. Try it again in @1."
 msgstr ""
@@ -370,71 +392,71 @@ msgstr ""
 "Versuchen Sie es erneut in @1."
 
 #. ~ Chess board tooltip
-#: src/chess.lua:3442
+#: src/chess.lua:3497
 msgid "Play a game of Chess against another player or the computer"
 msgstr "Für Schachspiele gegen einen anderen Spieler oder den Computer"
 
 #. ~ chess piece
-#: src/chess.lua:3551
+#: src/chess.lua:3606
 msgid "White Pawn"
 msgstr "Weißer Bauer"
 
 #. ~ chess piece
-#: src/chess.lua:3553
+#: src/chess.lua:3608
 msgid "Black Pawn"
 msgstr "Schwarzer Bauer"
 
 #. ~ chess piece
-#: src/chess.lua:3556
+#: src/chess.lua:3611
 msgid "White Rook"
 msgstr "Weißer Turm"
 
 #. ~ chess piece
-#: src/chess.lua:3558
+#: src/chess.lua:3613
 msgid "Black Rook"
 msgstr "Schwarzer Turm"
 
 #. ~ chess piece
-#: src/chess.lua:3561
+#: src/chess.lua:3616
 msgid "White Knight"
 msgstr "Weißer Springer"
 
 #. ~ chess piece
-#: src/chess.lua:3563
+#: src/chess.lua:3618
 msgid "Black Knight"
 msgstr "Schwarzer Springer"
 
 #. ~ chess piece
-#: src/chess.lua:3566
+#: src/chess.lua:3621
 msgid "White Bishop"
 msgstr "Weißer Läufer"
 
 #. ~ chess piece
-#: src/chess.lua:3568
+#: src/chess.lua:3623
 msgid "Black Bishop"
 msgstr "Schwarzer Läufer"
 
 #. ~ chess piece
-#: src/chess.lua:3571
+#: src/chess.lua:3626
 msgid "White Queen"
 msgstr "Weiße Dame"
 
 #. ~ chess piece
-#: src/chess.lua:3573
+#: src/chess.lua:3628
 msgid "Black Queen"
 msgstr "Schwarze Dame"
 
 #. ~ chess piece
-#: src/chess.lua:3576
+#: src/chess.lua:3631
 msgid "White King"
 msgstr "Weißer König"
 
 #. ~ chess piece
-#: src/chess.lua:3578
+#: src/chess.lua:3633
 msgid "Black King"
 msgstr "Schwarzer König"
 
-#: src/chess.lua:3667
+#: src/chess.lua:3899
 msgid "Computer"
 msgstr "Computer"
 
@@ -568,7 +590,7 @@ msgid "Enchant your tools with mese crystals"
 msgstr "Werkzeuge mit Mesekristallen verzaubern"
 
 #. ~ Enchanted tool description, e.g. "Enchanted Diamond Sword". @1 is the original tool name, @2 is the enchantment text, e.g. "Durability (+20%)"
-#: src/enchanting.lua:379 src/enchanting.lua:507
+#: src/enchanting.lua:388 src/enchanting.lua:516
 msgid ""
 "Enchanted @1\n"
 "@2"
@@ -577,7 +599,7 @@ msgstr ""
 "@2"
 
 #. ~ Enchanted tool description, e.g. "Enchanted Diamond Sword"
-#: src/enchanting.lua:381 src/enchanting.lua:508
+#: src/enchanting.lua:390 src/enchanting.lua:517
 msgid "Enchanted @1"
 msgstr "@1 (verzaubert)"
 
@@ -938,112 +960,138 @@ msgstr "Lautsprecher"
 msgid "Rope"
 msgstr "Seil"
 
-#. ~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:19
+#. ~ Part of a block name for a tiny slab with 1/16 height and 1/4 area. E.g. "Stone Nanoslab"
+#: src/workbench.lua:31
+msgid "Nanoslab"
+msgstr "Nanoplatte"
+
+#. ~ Block name for a tiny slab with 1/16 height and 1/4 area. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:33
 msgid "@1 Nanoslab"
 msgstr "@1nanoplatte"
 
-#. ~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:21
+#. ~ Part of a block name for a tiny slab with 1/16 height and 1/2 area. E.g. "Stone Micropanel"
+#: src/workbench.lua:36
+msgid "Micropanel"
+msgstr "Mikropaneel"
+
+#. ~ Block name for a tiny slab with 1/16 height and 1/2 area. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:38
 msgid "@1 Micropanel"
 msgstr "@1mikropaneel"
 
-#. ~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:23
+#. ~ Part of a block name for a tiny slab with 1/16 height and full area. E.g. "Stone Microslab"
+#: src/workbench.lua:41
+msgid "Microslab"
+msgstr "Mikroplatte"
+
+#. ~ Block name for a tiny slab with 1/16 height and full area. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:43
 msgid "@1 Microslab"
 msgstr "@1mikroplatte"
 
-#. ~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:26
+#. ~ Part of a block name of a thin stair, a stair-like block where the "steps" are thinner. E.g. "Stone Thin Stair"
+#: src/workbench.lua:46
+msgid "Thin Stair"
+msgstr "Flachtreppe"
+
+#. ~ Block name of a thin stair, a stair-like block where the "steps" are thinner. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:48
 msgid "@1 Thin Stair"
 msgstr "@1flachtreppe"
 
-#. ~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:28
+#. ~ Part of a block name of a tiny cube-shaped block with 1/2 the side length of a full block. E.g. "Stone Cube"
+#: src/workbench.lua:51
+msgid "Cube"
+msgstr "Würfel"
+
+#. ~ Block name of a tiny cube-shaped block with 1/2 the side length of a full block. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:53
 msgid "@1 Cube"
 msgstr "@1würfel"
 
-#. ~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:30
+#. ~ Part of a block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. E.g. "Stone Panel"
+#: src/workbench.lua:56
+msgid "Panel"
+msgstr "Paneel"
+
+#. ~ Block name of a block with 1/2 the height and 1/2 the length of a full block. It's like a slab that was cut in half. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:58
 msgid "@1 Panel"
 msgstr "@1paneel"
 
-#. ~ Block name of a block with 1/2 the height of a full block. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:32 src/workbench.lua:409 src/workbench.lua:416
-#: handlers/registration.lua:84 handlers/registration.lua:92
-msgid "@1 Slab"
-msgstr "@1platte"
+#. ~ Part of block name of a block with 1/2 the height of a full block. E.g. "Stone Slab"
+#: src/workbench.lua:61
+msgid "Slab"
+msgstr "Platte"
 
-#. ~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:35
+#. ~ Block name of a stair-like block variant with a lower piece cut away. E.g. "Stone Double Panel"
+#: src/workbench.lua:66
+msgid "Double Panel"
+msgstr "Doppelpaneel"
+
+#. ~ Block name of a stair-like block variant with a lower piece cut away. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:68
 msgid "@1 Double Panel"
 msgstr "@1doppelpaneel"
 
-#. ~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:38
+#. ~ Part of a block name for a stair where 1/2 has been cut away sideways. Can be obtained by work bench. E.g. "Stone Half-Stair"
+#: src/workbench.lua:72
+msgid "Half-Stair"
+msgstr "Halbtreppe"
+
+#. ~ Block name of a stair where 1/2 has been cut away sideways. Can be obtained by work bench. (@1 = base block name, e.g. "Stone")
+#: src/workbench.lua:74
 msgid "@1 Half-Stair"
 msgstr "@1halbtreppe"
 
-#. ~ Block name of a 'traditional' stair-shaped block. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:41 src/workbench.lua:398 src/workbench.lua:415
-#: handlers/registration.lua:75 handlers/registration.lua:91
-msgid "@1 Stair"
-msgstr "@1treppe"
+#. ~ Block name of a 'traditional' stair-shaped block. E.g. "Stone Stair"
+#: src/workbench.lua:78
+msgid "Stair"
+msgstr "Treppe"
 
 #. ~ Label shown in work bench menu where you can cut a block to create smaller versions of it
-#: src/workbench.lua:128
+#: src/workbench.lua:167
 msgid "Cut"
 msgstr "Zuschnitt"
 
 #. ~ Label shown in work bench menu where you can repair an item
-#: src/workbench.lua:130
+#: src/workbench.lua:169
 msgid "Repair"
 msgstr "Reparatur"
 
 #. ~ Button in work bench menu for the crafting grid
-#: src/workbench.lua:134
+#: src/workbench.lua:173
 msgid "Crafting"
 msgstr "Fertigung"
 
 #. ~ Button in work bench menu for its inventory
-#: src/workbench.lua:136
+#: src/workbench.lua:175
 msgid "Storage"
 msgstr "Lager"
 
 #. ~ Button to return to main page in work bench menu
-#: src/workbench.lua:157 src/workbench.lua:165
+#: src/workbench.lua:196 src/workbench.lua:204
 msgid "Back"
 msgstr "Zurück"
 
-#: src/workbench.lua:197 src/workbench.lua:324
+#: src/workbench.lua:236 src/workbench.lua:375
 msgid "Work Bench"
 msgstr "Werkbank"
 
 #. ~ Work bench tooltip
-#: src/workbench.lua:326
+#: src/workbench.lua:377
 msgid ""
 "For cutting blocks, repairing tools with a hammer, crafting and storing items"
 msgstr ""
 "Für Blockzuschnitt, Werkzeugreparatur mit Hammer, Fertigung und Lagerung"
 
-#. ~ Block name of a stair-shaped block, inner corner. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:402 src/workbench.lua:418 handlers/registration.lua:78
-#: handlers/registration.lua:94
-msgid "Inner @1 Stair"
-msgstr "Innere @1treppe"
-
-#. ~ Block name of a stair-shaped block, outer corner. @1 = original block name (e.g. "Stone")
-#: src/workbench.lua:405 src/workbench.lua:419 handlers/registration.lua:80
-#: handlers/registration.lua:95
-msgid "Outer @1 Stair"
-msgstr "Äußere @1treppe"
-
 #. ~ Hammer tooltip
-#: src/workbench.lua:564
+#: src/workbench.lua:668
 msgid "Repairs tools at the work bench"
 msgstr "Repariert Werkzeuge an der Werkbank"
 
-#: src/workbench.lua:646
+#: src/workbench.lua:756
 msgid "Hammer"
 msgstr "Hammer"
 

@@ -8,6 +8,18 @@ Luanti 5.10.0); they can be edited with programs like Poedit.
 Many strings are commented, so read the comments to understand the context
 of each string.
 
+There are two files to translate:
+
+* `xdecor.pot`: Main translation file
+* `_xdecor_cut_nodes.pot`: Descriptions of nodes that were cut by the workbench
+
+To create a complete translation, you need to have:
+
+* `xdecor.<CODE>.po`
+* `_xdecor_cut_nodes.<CODE>.po`
+
+where `<CODE>` is the language code like `de` for German.
+
 ## Special symbols
 
 The strings may contain some symbols with special meaning:
