@@ -143,9 +143,12 @@ function workbench:get_output(inv, input, name)
 		local was_cut = false
 		if extended or nbox[3] == nil then
 			local item = name .. "_" .. cuttype
-
-			item = nbox[3] and item or "stairs:" .. cuttype .. "_" .. name:match(":(.*)")
-			if minetest.registered_items[item] then
+			local name_after_colon = name:match(":(.*)")
+			item = (nbox[3] and item)
+			if not item and name_after_colon then
+				item = "stairs:" .. cuttype .. "_" .. name_after_colon
+			end
+			if item and minetest.registered_items[item] then
 				output[i] = item .. " " .. count
 				was_cut = true
 			end
