@@ -11,7 +11,7 @@ bugfixes. There are no major new features.
 
 ## Version
 
-This is version `libre15`.
+This is version `libre16`.
 
 ## New blocks
 
